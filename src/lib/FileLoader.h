@@ -41,6 +41,7 @@ class FileLoader : public QThread
         void saveFile(const QString& filename );
         void savePlacemarks(QDataStream &out, const GeoDataContainer *container);
         void loadPntFile( const QString &fileName );
+	void loadOsmFile( const QString &fileName );
 
         void setupStyle( GeoDataDocument *doc, GeoDataContainer *container );
         void createFilterProperties( GeoDataContainer *container );

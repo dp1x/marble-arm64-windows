@@ -118,6 +118,9 @@ void FileLoader::run()
             if( suffix.compare( "pnt", Qt::CaseInsensitive ) == 0 ) {
                 loadPntFile( m_filepath );
             }
+            else if( suffix.compare( "osm", Qt::CaseInsensitive ) == 0 ) {
+                loadOsmFile( m_filepath );
+            }
             else {
                 mDebug() << "No recent Default Placemark Cache File available!";
                 if ( QFile::exists( defaultSourceName ) ) {
@@ -333,6 +336,37 @@ void FileLoader::savePlacemarks(QDataStream &out, const GeoDataContainer *contai
     for (; cont != endcont; ++cont ) {
             savePlacemarks(out, *cont);
     }
+}
+
+void FileLoader::loadOsmFile( const QString& fileName )
+{
+   GeoDataParser parser( GeoData_OSM );
+
+    QFile file( fileName );
+    if ( !file.exists() ) {
+        qWarning( "File does not exist!" );
+        return;
+    }
+
+    // Open file in right mode
+    file.open( QIODevice::ReadOnly );
+
+    if ( !parser.read( &file ) ) {
+        qWarning( "Could not parse file!" );
+        return;
+    }
+    GeoDocument* document = parser.releaseDocument();
+    Q_ASSERT( document );
+
+    m_document = static_cast<GeoDataDocument*>( document );
+    m_document->setFileName( m_filepath );
+    //setupStyle( m_document, m_document );
+
+    file.close();
+
+    mDebug() << "Osm file loaded: " << m_filepath;
+
+    emit newGeoDataDocumentAdded( m_document );
 }
 
 void FileLoader::loadPntFile( const QString &fileName )
