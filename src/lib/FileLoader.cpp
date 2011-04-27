@@ -27,6 +27,9 @@
 #include "MarbleDirs.h"
 #include "MarbleDebug.h"
 
+//FIXME: Clean up nodes in other place?
+#include "osm/OsmNodeFactory.h"
+
 namespace Marble
 {
 
@@ -365,6 +368,8 @@ void FileLoader::loadOsmFile( const QString& fileName )
     m_document = static_cast<GeoDataDocument*>( document );
     m_document->setFileName( m_filepath );
     //setupStyle( m_document, m_document );
+    
+    osm::OsmNodeFactory::cleanUp();
 
     file.close();
 
