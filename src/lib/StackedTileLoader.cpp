@@ -219,10 +219,8 @@ StackedTile* StackedTileLoader::loadTile( TileId const & stackedTileId )
                              stackedTileId.x(), stackedTileId.y() );
         mDebug() << "StackedTileLoader::loadTile: tile" << textureLayer->sourceDir()
                  << tileId.toString() << textureLayer->tileSize();
-        QSharedPointer<TextureTile> const tile = d->m_tileLoader->loadTile( stackedTileId, tileId,
-                                                                            DownloadBrowse );
+        QSharedPointer<TextureTile> const tile = d->m_tileLoader->loadTile( tileId, DownloadBrowse );
         if ( tile ) {
-            tile->setBlending( textureLayer->blending() );
             tiles.append( tile );
         }
     }
@@ -261,7 +259,7 @@ void StackedTileLoader::reloadVisibleTiles()
             // it's debatable here, whether DownloadBulk or DownloadBrowse should be used
             // but since "reload" or "refresh" seems to be a common action of a browser and it
             // allows for more connections (in our model), use "DownloadBrowse"
-            d->m_tileLoader->reloadTile( tile, DownloadBrowse );
+            d->m_tileLoader->reloadTile( tile->id(), DownloadBrowse );
         }
         mergeDecorations( displayedTile );
     }
@@ -343,22 +341,26 @@ void StackedTileLoader::setVolatileCacheLimit( quint64 kiloBytes )
     d->m_tileCache.setMaxCost( kiloBytes * 1024 );
 }
 
-void StackedTileLoader::updateTile( TileId const & stackedTileId )
+void StackedTileLoader::updateTile( TileId const & tileId )
 {
     d->detectMaxTileLevel();
 
+    const TileId stackedTileId( 0, tileId.zoomLevel(), tileId.x(), tileId.y() );
+
     StackedTile * const displayedTile = d->m_tilesOnDisplay.value( stackedTileId, 0 );
     if ( displayedTile ) {
+        QVector<QSharedPointer<TextureTile> > *tiles = displayedTile->tiles();
+        for ( int i = 0; i < tiles->count(); ++ i) {
+            if ( (*tiles)[i]->id() == tileId ) {
+                (*tiles)[i] = d->m_tileLoader->loadTile( tileId, DownloadBrowse );
+            }
+        }
         mergeDecorations( displayedTile );
         emit tileUpdateAvailable( stackedTileId );
+        return;
     }
-    else {
-        StackedTile * const cachedTile = d->m_tileCache.object( stackedTileId );
-        if ( cachedTile ) {
-            mergeDecorations( cachedTile );
-            emit tileUpdateAvailable( stackedTileId );
-        }
-    }
+
+    d->m_tileCache.remove( stackedTileId );
 }
 
 void StackedTileLoader::update()

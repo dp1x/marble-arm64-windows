@@ -49,26 +49,25 @@ TileLoader::TileLoader( HttpDownloadManager * const downloadManager, MapThemeMan
 //     - if not expired: create TextureTile, set state to "uptodate", return it => done
 //     - if expired: create TextureTile, state is set to Expired by default, trigger dl,
 
-QSharedPointer<TextureTile> TileLoader::loadTile( TileId const & stackedTileId,
-                                                  TileId const & tileId,
-                                                  DownloadUsage const usage )
+QSharedPointer<TextureTile> TileLoader::loadTile( TileId const & tileId, DownloadUsage const usage )
 {
+    GeoSceneTexture const * const textureLayer = findTextureLayer( tileId );
     QString const fileName = tileFileName( tileId );
     QImage const image( fileName );
     if ( !image.isNull() ) {
         // file is there, so create and return a tile object in any case,
         // but check if an update should be triggered
-        GeoSceneTexture const * const textureLayer = findTextureLayer( tileId );
-        QSharedPointer<TextureTile> const tile( new TextureTile( tileId, new QImage( image ) ));
-        tile->setStackedTileId( stackedTileId );
-        tile->setLastModified( QFileInfo( fileName ).lastModified() );
-        tile->setExpireSecs( textureLayer->expire() );
+        QSharedPointer<TextureTile> const tile( new TextureTile( tileId, new QImage( image ), textureLayer->blending() ));
 
-        if ( !tile->isExpired() ) {
+        const QDateTime lastModified = QFileInfo( fileName ).lastModified();
+        const int expireSecs = textureLayer->expire();
+        const bool isExpired = lastModified.secsTo( QDateTime::currentDateTime() ) >= expireSecs;
+
+        if ( !isExpired ) {
             mDebug() << "TileLoader::loadTile" << tileId.toString() << "StateUptodate";
         } else {
             mDebug() << "TileLoader::loadTile" << tileId.toString() << "StateExpired";
-            m_waitingForUpdate.insert( tileId, tile );
+            m_waitingForUpdate.insert( tileId );
             triggerDownload( tileId, usage );
         }
         return tile;
@@ -79,52 +78,11 @@ QSharedPointer<TextureTile> TileLoader::loadTile( TileId const & stackedTileId,
     QImage * replacementTile = scaledLowerLevelTile( tileId );
     Q_ASSERT( replacementTile && !replacementTile->isNull() );
 
-    QSharedPointer<TextureTile> const tile( new TextureTile( tileId, replacementTile ));
-    tile->setStackedTileId( stackedTileId );
+    QSharedPointer<TextureTile> const tile( new TextureTile( tileId, replacementTile, textureLayer->blending() ));
 
-    m_waitingForUpdate.insert( tileId, tile );
+    m_waitingForUpdate.insert( tileId );
     triggerDownload( tileId, usage );
 
-    return tile;
-}
-
-// This method loads a tile from the filesystem and additionally triggers a
-// download of that tile (without checking expiration). It is called by upper
-// layer (StackedTileLoader) when the tile that should be reloaded is not
-// currently loaded in memory.
-// It is (theoretically) used for map refresh/reload (F5 key) and will be used
-// for the (hopefully) coming download region feature.
-//
-// post condition
-//     - tile object is being returned, with download triggered,
-//       pointer is kept in m_waitingForUpdate until tile is downloaded
-QSharedPointer<TextureTile> TileLoader::reloadTile( TileId const & stackedTileId,
-                                                    TileId const & tileId,
-                                                    DownloadUsage const usage )
-{
-    QSharedPointer<TextureTile> tile =
-        m_waitingForUpdate.value( tileId, QSharedPointer<TextureTile>() );
-    if ( tile )
-        // tile is being downloaded already and waiting for update,
-        // no need to reload 2 times => just return the tile
-        return tile;
-
-    QString const fileName = tileFileName( tileId );
-    QImage const image( fileName );
-    if ( !image.isNull() ) {
-        tile = QSharedPointer<TextureTile>( new TextureTile( tileId, new QImage( image ) ));
-        tile->setLastModified( QFileInfo( fileName ).lastModified() );
-    }
-    else {
-        QImage * const replacementTile = scaledLowerLevelTile( tileId );
-        tile = QSharedPointer<TextureTile>( new TextureTile( tileId, replacementTile ));
-    }
-
-    GeoSceneTexture const * const textureLayer = findTextureLayer( tileId );
-    tile->setExpireSecs( textureLayer->expire() );
-    tile->setStackedTileId( stackedTileId );
-    m_waitingForUpdate.insert( tileId, tile );
-    triggerDownload( tileId, usage );
     return tile;
 }
 
@@ -135,12 +93,12 @@ QSharedPointer<TextureTile> TileLoader::reloadTile( TileId const & stackedTileId
 // post condition
 //     - download is triggered, but only if not in progress (indicated by
 //       m_waitingForUpdate)
-void TileLoader::reloadTile( QSharedPointer<TextureTile> const & tile, DownloadUsage const usage )
+void TileLoader::reloadTile( TileId const &tileId, DownloadUsage const usage )
 {
-    if ( m_waitingForUpdate.contains( tile->id() ))
+    if ( m_waitingForUpdate.contains( tileId ) )
         return;
-    m_waitingForUpdate.insert( tile->id(), tile );
-    triggerDownload( tile->id(), usage );
+    m_waitingForUpdate.insert( tileId );
+    triggerDownload( tileId, usage );
 }
 
 void TileLoader::downloadTile( TileId const & tileId )
@@ -150,22 +108,19 @@ void TileLoader::downloadTile( TileId const & tileId )
 
 void TileLoader::updateTile( QByteArray const & data, QString const & tileId )
 {
+    Q_UNUSED( data ); // image data has been written to disk by HttpDownloadManager,
+                      // so it can be loaded using loadTile()
+
     TileId const id = TileId::fromString( tileId );
-    QSharedPointer<TextureTile> const tile =
-        m_waitingForUpdate.value( id, QSharedPointer<TextureTile>() );
+
     // preliminary fix for reload map crash
     // TODO: fix properly
-    if ( !tile )
-        return;
-    Q_ASSERT( tile );
-    m_waitingForUpdate.remove( id );
-    QImage *image( new QImage( QImage::fromData( data ) ) );
-    if ( image->isNull() )
+    if ( !m_waitingForUpdate.contains( id ) )
         return;
 
-    tile->setImage( image );
-    tile->setLastModified( QDateTime::currentDateTime() );
-    emit tileCompleted( tile->stackedTileId() );
+    m_waitingForUpdate.remove( id );
+
+    emit tileCompleted( id );
 }
 
 void TileLoader::updateTextureLayers()

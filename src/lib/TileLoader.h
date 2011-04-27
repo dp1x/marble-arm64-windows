@@ -18,6 +18,7 @@
 
 #include <QtCore/QHash>
 #include <QtCore/QObject>
+#include <QtCore/QSet>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QString>
 
@@ -31,7 +32,7 @@ class QUrl;
 
 namespace Marble
 {
-class HttpDownloadManager; // remove?
+class HttpDownloadManager;
 class GeoSceneTexture;
 class MapThemeManager;
 
@@ -42,11 +43,8 @@ class TileLoader: public QObject
  public:
     TileLoader( HttpDownloadManager * const, MapThemeManager const * mapThemeManager );
 
-    QSharedPointer<TextureTile> loadTile( TileId const & stackedTileId, TileId const & tileId,
-                                          DownloadUsage const );
-    QSharedPointer<TextureTile> reloadTile( TileId const & stackedTileId, TileId const & tileId,
-                                            DownloadUsage const );
-    void reloadTile( QSharedPointer<TextureTile> const & tile, DownloadUsage const );
+    QSharedPointer<TextureTile> loadTile( TileId const & tileId, DownloadUsage const );
+    void reloadTile( TileId const &tileId, DownloadUsage const );
     void downloadTile( TileId const & tileId );
 
  public Q_SLOTS:
@@ -60,7 +58,7 @@ class TileLoader: public QObject
 
     // when this signal is emitted, the TileLoader gives up ownership of
     // the corrsponding tile. Might be better to explicitly transfer...
-    void tileCompleted( TileId const & stackedTileId );
+    void tileCompleted( TileId const & tileId );
 
  private:
     GeoSceneTexture const * findTextureLayer( TileId const & ) const;
@@ -75,7 +73,7 @@ class TileLoader: public QObject
 
     // contains tiles, for which a download has been triggered
     // because the tile was not there at all or is expired.
-    QHash<TileId, QSharedPointer<TextureTile> > m_waitingForUpdate;
+    QSet<TileId> m_waitingForUpdate;
 };
 
 }
