@@ -192,9 +192,6 @@ void MarbleMapPrivate::paintGround( GeoPainter &painter, QRect &dirtyRect )
         m_layerManager.renderLayers( &painter, &m_viewParams, renderPositions );
     }
 
-    // Paint the GeoDataPlacemark layer
-    m_placemarkLayout.paintPlaceFolder( &painter, &m_viewParams );
-
     renderPositions.clear();
     renderPositions << "HOVERS_ABOVE_SURFACE";
     m_layerManager.renderLayers( &painter, &m_viewParams, renderPositions );
@@ -205,6 +202,9 @@ void MarbleMapPrivate::paintGround( GeoPainter &painter, QRect &dirtyRect )
 
     if ( m_viewParams.mapQuality() == PrintQuality )
         m_fogLayer.render( &painter, m_viewParams.viewport() );
+    
+    // Paint the GeoDataPlacemark layer
+    m_placemarkLayout.paintPlaceFolder( &painter, &m_viewParams );
 
     renderPositions.clear();
     renderPositions << "ATMOSPHERE"
