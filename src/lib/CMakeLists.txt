@@ -220,6 +220,8 @@ set(marblewidget_SRCS
     GoToDialog.cpp
 
     MapWizard.cpp
+
+    AltitudeModel.cpp
 )
 
 set (marblewidget_UI
@@ -408,6 +410,7 @@ else (APPLE AND QTONLY)
 
     LatLonEdit.h
     MapWizard.h
+    AltitudeModel.h
     DESTINATION ${CMAKE_INSTALL_PREFIX}/include/marble
 )
 endif (APPLE AND QTONLY)

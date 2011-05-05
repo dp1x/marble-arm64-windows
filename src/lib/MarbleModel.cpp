@@ -66,6 +66,7 @@
 #include "ViewportParams.h"
 #include "routing/RoutingManager.h"
 #include "BookmarkManager.h"
+#include "AltitudeModel.h"
 
 namespace Marble
 {
@@ -149,6 +150,8 @@ class MarbleModelPrivate
     BookmarkManager         *m_bookmarkManager; 
     RoutingManager          *m_routingManager;
     QTextDocument           *m_legend;
+
+    AltitudeModel           *m_altitudeModel;
 };
 
 MarbleModel::MarbleModel( QObject *parent )
@@ -196,6 +199,9 @@ MarbleModel::MarbleModel( QObject *parent )
             d->m_sunLocator, SLOT( update() ) );
      //Initializing Bookmark manager
     d->m_bookmarkManager = new BookmarkManager();
+
+    d->m_altitudeModel = new AltitudeModel( d->m_mapThemeManager, d->m_downloadManager, this );
+
 }
 
 MarbleModel::~MarbleModel()
@@ -539,7 +545,7 @@ void MarbleModel::addDownloadPolicies( GeoSceneDocument *mapTheme )
     }
 }
 
-RoutingManager* MarbleModel::routingManager()
+RoutingManager* MarbleModel::routingManager() const
 {
     return d->m_routingManager;
 }
@@ -597,6 +603,11 @@ void MarbleModel::addGeoDataString( const QString& data, const QString& key )
 void MarbleModel::removeGeoData( const QString& fileName )
 {
     d->m_fileManager->removeFile( fileName );
+}
+
+AltitudeModel* MarbleModel::altitudeModel() const
+{
+    return d->m_altitudeModel;
 }
 
 }

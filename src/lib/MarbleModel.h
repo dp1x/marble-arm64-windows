@@ -75,6 +75,7 @@ class Planet;
 class LayerInterface;
 class RoutingManager;
 class BookmarkManager;
+class AltitudeModel;
 
 /**
  * @short The data model (not based on QAbstractModel) for a MarbleWidget.
@@ -244,7 +245,7 @@ class MARBLE_EXPORT MarbleModel : public QObject
      */
     Planet* planet() const;
 
-    RoutingManager* routingManager();
+    RoutingManager* routingManager() const;
 
     void setClockDateTime( const QDateTime& datetime );
 
@@ -266,6 +267,8 @@ class MARBLE_EXPORT MarbleModel : public QObject
     QTextDocument * legend();
 
     void setLegend( QTextDocument * document );
+
+    AltitudeModel* altitudeModel() const;
 
  public Q_SLOTS:
     void clearPersistentTileCache();
