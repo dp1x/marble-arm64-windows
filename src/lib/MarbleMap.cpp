@@ -84,9 +84,7 @@ MarbleMapPrivate::MarbleMapPrivate( MarbleMap *parent, MarbleModel *model )
           m_measureTool( model ),
           m_viewAngle( 110.0 )
 {
-    GeoDataObject *object = static_cast<GeoDataObject*>( model->treeModel()->index(0, 0, QModelIndex()).internalPointer());
-    GeoDataDocument *document = dynamic_cast<GeoDataDocument*>( object->parent() );
-    m_geometryLayer = new GeometryLayer( document );
+    m_geometryLayer = new GeometryLayer( model->treeModel() );
     m_layerManager.addLayer( m_geometryLayer );
 }
 
@@ -115,6 +113,9 @@ void MarbleMapPrivate::construct()
                        m_parent,        SIGNAL( repaintNeeded( QRegion ) ) );
     QObject::connect ( &m_layerManager, SIGNAL( renderPluginInitialized( RenderPlugin * ) ),
                        m_parent,        SIGNAL( renderPluginInitialized( RenderPlugin * ) ) );
+    
+    QObject::connect ( m_model,  SIGNAL( modelChanged() ),
+                       m_geometryLayer,  SLOT( invalidateScene() ) );
 
     m_logzoom  = 0;
 
