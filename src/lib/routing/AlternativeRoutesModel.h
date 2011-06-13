@@ -30,7 +30,7 @@ class AlternativeRoutesModelPrivate;
 class RouteRequest;
 class MarbleModel;
 
-class AlternativeRoutesModel : public QAbstractListModel
+class MARBLE_EXPORT AlternativeRoutesModel : public QAbstractListModel
 {
     Q_OBJECT
 
