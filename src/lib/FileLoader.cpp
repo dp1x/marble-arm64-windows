@@ -29,6 +29,7 @@
 
 //FIXME: Clean up nodes in other place?
 #include "osm/OsmNodeFactory.h"
+#include "osm/OsmGlobals.h"
 
 namespace Marble
 {
@@ -370,6 +371,7 @@ void FileLoader::loadOsmFile( const QString& fileName )
     //setupStyle( m_document, m_document );
     
     osm::OsmNodeFactory::cleanUp();
+    osm::OsmGlobals::cleanUpDummyPlacemarks();
 
     file.close();
 
