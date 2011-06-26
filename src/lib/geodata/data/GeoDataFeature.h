@@ -225,7 +225,6 @@ class GEODATA_EXPORT GeoDataFeature : public GeoDataObject
         TransportTaxiRank,
         TransportTrainStation,
         TransportTramStop,
-
         // OpenStreetMap category religion
         ReligionPlaceOfWorship,
         ReligionBahai,

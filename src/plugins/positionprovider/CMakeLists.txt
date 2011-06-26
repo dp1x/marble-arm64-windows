@@ -1,7 +1,7 @@
 FIND_PACKAGE(libgps)
 IF(LIBGPS_FOUND)
      MESSAGE( STATUS "Building with gpsd position provider")
-     ADD_SUBDIRECTORY( gpsd )
+     #ADD_SUBDIRECTORY( gpsd )
 ELSE(LIBGPS_FOUND)
      MESSAGE( STATUS "Not building with gpsd position provider")
 ENDIF(LIBGPS_FOUND)

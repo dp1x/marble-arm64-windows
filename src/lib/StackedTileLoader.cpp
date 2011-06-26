@@ -55,6 +55,8 @@ public:
         m_tileCache.setMaxCost( 20000 * 1024 ); // Cache size measured in bytes
     }
 
+    QImage mergeDecorations( TileId const &id, const QVector<QSharedPointer<TextureTile> > &tiles );
+
     void detectMaxTileLevel();
     QVector<GeoSceneTexture const *>
         findRelevantTextureLayers( TileId const & stackedTileId ) const;
