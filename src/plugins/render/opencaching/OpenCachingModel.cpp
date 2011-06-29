@@ -37,7 +37,7 @@ QHash<QString, QVariant> OpenCachingModelPrivate::parseCache( QXmlStreamReader& 
 {
     QHash<QString, QVariant> cache;
     while ( !reader.atEnd() ) {
-        if ( reader.isStartElement() && reader.text() != "cache" ) {
+        if ( reader.isStartElement() && reader.name() != "cache" ) {
             if( reader.name() == "id" ) {
                 cache["id"] = reader.attributes().value("id").toString();
             }
