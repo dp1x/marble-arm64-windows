@@ -27,7 +27,6 @@
 #include "MarbleModel.h"
 #include "PluginManager.h"
 #include "RenderPlugin.h"
-#include "ViewParams.h"
 #include "LayerInterface.h"
 
 namespace Marble
@@ -98,7 +97,6 @@ LayerManager::LayerManager( MarbleModel* model, QObject *parent )
             d->m_dataPlugins.append( dataPlugin );
     }
 
-    // Just for initial testing
     foreach( RenderPlugin * renderPlugin, d->m_renderPlugins ) {
         renderPlugin->setMarbleModel( d->m_marbleModel );
     }
@@ -134,23 +132,21 @@ QList<AbstractDataPluginItem *> LayerManager::whichItemAt( const QPoint& curpos 
     return itemList;
 }
 
-void LayerManager::renderLayers( GeoPainter *painter, ViewParams *viewParams,
+void LayerManager::renderLayers( GeoPainter *painter, ViewportParams *viewport,
                                  const QStringList& renderPositions )
 {    
     foreach( const QString& renderPosition, renderPositions ) {
-        renderLayer( painter, viewParams, renderPosition );
+        renderLayer( painter, viewport, renderPosition );
     }
 }
 
-void LayerManager::renderLayer( GeoPainter *painter, ViewParams *viewParams,
+void LayerManager::renderLayer( GeoPainter *painter, ViewportParams *viewport,
                                 const QString& renderPosition )
 {
-    if ( !viewParams || !viewParams->viewport() ) {
+    if ( !viewport ) {
         mDebug() << "LayerManager: No valid viewParams set!";
         return;
     }
-
-    ViewportParams* viewport = viewParams->viewport();
 
     QList<LayerInterface*> layers;
 

@@ -45,6 +45,7 @@ class GeoPainter;
 class GeoSceneDocument;
 class LayerInterface;
 class MarbleModel;
+class MarbleWidgetPopupMenu;
 class MarbleWidgetInputHandler;
 class MarbleWidgetPrivate;
 class MeasureTool;
@@ -127,6 +128,9 @@ class MARBLE_EXPORT MarbleWidget : public QWidget
     Q_PROPERTY(bool showGrid     READ showGrid        WRITE setShowGrid)
 
     Q_PROPERTY(bool showClouds   READ showClouds      WRITE setShowClouds)
+    Q_PROPERTY(bool showSunShading READ showSunShading WRITE setShowSunShading)
+    Q_PROPERTY(bool showCityLights READ showCityLights WRITE setShowCityLights)
+    Q_PROPERTY(bool showSunInZenith READ showSunInZenith WRITE setShowSunInZenith)
     Q_PROPERTY(bool showAtmosphere READ showAtmosphere WRITE setShowAtmosphere)
     Q_PROPERTY(bool showCrosshairs READ showCrosshairs WRITE setShowCrosshairs)
 
@@ -136,7 +140,6 @@ class MARBLE_EXPORT MarbleWidget : public QWidget
     Q_PROPERTY(bool showOtherPlaces READ showOtherPlaces WRITE setShowOtherPlaces)
 
     Q_PROPERTY(bool showRelief   READ showRelief      WRITE setShowRelief)
-    Q_PROPERTY(bool showElevationModel READ showElevationModel WRITE setShowElevationModel)
 
     Q_PROPERTY(bool showIceLayer READ showIceLayer    WRITE setShowIceLayer)
     Q_PROPERTY(bool showBorders  READ showBorders     WRITE setShowBorders)
@@ -169,6 +172,8 @@ class MARBLE_EXPORT MarbleWidget : public QWidget
 
     ViewportParams *viewport();
     const ViewportParams *viewport() const;
+
+    MarbleWidgetPopupMenu *popupMenu();
 
     /**
      * Returns the current input handler
@@ -438,6 +443,24 @@ class MARBLE_EXPORT MarbleWidget : public QWidget
     bool showClouds() const;
 
     /**
+     * @brief  Return whether the night shadow is visible.
+     * @return visibility of night shadow
+     */
+    bool showSunShading() const;
+
+    /**
+     * @brief  Return whether the city lights are shown instead of the night shadow.
+     * @return visibility of city lights
+     */
+    bool showCityLights() const;
+
+    /**
+     * @brief  Return whether the sun is shown in the zenith.
+     * @return visibility of sun in the zenith
+     */
+    bool showSunInZenith() const;
+
+    /**
      * @brief  Return whether the atmospheric glow is visible.
      * @return The cloud cover visibility.
      */
@@ -486,12 +509,6 @@ class MARBLE_EXPORT MarbleWidget : public QWidget
     bool showRelief() const;
 
     /**
-     * @brief  Return whether the elevation model is visible.
-     * @return The elevation model visibility.
-     */
-    bool showElevationModel() const;
-
-    /**
      * @brief  Return whether the ice layer is visible.
      * @return The ice layer visibility.
      */
@@ -514,12 +531,6 @@ class MARBLE_EXPORT MarbleWidget : public QWidget
      * @return The lakes' visibility.
      */
     bool showLakes() const;
-
-    /**
-     * @brief Return whether Gps Data is visible.
-     * @return The Gps Data's visibility.
-     */
-    bool showGps() const;
 
     /**
      * @brief  Return whether the frame rate gets displayed.
@@ -648,6 +659,14 @@ class MARBLE_EXPORT MarbleWidget : public QWidget
     void centerOn( const GeoDataLatLonBox& box, bool animated = false );
 
     /**
+     * @brief Center the view on a placemark according to the following logic:
+     * - if the placemark has a lookAt, zoom and center on that lookAt
+     * - otherwise use the placemark geometry's latLonAltBox
+     * @param box The GeoDataPlacemark to zoom and move the MarbleWidget to.
+     */
+    void centerOn( const GeoDataPlacemark& placemark, bool animated = false );
+
+    /**
      * @brief  Set the latitude for the center point
      * @param  lat  the new value for the latitude in degree.
      * @param  mode the FlyToMode that will be used.
@@ -759,6 +778,24 @@ class MARBLE_EXPORT MarbleWidget : public QWidget
     void setShowClouds( bool visible );
 
     /**
+     * @brief  Set whether the night shadow is visible.
+     * @param  visibile visibility of shadow
+     */
+    void setShowSunShading( bool visible );
+
+    /**
+     * @brief  Set whether city lights instead of night shadow are visible.
+     * @param  visible visibility of city lights
+     */
+    void setShowCityLights( bool visible );
+
+    /**
+     * @brief Set whether the sun is visible in the zenith.
+     * @param visible  visibility of the sun in the zenith
+     */
+    void setShowSunInZenith( bool visible );
+
+    /**
      * @brief  Set whether the atmospheric glow is visible
      * @param  visible  visibility of the atmospheric glow
      */
@@ -807,12 +844,6 @@ class MARBLE_EXPORT MarbleWidget : public QWidget
     void setShowRelief( bool visible );
 
     /**
-     * @brief  Set whether the elevation model is visible
-     * @param  visible  visibility of the elevation model
-     */
-    void setShowElevationModel( bool visible );
-
-    /**
      * @brief  Set whether the ice layer is visible
      * @param  visible  visibility of the ice layer
      */
@@ -835,12 +866,6 @@ class MARBLE_EXPORT MarbleWidget : public QWidget
      * @param  visible  visibility of the lakes
      */
     void setShowLakes( bool visible );
-
-    /**
-     * @brief Set whether Gps Data is visible
-     * @param visible  visibility of the Gps Data
-     */
-    void setShowGps( bool visible );
 
     /**
      * @brief Set whether the frame rate gets shown
@@ -1016,7 +1041,9 @@ class MARBLE_EXPORT MarbleWidget : public QWidget
     /**
      * @brief Enables custom drawing onto the MarbleWidget straight after
      * @brief the globe and before all other layers has been rendered.
-     * @param painter 
+     * @param painter
+     *
+     * @deprecated implement LayerInterface and add it using @p addLayer()
      */
     virtual void customPaint( GeoPainter *painter );
 

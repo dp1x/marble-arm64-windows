@@ -12,8 +12,7 @@
 
 #include "TextureColorizer.h"
 
-#include <cmath>
-
+#include <QtCore/qmath.h>
 #include <QtCore/QFile>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QString>
@@ -23,9 +22,9 @@
 #include <QtGui/QPainter>
 
 #include "global.h"
+#include "GeoPainter.h"
 #include "MarbleDebug.h"
-#include "GeoSceneDocument.h"
-#include "GeoSceneSettings.h"
+#include "VectorComposer.h"
 #include "ViewParams.h"
 #include "ViewportParams.h"
 #include "AbstractProjection.h"
@@ -66,11 +65,12 @@ private:
 
 TextureColorizer::TextureColorizer( const QString &seafile,
                                     const QString &landfile,
+                                    VectorComposer *veccomposer,
                                     QObject *parent )
     : QObject( parent )
-    , m_veccomposer( this )
+    , m_veccomposer( veccomposer )
 {
-    connect( &m_veccomposer, SIGNAL( datasetLoaded() ), SIGNAL( datasetLoaded() ) );
+    connect( m_veccomposer, SIGNAL( datasetLoaded() ), SIGNAL( datasetLoaded() ) );
 
     QTime t;
     t.start();
@@ -149,6 +149,11 @@ TextureColorizer::TextureColorizer( const QString &seafile,
     qDebug("TextureColorizer::setSeaFileLandFile: Time elapsed: %d ms", t.elapsed());
 }
 
+void TextureColorizer::setShowRelief( bool show )
+{
+    m_showRelief = show;
+}
+
 // This function takes two images, both in viewParams:
 //  - The coast image, which has a number of colors where each color
 //    represents a sort of terrain (ex: land/sea)
@@ -168,11 +173,35 @@ TextureColorizer::TextureColorizer( const QString &seafile,
 
 void TextureColorizer::colorize(ViewParams *viewParams)
 {
-    // update coastimg
-    m_veccomposer.drawTextureMap( viewParams );
+    if ( m_coastImage.size() != viewParams->viewport()->size() )
+        m_coastImage = QImage( viewParams->viewport()->size(), QImage::Format_RGB32 );
+
+    // update coast image
+    m_coastImage.fill( Qt::transparent );
+
+    bool doClip = false; //assume false
+    switch( viewParams->projection() ) {
+        case Spherical:
+            doClip = ( viewParams->radius() > ( viewParams->width()  / 2 )
+                       || viewParams->radius() > ( viewParams->height() / 2 ) );
+            break;
+        case Equirectangular:
+            doClip = true; // clipping should always be enabled
+            break;
+        case Mercator:
+            doClip = true; // clipping should always be enabled
+            break;
+    }
+
+    const bool antialiased =    viewParams->mapQuality() == HighQuality
+                             || viewParams->mapQuality() == PrintQuality;
+
+    GeoPainter painter( &m_coastImage, viewParams->viewport(), viewParams->mapQuality(), doClip );
+    painter.setRenderHint( QPainter::Antialiasing, antialiased );
+
+    m_veccomposer->drawTextureMap( &painter, viewParams->viewport() );
 
     QSharedPointer<QImage>        origimg = viewParams->canvasImagePtr();
-    QSharedPointer<const QImage>  coastimg = viewParams->coastImagePtr();
     const qint64   radius   = viewParams->radius();
 
     const int  imgheight = origimg->height();
@@ -188,9 +217,6 @@ void TextureColorizer::colorize(ViewParams *viewParams)
     // const uint glaciercolor = qRgb(200,200,200);
 
     int     bump = 8;
-
-    bool showRelief;
-    viewParams->mapTheme()->settings()->propertyValue( "relief", showRelief );
 
     if ( radius * radius > imgradius
          || viewParams->projection() == Equirectangular
@@ -225,7 +251,7 @@ void TextureColorizer::colorize(ViewParams *viewParams)
         for (int y = yTop; y < itEnd; ++y) {
 
             QRgb  *writeData         = (QRgb*)( origimg->scanLine( y ) );
-            const QRgb  *coastData   = (QRgb*)( coastimg->scanLine( y ) );
+            const QRgb  *coastData   = (QRgb*)( m_coastImage.scanLine( y ) );
 
             uchar *readDataStart     = origimg->scanLine( y );
             const uchar *readDataEnd = readDataStart + imgwidth*4;
@@ -240,7 +266,7 @@ void TextureColorizer::colorize(ViewParams *viewParams)
                 // Cheap Emboss / Bumpmapping
                 uchar&  grey = *readData; // qBlue(*data);
 
-                if ( showRelief ) {
+                if ( m_showRelief ) {
                     emboss << grey;
                     bump = ( emboss.head() + 8 - grey );
                     if ( bump  < 0 )  bump = 0;
@@ -315,7 +341,7 @@ void TextureColorizer::colorize(ViewParams *viewParams)
             }
 
             QRgb  *writeData         = (QRgb*)( origimg->scanLine( y ) )  + xLeft;
-            const QRgb *coastData    = (QRgb*)( coastimg->scanLine( y ) ) + xLeft;
+            const QRgb *coastData    = (QRgb*)( m_coastImage.scanLine( y ) ) + xLeft;
 
             uchar *readDataStart     = origimg->scanLine( y ) + xLeft * 4;
             const uchar *readDataEnd = origimg->scanLine( y ) + xRight * 4;
@@ -329,7 +355,7 @@ void TextureColorizer::colorize(ViewParams *viewParams)
 
                 uchar& grey = *readData; // qBlue(*data);
 
-                if ( showRelief ) {
+                if ( m_showRelief ) {
                     emboss << grey;
                     bump = ( emboss.head() + 16 - grey ) >> 1;
                     if ( bump > 15 ) bump = 15;

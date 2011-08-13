@@ -35,7 +35,6 @@ VectorMap::VectorMap()
       m_plimit( 0.0 ),
       m_zBoundingBoxLimit( 0.0 ),
       m_zPointLimit( 0.0 ),
-      m_brush( QBrush( QColor( 0, 0, 0 ) ) ),
       // Initialising booleans for horizoncrossing
       m_firsthorizon( false ),
       m_lastvisible( false ),
@@ -53,7 +52,7 @@ VectorMap::~VectorMap()
 
 
 void VectorMap::createFromPntMap( const PntMap* pntmap, 
-				  ViewportParams* viewport )
+                                  const ViewportParams* viewport )
 {
     switch( viewport->projection() ) {
         case Spherical:
@@ -69,7 +68,7 @@ void VectorMap::createFromPntMap( const PntMap* pntmap,
 }
 
 void VectorMap::sphericalCreateFromPntMap( const PntMap* pntmap, 
-					   ViewportParams* viewport )
+                                           const ViewportParams* viewport )
 {
     clear();
 
@@ -137,7 +136,7 @@ void VectorMap::sphericalCreateFromPntMap( const PntMap* pntmap,
 }
 
 void VectorMap::rectangularCreateFromPntMap( const PntMap* pntmap, 
-					     ViewportParams* viewport )
+                                             const ViewportParams* viewport )
 {
     clear();
     int  radius = viewport->radius();
@@ -241,7 +240,7 @@ void VectorMap::rectangularCreateFromPntMap( const PntMap* pntmap,
 }
 
 void VectorMap::mercatorCreateFromPntMap( const PntMap* pntmap,
-                                          ViewportParams* viewport )
+                                          const ViewportParams* viewport )
 {
     clear();
     int  radius = viewport->radius();
@@ -348,7 +347,7 @@ void VectorMap::mercatorCreateFromPntMap( const PntMap* pntmap,
 
 void VectorMap::createPolyLine( GeoDataCoordinates::Vector::ConstIterator const & itStartPoint,
                                 GeoDataCoordinates::Vector::ConstIterator const & itEndPoint,
-                                const int detail, ViewportParams *viewport )
+                                const int detail, const ViewportParams *viewport )
 {
     switch( viewport->projection() ) {
        case Spherical:
@@ -369,7 +368,7 @@ void VectorMap::createPolyLine( GeoDataCoordinates::Vector::ConstIterator const 
 void VectorMap::sphericalCreatePolyLine(
 GeoDataCoordinates::Vector::ConstIterator const & itStartPoint,
 GeoDataCoordinates::Vector::ConstIterator const & itEndPoint,
-const int detail, ViewportParams *viewport )
+const int detail, const ViewportParams *viewport )
 {
     int  radius = viewport->radius();
 
@@ -447,7 +446,7 @@ const int detail, ViewportParams *viewport )
 void VectorMap::rectangularCreatePolyLine(
     GeoDataCoordinates::Vector::ConstIterator const & itStartPoint,
     GeoDataCoordinates::Vector::ConstIterator const & itEndPoint,
-    const int detail, ViewportParams *viewport )
+    const int detail, const ViewportParams *viewport )
 {
     Quaternion qpos;
 
@@ -559,7 +558,7 @@ void VectorMap::mercatorCreatePolyLine(
         GeoDataCoordinates::Vector::ConstIterator const & itStartPoint,
         GeoDataCoordinates::Vector::ConstIterator const & itEndPoint,
         const int detail,
-        ViewportParams *viewport )
+        const ViewportParams *viewport )
 {
     Quaternion qpos;
 
@@ -683,66 +682,25 @@ void VectorMap::mercatorCreatePolyLine(
 }
 
 
-// Paint the background of the ground, i.e. the water.
-//
-// FIXME: This is a strange thing to have in the vector code. 
-//        Move it somewhere better.
-//
-void VectorMap::paintBase( GeoPainter * painter, ViewportParams* viewport,
-			   bool antialiasing )
+void VectorMap::drawMap( GeoPainter *painter )
 {
-    painter->setRenderHint( QPainter::Antialiasing, antialiasing );
-    painter->setPen( m_pen );
-    painter->setBrush( m_brush );
-
-    painter->drawPath( viewport->currentProjection()->mapShape( viewport ) );
-}
-
-
-void VectorMap::drawMap( QPaintDevice *origimg, bool antialiasing,
-			 ViewportParams *viewport, MapQuality mapQuality )
-{
-    bool doClip = false; //assume false
-    switch( viewport->projection() ) {
-        case Spherical:
-            doClip = ( viewport->radius() > ( viewport->width()  / 2 )
-		       || viewport->radius() > ( viewport->height() / 2 ) );
-            break;
-        case Equirectangular:
-            doClip = true; // clipping should always be enabled
-            break;
-        case Mercator:
-            doClip = true; // clipping should always be enabled
-            break;
-    }
-
-    GeoPainter  painter( origimg, viewport, mapQuality, doClip );
-    painter.setRenderHint( QPainter::Antialiasing, antialiasing );
-    painter.setPen( m_pen );
-    painter.setBrush( m_brush );
-
     ScreenPolygon::Vector::const_iterator  itEndPolygon = constEnd();
     for ( ScreenPolygon::Vector::const_iterator itPolygon = constBegin();
           itPolygon != itEndPolygon; 
           ++itPolygon )
     {
         if ( itPolygon->closed() )  
-            painter.drawPolygon( *itPolygon );
+            painter->drawPolygon( *itPolygon );
         else
-            painter.drawPolyline( *itPolygon );
+            painter->drawPolyline( *itPolygon );
     }
 }
 
 
 // Paint the prepared vectors in screen coordinates.
 
-void VectorMap::paintMap(GeoPainter * painter, bool antialiasing)
+void VectorMap::paintMap(GeoPainter * painter)
 {
-    painter->setRenderHint( QPainter::Antialiasing, antialiasing );
-
-    painter->setPen( m_pen );
-    painter->setBrush( m_brush );
-
     ScreenPolygon::Vector::const_iterator  itEndPolygon = constEnd();
 
     for ( ScreenPolygon::Vector::const_iterator itPolygon = constBegin();
@@ -757,7 +715,7 @@ void VectorMap::paintMap(GeoPainter * painter, bool antialiasing)
 }
 
 
-void VectorMap::manageCrossHorizon(ViewportParams *viewport)
+void VectorMap::manageCrossHorizon( const ViewportParams *viewport )
 {
     // qDebug("Crossing horizon line");
     // if (!currentlyvisible) qDebug("Leaving visible hemisphere");
@@ -786,7 +744,7 @@ void VectorMap::manageCrossHorizon(ViewportParams *viewport)
 }
 
 
-const QPointF VectorMap::horizonPoint(ViewportParams *viewport)
+QPointF VectorMap::horizonPoint( const ViewportParams *viewport ) const
 {
     // qDebug("Interpolating");
     qreal  xa;
@@ -806,7 +764,7 @@ const QPointF VectorMap::horizonPoint(ViewportParams *viewport)
 }
 
 
-void VectorMap::createArc(ViewportParams *viewport)
+void VectorMap::createArc( const ViewportParams *viewport )
 {
 
     qreal  beta  = (qreal)( RAD2DEG 

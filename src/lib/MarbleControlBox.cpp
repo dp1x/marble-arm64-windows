@@ -187,10 +187,6 @@ void MarbleControlBox::setCurrentLocationTabShown( bool show )
         if ( locationIndex >= 0 ) {
             setItemEnabled( locationIndex, enabled );
         }
-
-        if ( !enabled ) {
-            d->m_widget->setShowGps( false );
-        }
     }
 }
 
@@ -222,14 +218,7 @@ void MarbleControlBox::selectTheme( const QString &theme )
 
 void MarbleControlBox::setWorkOffline(bool offline)
 {
-    HttpDownloadManager * const downloadManager =
-        d->m_widget->model()->downloadManager();
-    downloadManager->setDownloadEnabled( !offline );
-    d->m_navigationWidget->setWorkOffline( offline );
-    d->m_widget->model()->routingManager()->setWorkOffline( offline );
-    if ( d->m_routingWidget ) {
-        d->m_routingWidget->setWorkOffline( offline );
-    }
+    d->m_widget->model()->setWorkOffline( offline );
 }
 
 void MarbleControlBox::updateMapThemeView()

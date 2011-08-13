@@ -14,6 +14,7 @@
 #include "MarbleDebug.h"
 #include "MarbleModel.h"
 #include "Planet.h"
+#include "GeoDataDocument.h"
 #include "GeoDataPlacemark.h"
 #include "PluginManager.h"
 #include "RunnerPlugin.h"
@@ -43,8 +44,8 @@ public:
     QVector<GeoDataPlacemark*> m_placemarkContainer;
     QVector<GeoDataDocument*> m_routingResult;
     QList<GeoDataCoordinates> m_reverseGeocodingResults;
+    QVector<GeoDataDocument*> m_parsingResults;
     RouteRequest* m_routeRequest;
-    bool m_workOffline;
     PluginManager* m_pluginManager;
 
     MarbleRunnerManagerPrivate( MarbleRunnerManager* parent, PluginManager* pluginManager );
@@ -55,18 +56,20 @@ public:
 
     QList<RunnerTask*> m_searchTasks;
     QList<RunnerTask*> m_routingTasks;
+    QList<RunnerTask*> m_parsingTasks;
 
     void cleanupSearchTask( RunnerTask* task );
 
     void cleanupRoutingTask( RunnerTask* task );
+
+    void cleanupParsingTask( RunnerTask* task );
 };
 
 MarbleRunnerManagerPrivate::MarbleRunnerManagerPrivate( MarbleRunnerManager* parent, PluginManager* pluginManager ) :
         q( parent ),
         m_marbleModel( 0 ),
-        m_model( new MarblePlacemarkModel ),
+        m_model( new MarblePlacemarkModel( parent ) ),
         m_routeRequest( 0 ),
-        m_workOffline( false ),
         m_pluginManager( pluginManager )
 {
     m_model->setPlacemarkContainer( &m_placemarkContainer );
@@ -77,7 +80,7 @@ MarbleRunnerManagerPrivate::MarbleRunnerManagerPrivate( MarbleRunnerManager* par
 
 MarbleRunnerManagerPrivate::~MarbleRunnerManagerPrivate()
 {
-    delete m_model;
+    // nothing to do
 }
 
 QList<RunnerPlugin*> MarbleRunnerManagerPrivate::plugins( RunnerPlugin::Capability capability )
@@ -89,7 +92,7 @@ QList<RunnerPlugin*> MarbleRunnerManagerPrivate::plugins( RunnerPlugin::Capabili
             continue;
         }
 
-        if ( ( m_workOffline && !plugin->canWorkOffline() ) ) {
+        if ( ( m_marbleModel && m_marbleModel->workOffline() && !plugin->canWorkOffline() ) ) {
             continue;
         }
 
@@ -126,6 +129,11 @@ void MarbleRunnerManagerPrivate::cleanupRoutingTask( RunnerTask* task )
     }
 }
 
+void MarbleRunnerManagerPrivate::cleanupParsingTask( RunnerTask* task )
+{
+    m_parsingTasks.removeAll( task );
+}
+
 MarbleRunnerManager::MarbleRunnerManager( PluginManager* pluginManager, QObject *parent )
     : QObject( parent ), d( new MarbleRunnerManagerPrivate( this, pluginManager ) )
 {
@@ -160,8 +168,9 @@ void MarbleRunnerManager::reverseGeocoding( const GeoDataCoordinates &coordinate
 void MarbleRunnerManager::findPlacemarks( const QString &searchTerm )
 {
     if ( searchTerm == d->m_lastSearchTerm ) {
-      emit searchFinished( searchTerm );
       emit searchResultChanged( d->m_model );
+      emit searchResultChanged( d->m_placemarkContainer );
+      emit searchFinished( searchTerm );
       return;
     }
 
@@ -175,6 +184,11 @@ void MarbleRunnerManager::findPlacemarks( const QString &searchTerm )
     d->m_placemarkContainer.clear();
     d->m_modelMutex.unlock();
     emit searchResultChanged( d->m_model );
+
+    if ( searchTerm.trimmed().isEmpty() ) {
+        emit searchFinished( searchTerm );
+        return;
+    }
 
     QList<RunnerPlugin*> plugins = d->plugins( RunnerPlugin::Search );
     foreach( RunnerPlugin* plugin, plugins ) {
@@ -202,17 +216,13 @@ void MarbleRunnerManager::addSearchResult( QVector<GeoDataPlacemark*> result )
     d->m_model->addPlacemarks( start, result.size() );
     d->m_modelMutex.unlock();
     emit searchResultChanged( d->m_model );
+    emit searchResultChanged( d->m_placemarkContainer );
 }
 
 void MarbleRunnerManager::setModel( MarbleModel * model )
 {
     // TODO: Terminate runners which are making use of the map.
     d->m_marbleModel = model;
-}
-
-void MarbleRunnerManager::setWorkOffline( bool offline )
-{
-    d->m_workOffline = offline;
 }
 
 void MarbleRunnerManager::addReverseGeocodingResult( const GeoDataCoordinates &coordinates, const GeoDataPlacemark &placemark )
@@ -234,7 +244,7 @@ void MarbleRunnerManager::retrieveRoute( RouteRequest *request )
     QList<RunnerPlugin*> plugins = d->plugins( RunnerPlugin::Routing );
     bool started = false;
     foreach( RunnerPlugin* plugin, plugins ) {
-        if ( !profile.pluginSettings().contains( plugin->nameId() ) ) {
+        if ( !profile.name().isEmpty() && !profile.pluginSettings().contains( plugin->nameId() ) ) {
             continue;
         }
 
@@ -261,6 +271,32 @@ void MarbleRunnerManager::addRoutingResult( GeoDataDocument* route )
     if ( route ) {
         d->m_routingResult.push_back( route );
         emit routeRetrieved( route );
+    }
+}
+
+void MarbleRunnerManager::parseFile( const QString &fileName, DocumentRole role )
+{
+    d->m_parsingResults.clear();
+    QList<RunnerPlugin*> plugins = d->plugins( RunnerPlugin::Parsing );
+    bool started = false;
+    foreach( RunnerPlugin *plugin, plugins ) {
+        started = true;
+        MarbleAbstractRunner* runner = plugin->newRunner();
+        connect( runner, SIGNAL( parsingFinished(GeoDataDocument*) ),
+                 this, SLOT(addParsingResult(GeoDataDocument*)) );
+        ParsingTask *task = new ParsingTask( runner, fileName, role );
+        d->m_parsingTasks << task;
+        connect( task, SIGNAL( finished( RunnerTask* ) ),
+                 this, SLOT( cleanupParsingTask( RunnerTask* ) ) );
+        QThreadPool::globalInstance()->start( task );
+    }
+}
+
+void MarbleRunnerManager::addParsingResult( GeoDataDocument *document )
+{
+    if ( document ) {
+        d->m_parsingResults.push_back( document );
+        emit parsingFinished( document );
     }
 }
 

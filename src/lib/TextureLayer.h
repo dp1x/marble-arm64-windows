@@ -17,7 +17,6 @@
 #include "GeoSceneTexture.h"
 
 #include <QtCore/QSize>
-#include <QtGui/QRegion>
 
 class QImage;
 class QRegion;
@@ -27,10 +26,11 @@ namespace Marble
 {
 
 class GeoPainter;
-class GeoSceneDocument;
+class GeoSceneGroup;
 class HttpDownloadManager;
 class MapThemeManager;
 class SunLocator;
+class TextureColorizer;
 class ViewParams;
 
 class TextureLayer : public QObject
@@ -40,6 +40,9 @@ class TextureLayer : public QObject
  public:
     TextureLayer( MapThemeManager *mapThemeManager, HttpDownloadManager *downloadManager, SunLocator *sunLocator );
     ~TextureLayer();
+
+    bool showSunShading() const;
+    bool showCityLights() const;
 
     /**
      * @brief Return the current tile zoom level. For example for OpenStreetMap
@@ -64,7 +67,13 @@ class TextureLayer : public QObject
                      ViewParams *viewParams,
                      const QRect& dirtyRect );
 
+    void setShowSunShading( bool show );
+
+    void setShowCityLights( bool show );
+
     void setShowTileId( bool show );
+
+    void setTextureColorizer( TextureColorizer *texcolorizer );
 
     /**
      * @brief  Set the Projection used for the map
@@ -74,7 +83,7 @@ class TextureLayer : public QObject
 
     void setNeedsUpdate();
 
-    void setMapTheme( GeoSceneDocument* mapTheme );
+    void setMapTheme( const QVector<const GeoSceneTexture *> &textures, GeoSceneGroup *textureLayerSettings );
 
     void setVolatileCacheLimit( quint64 kilobytes );
 
@@ -91,6 +100,7 @@ class TextureLayer : public QObject
  private:
     Q_PRIVATE_SLOT( d, void mapChanged() )
     Q_PRIVATE_SLOT( d, void updateTextureLayers() )
+    Q_PRIVATE_SLOT( d, void updateTile( const TileId &tileId, const QImage &tileImage ) )
 
  private:
     class Private;

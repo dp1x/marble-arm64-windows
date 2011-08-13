@@ -86,7 +86,7 @@ ControlView::~ControlView()
 
 QString ControlView::applicationVersion()
 {
-    return "1.1.85 (1.2 Beta 2)";
+    return "PRE 1.3 GIT";
 }
 
 void ControlView::zoomIn()
@@ -536,11 +536,6 @@ bool ControlView::setSideBarState( const QByteArray &state )
 void ControlView::addGeoDataFile( QString filename )
 {
     m_marbleWidget->model()->addGeoDataFile( filename );
-}
-
-SunLocator* ControlView::sunLocator()
-{
-    return m_marbleWidget->model()->sunLocator();
 }
 
 }

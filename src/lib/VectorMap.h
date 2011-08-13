@@ -35,18 +35,13 @@ class VectorMap : public ScreenPolygon::Vector
  public:
     VectorMap();
     ~VectorMap();
-    void createFromPntMap( const PntMap*, ViewportParams *viewport );
+    void createFromPntMap( const PntMap*, const ViewportParams *viewport );
 
     /**
      * @brief Paint the background, i.e. the water.
      */
-    void paintBase( GeoPainter *painter, ViewportParams *viewport, bool antialiasing );
-    void paintMap( GeoPainter *painter, bool antialiasing );
-    void drawMap( QPaintDevice *paintDevice, bool antialiasing,
-		  ViewportParams *viewport, MapQuality mapQuality );
-
-    void setPen ( const QPen & p )     { m_pen   = p; }
-    void setBrush ( const QBrush & b ) { m_brush = b; }
+    void paintMap( GeoPainter *painter );
+    void drawMap( GeoPainter *painter );
 
     void setzBoundingBoxLimit ( const qreal zBoundingBoxLimit ) {
         m_zBoundingBoxLimit = zBoundingBoxLimit; }
@@ -57,26 +52,26 @@ class VectorMap : public ScreenPolygon::Vector
     //	int nodeCount(){ return m_debugNodeCount; }
 
  private:
-    void sphericalCreateFromPntMap( const PntMap*, ViewportParams *viewport );
-    void rectangularCreateFromPntMap( const PntMap*, ViewportParams *viewport );
-    void mercatorCreateFromPntMap( const PntMap*, ViewportParams *viewport );
+    void sphericalCreateFromPntMap( const PntMap*, const ViewportParams *viewport );
+    void rectangularCreateFromPntMap( const PntMap*, const ViewportParams *viewport );
+    void mercatorCreateFromPntMap( const PntMap*, const ViewportParams *viewport );
 
     void createPolyLine( GeoDataCoordinates::Vector::ConstIterator const &,
                          GeoDataCoordinates::Vector::ConstIterator const &, const int,
-			 ViewportParams *viewport );
+                         const ViewportParams *viewport );
     void sphericalCreatePolyLine( GeoDataCoordinates::Vector::ConstIterator const &,
 				  GeoDataCoordinates::Vector::ConstIterator const &,
-				  const int detail, ViewportParams *viewport );
+                                  const int detail, const ViewportParams *viewport );
     void rectangularCreatePolyLine( GeoDataCoordinates::Vector::ConstIterator const &,
 				    GeoDataCoordinates::Vector::ConstIterator const &,
-				    const int detail, ViewportParams *viewport );
+                                    const int detail, const ViewportParams *viewport );
     void mercatorCreatePolyLine( GeoDataCoordinates::Vector::ConstIterator const &,
 				 GeoDataCoordinates::Vector::ConstIterator const &,
-				 const int detail, ViewportParams *viewport );
+                                 const int detail, const ViewportParams *viewport );
 
-    void           manageCrossHorizon(ViewportParams *viewport);
-    const QPointF  horizonPoint(ViewportParams *viewport);
-    void           createArc(ViewportParams *viewport);
+    void           manageCrossHorizon( const ViewportParams *viewport );
+    QPointF  horizonPoint( const ViewportParams *viewport ) const;
+    void           createArc( const ViewportParams *viewport );
 
     int            getDetailLevel( int radius ) const;
 
@@ -95,9 +90,6 @@ class VectorMap : public ScreenPolygon::Vector
 
     QPointF           m_currentPoint;
     QPointF           m_lastPoint; 
-
-    QPen              m_pen;
-    QBrush            m_brush;
 
     // Dealing with the horizon for spherical projection.
     bool              m_firsthorizon;

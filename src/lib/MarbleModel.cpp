@@ -36,7 +36,6 @@
 #include "GeoSceneLayer.h"
 #include "GeoSceneMap.h"
 #include "GeoScenePalette.h"
-#include "GeoSceneSettings.h"
 #include "GeoSceneTexture.h"
 #include "GeoSceneVector.h"
 #include "GeoSceneXmlDataSource.h"
@@ -96,7 +95,8 @@ class MarbleModelPrivate
           m_positionTracking( 0 ),
           m_bookmarkManager( 0 ),
           m_routingManager( 0 ),
-          m_legend( 0 )
+          m_legend( 0 ),
+          m_workOffline( false )
     {
         m_sortproxy.setFilterFixedString( GeoDataTypes::GeoDataPlacemarkType );
         m_sortproxy.setFilterKeyColumn( 1 );
@@ -152,6 +152,8 @@ class MarbleModelPrivate
     QTextDocument           *m_legend;
 
     AltitudeModel           *m_altitudeModel;
+
+    bool                     m_workOffline;
 };
 
 MarbleModel::MarbleModel( QObject *parent )
@@ -319,8 +321,9 @@ void MarbleModel::setMapTheme( GeoSceneDocument* mapTheme )
                 GeoSceneAbstractDataset* dataset = *itds;
                 if( dataset->fileFormat() == "KML" ) {
                     QString containername = reinterpret_cast<GeoSceneXmlDataSource*>(dataset)->filename();
-                    loadedContainers.removeOne( containername );
-                    loadList << containername;
+                    if ( !loadedContainers.removeOne( containername ) ) {
+                        loadList << containername;
+                    }
                 }
             }
         }
@@ -608,6 +611,20 @@ void MarbleModel::removeGeoData( const QString& fileName )
 AltitudeModel* MarbleModel::altitudeModel() const
 {
     return d->m_altitudeModel;
+}
+
+bool MarbleModel::workOffline() const
+{
+    return d->m_workOffline;
+}
+
+void MarbleModel::setWorkOffline( bool workOffline )
+{
+    if ( d->m_workOffline != workOffline ) {
+        downloadManager()->setDownloadEnabled( !workOffline );
+        d->m_workOffline = workOffline;
+        emit workOfflineChanged();
+    }
 }
 
 }

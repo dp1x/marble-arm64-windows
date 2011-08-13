@@ -18,21 +18,18 @@
 #include <QtCore/QVectorIterator>
 #include <QtGui/QFont>
 #include <QtGui/QItemSelectionModel>
-#include <QtGui/QPainter>
 #include <QtGui/QSortFilterProxyModel>
 
-#include "GeoSceneDocument.h"
-#include "GeoSceneMap.h"
 #include "GeoDataPlacemark.h"
 #include "GeoDataStyle.h"
 #include "GeoDataTypes.h"
+#include "GeoPainter.h"
 
 #include "MarbleDebug.h"
 #include "global.h"
 #include "PlacemarkPainter.h"
 #include "MarblePlacemarkModel.h"
 #include "MarbleDirs.h"
-#include "ViewParams.h"
 #include "ViewportParams.h"
 #include "TileId.h"
 #include "TileCoordsPyramid.h"
@@ -121,6 +118,46 @@ PlacemarkLayout::PlacemarkLayout( QAbstractItemModel  *placemarkModel,
 PlacemarkLayout::~PlacemarkLayout()
 {
     styleReset();
+}
+
+void PlacemarkLayout::setDefaultLabelColor( const QColor &color )
+{
+    m_placemarkPainter->setDefaultLabelColor( color );
+}
+
+void PlacemarkLayout::setShowPlaces( bool show )
+{
+    m_showPlaces = show;
+}
+
+void PlacemarkLayout::setShowCities( bool show )
+{
+    m_showCities = show;
+}
+
+void PlacemarkLayout::setShowTerrain( bool show )
+{
+    m_showTerrain = show;
+}
+
+void PlacemarkLayout::setShowOtherPlaces( bool show )
+{
+    m_showOtherPlaces = show;
+}
+
+void PlacemarkLayout::setShowLandingSites( bool show )
+{
+    m_showLandingSites = show;
+}
+
+void PlacemarkLayout::setShowCraters( bool show )
+{
+    m_showCraters = show;
+}
+
+void PlacemarkLayout::setShowMaria( bool show )
+{
+    m_showMaria = show;
 }
 
 void PlacemarkLayout::requestStyleReset()
@@ -233,6 +270,9 @@ void PlacemarkLayout::setCacheData()
 {
     const int rowCount = m_placemarkModel->rowCount();
 
+    m_paintOrder.clear();
+    qDeleteAll( m_visiblePlacemarks );
+    m_visiblePlacemarks.clear();
     m_placemarkCache.clear();
     for ( int i = 0; i != rowCount; ++i )
     {
@@ -254,33 +294,28 @@ void PlacemarkLayout::setCacheData()
     }
 }
 
-void PlacemarkLayout::paintPlaceFolder( QPainter   *painter,
-                                        ViewParams *viewParams )
+QStringList PlacemarkLayout::renderPosition() const
 {
-    // earth
-    bool showPlaces, showCities, showTerrain, showOtherPlaces;
+    return QStringList() << "HOVERS_ABOVE_SURFACE";
+}
 
-    viewParams->propertyValue( "places", showPlaces );
-    viewParams->propertyValue( "cities", showCities );
-    viewParams->propertyValue( "terrain", showTerrain );
-    viewParams->propertyValue( "otherplaces", showOtherPlaces );
-    
-    // other planets
-    bool showLandingSites, showCraters, showMaria;
+bool PlacemarkLayout::render( GeoPainter *painter,
+                              ViewportParams *viewport,
+                              const QString &renderPos,
+                              GeoSceneLayer *layer )
+{
+    Q_UNUSED( renderPos );
+    Q_UNUSED( layer );
 
-    viewParams->propertyValue( "landingsites", showLandingSites );
-    viewParams->propertyValue( "craters", showCraters );
-    viewParams->propertyValue( "maria", showMaria );
-
-    if ( !showPlaces && !showCities && !showTerrain && !showOtherPlaces &&
-         !showLandingSites && !showCraters && !showMaria )
-        return;
+    if ( !m_showPlaces && !m_showCities && !m_showTerrain && !m_showOtherPlaces &&
+         !m_showLandingSites && !m_showCraters && !m_showMaria )
+        return true;
 
     if ( m_placemarkModel->rowCount() <= 0 )
-        return;
+        return true;
 
-    // const int imgwidth  = viewParams->canvasImage()->width();
-    const int imgheight = viewParams->canvasImagePtr()->height();
+    // const int imgwidth  = viewport->width();
+    const int imgheight = viewport->height();
 
     if ( m_styleResetRequested ) {
         m_styleResetRequested = false;
@@ -288,7 +323,7 @@ void PlacemarkLayout::paintPlaceFolder( QPainter   *painter,
     }
 
     if ( m_maxLabelHeight == 0 ) {
-        return;
+        return true;
     }
     const int   secnumber         = imgheight / m_maxLabelHeight + 1;
 
@@ -304,10 +339,10 @@ void PlacemarkLayout::paintPlaceFolder( QPainter   *painter,
     qreal x = 0;
     qreal y = 0;
 
-    GeoDataLatLonAltBox latLonAltBox = viewParams->viewport()->viewLatLonAltBox();
+    GeoDataLatLonAltBox latLonAltBox = viewport->viewLatLonAltBox();
 
     int popularity = 0;
-    while ( m_weightfilter.at( popularity ) > viewParams->radius() ) {
+    while ( m_weightfilter.at( popularity ) > viewport->radius() ) {
         ++popularity;
     }
     popularity = (20 - popularity)/2;
@@ -366,7 +401,7 @@ void PlacemarkLayout::paintPlaceFolder( QPainter   *painter,
         GeoDataCoordinates geopoint = placemark->coordinate();
 
         if ( !latLonAltBox.contains( geopoint ) ||
-             ! viewParams->currentProjection()->screenCoordinates( geopoint, viewParams->viewport(), x, y ))
+             ! viewport->currentProjection()->screenCoordinates( geopoint, viewport, x, y ))
             {
                 delete m_visiblePlacemarks.take( placemark );
                 continue;
@@ -459,14 +494,14 @@ void PlacemarkLayout::paintPlaceFolder( QPainter   *painter,
         }
 
         // Skip the places that are too small.
-        if ( m_weightfilter.at( popularityIndex ) > viewParams->radius() ) {
+        if ( m_weightfilter.at( popularityIndex ) > viewport->radius() ) {
             break;
         }
 
         GeoDataCoordinates geopoint = placemark->coordinate();
 
         if ( !latLonAltBox.contains( geopoint ) ||
-             ! viewParams->currentProjection()->screenCoordinates( geopoint, viewParams->viewport(), x, y ))
+             ! viewport->currentProjection()->screenCoordinates( geopoint, viewport, x, y ))
             {
                 delete m_visiblePlacemarks.take( placemark );
                 continue;
@@ -481,35 +516,35 @@ void PlacemarkLayout::paintPlaceFolder( QPainter   *painter,
         const int visualCategory  = placemark->visualCategory();
 
         // Skip city marks if we're not showing cities.
-        if ( !showCities
+        if ( !m_showCities
              && ( visualCategory > 2 && visualCategory < 20 ) )
             continue;
 
         // Skip terrain marks if we're not showing terrain.
-        if ( !showTerrain
+        if ( !m_showTerrain
              && (    visualCategory >= (int)(GeoDataFeature::Mountain) ) 
                   && visualCategory <= (int)(GeoDataFeature::OtherTerrain) )
             continue;
 
         // Skip other places if we're not showing other places.
-        if ( !showOtherPlaces
+        if ( !m_showOtherPlaces
              && (    visualCategory >= (int)(GeoDataFeature::GeographicPole) ) 
                   && visualCategory <= (int)(GeoDataFeature::Observatory) )
             continue;
 
         // Skip landing sites if we're not showing landing sites.
-        if ( !showLandingSites
+        if ( !m_showLandingSites
              && (    visualCategory >= (int)(GeoDataFeature::MannedLandingSite) ) 
                   && visualCategory <= (int)(GeoDataFeature::UnmannedHardLandingSite) )
             continue;
 
         // Skip craters if we're not showing craters.
-        if ( !showCraters
+        if ( !m_showCraters
              && (    visualCategory == (int)(GeoDataFeature::Crater) ) )
             continue;
 
         // Skip maria if we're not showing maria.
-        if ( !showMaria
+        if ( !m_showMaria
              && (    visualCategory == (int)(GeoDataFeature::Mare) ) )
             continue;
 
@@ -588,16 +623,16 @@ void PlacemarkLayout::paintPlaceFolder( QPainter   *painter,
 
         m_paintOrder.append( mark );
     }
-    if ( viewParams->mapTheme() )
-    {
-        QColor labelColor = viewParams->mapTheme()->map()->labelColor();
-
-        m_placemarkPainter->setDefaultLabelColor( labelColor );
-
-    }
 
     m_placemarkPainter->drawPlacemarks( painter, m_paintOrder, selection, 
-                                        viewParams->viewport() );
+                                        viewport );
+
+    return true;
+}
+
+qreal PlacemarkLayout::zValue() const
+{
+    return -1.0;
 }
 
 QRect PlacemarkLayout::roomForLabel( GeoDataStyle * style,
