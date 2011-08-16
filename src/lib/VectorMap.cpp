@@ -31,9 +31,7 @@
 using namespace Marble;
 
 VectorMap::VectorMap()
-    : m_zlimit( 0.0 ),
-      m_plimit( 0.0 ),
-      m_zBoundingBoxLimit( 0.0 ),
+    : m_zBoundingBoxLimit( 0.0 ),
       m_zPointLimit( 0.0 ),
       // Initialising booleans for horizoncrossing
       m_firsthorizon( false ),
@@ -52,7 +50,7 @@ VectorMap::~VectorMap()
 
 
 void VectorMap::createFromPntMap( const PntMap* pntmap, 
-				  ViewportParams* viewport )
+                                  const ViewportParams* viewport )
 {
     switch( viewport->projection() ) {
         case Spherical:
@@ -68,9 +66,9 @@ void VectorMap::createFromPntMap( const PntMap* pntmap,
 }
 
 void VectorMap::sphericalCreateFromPntMap( const PntMap* pntmap, 
-					   ViewportParams* viewport )
+                                           const ViewportParams* viewport )
 {
-    clear();
+    m_polygons.clear();
 
     // We must use qreal or int64 for the calculations because we
     // square radius sometimes below, and it may cause an overflow. We
@@ -124,8 +122,8 @@ void VectorMap::sphericalCreateFromPntMap( const PntMap* pntmap,
                 m_polygon.setClosed( (*itPolyLine)->getClosed() );
 
                 // mDebug() << i << " Visible: YES";
-                createPolyLine( (*itPolyLine)->constBegin(),
-                                (*itPolyLine)->constEnd(), detail, viewport );
+                sphericalCreatePolyLine( (*itPolyLine)->constBegin(),
+                                         (*itPolyLine)->constEnd(), detail, viewport );
 
                 break; // abort foreach test of current boundary
             } 
@@ -136,9 +134,9 @@ void VectorMap::sphericalCreateFromPntMap( const PntMap* pntmap,
 }
 
 void VectorMap::rectangularCreateFromPntMap( const PntMap* pntmap, 
-					     ViewportParams* viewport )
+                                             const ViewportParams* viewport )
 {
-    clear();
+    m_polygons.clear();
     int  radius = viewport->radius();
 
     // Calculate translation of center point
@@ -230,8 +228,8 @@ void VectorMap::rectangularCreateFromPntMap( const PntMap* pntmap,
             m_polygon.reserve( (*itPolyLine)->size() );
             m_polygon.setClosed( (*itPolyLine)->getClosed() );
 
-            createPolyLine( (*itPolyLine)->constBegin(),
-                            (*itPolyLine)->constEnd(), detail, viewport );
+            rectangularCreatePolyLine( (*itPolyLine)->constBegin(),
+                                       (*itPolyLine)->constEnd(), detail, viewport );
 
             m_offset += 4 * radius;
             boundingPolygon.translate( 4 * radius, 0 );
@@ -240,9 +238,9 @@ void VectorMap::rectangularCreateFromPntMap( const PntMap* pntmap,
 }
 
 void VectorMap::mercatorCreateFromPntMap( const PntMap* pntmap,
-                                          ViewportParams* viewport )
+                                          const ViewportParams* viewport )
 {
-    clear();
+    m_polygons.clear();
     int  radius = viewport->radius();
 
     // Calculate translation of center point
@@ -336,8 +334,8 @@ void VectorMap::mercatorCreateFromPntMap( const PntMap* pntmap,
             m_polygon.reserve( (*itPolyLine)->size() );
             m_polygon.setClosed( (*itPolyLine)->getClosed() );
 
-            createPolyLine( (*itPolyLine)->constBegin(),
-                            (*itPolyLine)->constEnd(), detail, viewport );
+            mercatorCreatePolyLine( (*itPolyLine)->constBegin(),
+                                    (*itPolyLine)->constEnd(), detail, viewport );
 
             m_offset += 4 * radius;
             boundingPolygon.translate( 4 * radius, 0 );
@@ -345,30 +343,10 @@ void VectorMap::mercatorCreateFromPntMap( const PntMap* pntmap,
     }
 }
 
-void VectorMap::createPolyLine( GeoDataCoordinates::Vector::ConstIterator const & itStartPoint,
-                                GeoDataCoordinates::Vector::ConstIterator const & itEndPoint,
-                                const int detail, ViewportParams *viewport )
-{
-    switch( viewport->projection() ) {
-       case Spherical:
-	   sphericalCreatePolyLine( itStartPoint, itEndPoint,
-				    detail, viewport );
-            break;
-        case Equirectangular:
-            rectangularCreatePolyLine( itStartPoint, itEndPoint, 
-				       detail, viewport );
-            break;
-        case Mercator:
-            mercatorCreatePolyLine( itStartPoint, itEndPoint, 
-				    detail, viewport );
-            break;
-    }
-}
-
 void VectorMap::sphericalCreatePolyLine(
 GeoDataCoordinates::Vector::ConstIterator const & itStartPoint,
 GeoDataCoordinates::Vector::ConstIterator const & itEndPoint,
-const int detail, ViewportParams *viewport )
+const int detail, const ViewportParams *viewport )
 {
     int  radius = viewport->radius();
 
@@ -439,14 +417,14 @@ const int detail, ViewportParams *viewport )
 
     // Avoid polygons degenerated to Points.
     if ( m_polygon.size() >= 2 ) {
-        append(m_polygon);
+        m_polygons.append(m_polygon);
     }
 }
 
 void VectorMap::rectangularCreatePolyLine(
     GeoDataCoordinates::Vector::ConstIterator const & itStartPoint,
     GeoDataCoordinates::Vector::ConstIterator const & itEndPoint,
-    const int detail, ViewportParams *viewport )
+    const int detail, const ViewportParams *viewport )
 {
     Quaternion qpos;
 
@@ -546,11 +524,11 @@ void VectorMap::rectangularCreatePolyLine(
 
     // Avoid polygons degenerated to Points.
     if ( m_polygon.size() >= 2 ) {
-        append(m_polygon);
+        m_polygons.append(m_polygon);
     }
 
     if ( otherPolygon.size() >= 2 ) {
-        append( otherPolygon );
+        m_polygons.append( otherPolygon );
     }
 }
 
@@ -558,7 +536,7 @@ void VectorMap::mercatorCreatePolyLine(
         GeoDataCoordinates::Vector::ConstIterator const & itStartPoint,
         GeoDataCoordinates::Vector::ConstIterator const & itEndPoint,
         const int detail,
-        ViewportParams *viewport )
+        const ViewportParams *viewport )
 {
     Quaternion qpos;
 
@@ -673,19 +651,19 @@ void VectorMap::mercatorCreatePolyLine(
 
     // Avoid polygons degenerated to Points.
     if ( m_polygon.size() >= 2 ) {
-        append(m_polygon);
+        m_polygons.append(m_polygon);
     }
 
     if ( otherPolygon.size() >= 2 ) {
-        append( otherPolygon );
+        m_polygons.append( otherPolygon );
     }
 }
 
 
 void VectorMap::drawMap( GeoPainter *painter )
 {
-    ScreenPolygon::Vector::const_iterator  itEndPolygon = constEnd();
-    for ( ScreenPolygon::Vector::const_iterator itPolygon = constBegin();
+    ScreenPolygon::Vector::const_iterator  itEndPolygon = m_polygons.constEnd();
+    for ( ScreenPolygon::Vector::const_iterator itPolygon = m_polygons.constBegin();
           itPolygon != itEndPolygon; 
           ++itPolygon )
     {
@@ -701,9 +679,9 @@ void VectorMap::drawMap( GeoPainter *painter )
 
 void VectorMap::paintMap(GeoPainter * painter)
 {
-    ScreenPolygon::Vector::const_iterator  itEndPolygon = constEnd();
+    ScreenPolygon::Vector::const_iterator  itEndPolygon = m_polygons.constEnd();
 
-    for ( ScreenPolygon::Vector::const_iterator itPolygon = constBegin();
+    for ( ScreenPolygon::Vector::const_iterator itPolygon = m_polygons.constBegin();
           itPolygon != itEndPolygon;
           ++itPolygon )
     {
@@ -715,7 +693,7 @@ void VectorMap::paintMap(GeoPainter * painter)
 }
 
 
-void VectorMap::manageCrossHorizon(ViewportParams *viewport)
+void VectorMap::manageCrossHorizon( const ViewportParams *viewport )
 {
     // qDebug("Crossing horizon line");
     // if (!currentlyvisible) qDebug("Leaving visible hemisphere");
@@ -744,7 +722,7 @@ void VectorMap::manageCrossHorizon(ViewportParams *viewport)
 }
 
 
-const QPointF VectorMap::horizonPoint(ViewportParams *viewport)
+QPointF VectorMap::horizonPoint( const ViewportParams *viewport ) const
 {
     // qDebug("Interpolating");
     qreal  xa;
@@ -764,7 +742,7 @@ const QPointF VectorMap::horizonPoint(ViewportParams *viewport)
 }
 
 
-void VectorMap::createArc(ViewportParams *viewport)
+void VectorMap::createArc( const ViewportParams *viewport )
 {
 
     qreal  beta  = (qreal)( RAD2DEG 
