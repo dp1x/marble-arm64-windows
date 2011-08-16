@@ -36,7 +36,7 @@ class GeoDataLineStringPrivate : public GeoDataGeometryPrivate
 
     ~GeoDataLineStringPrivate()
     {
-        //qDeleteAll(m_rangeCorrected);
+        qDeleteAll(m_rangeCorrected);
     }
 
     virtual GeoDataGeometryPrivate* copy()
