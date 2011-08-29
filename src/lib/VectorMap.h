@@ -61,14 +61,13 @@ class VectorMap
                                   const int detail, const ViewportParams *viewport );
     void rectangularCreatePolyLine( GeoDataCoordinates::Vector::ConstIterator const &,
 				    GeoDataCoordinates::Vector::ConstIterator const &,
-                                    const int detail, const ViewportParams *viewport );
+                                    const int detail, const ViewportParams *viewport, int offset );
     void mercatorCreatePolyLine( GeoDataCoordinates::Vector::ConstIterator const &,
 				 GeoDataCoordinates::Vector::ConstIterator const &,
-                                 const int detail, const ViewportParams *viewport );
+                                 const int detail, const ViewportParams *viewport, int offset );
 
-    void           manageCrossHorizon( const ViewportParams *viewport );
-    QPointF  horizonPoint( const ViewportParams *viewport ) const;
-    void           createArc( const ViewportParams *viewport );
+    QPointF  horizonPoint( const ViewportParams *viewport, const QPointF &currentPoint, int rLimit ) const;
+    void           createArc( const ViewportParams *viewport, const QPointF &horizona, const QPointF &horizonb, int rLimit );
 
     int            getDetailLevel( int radius ) const;
 
@@ -84,26 +83,6 @@ class VectorMap
     //	int m_debugNodeCount;
 
     ScreenPolygon     m_polygon;
-
-    QPointF           m_currentPoint;
-    QPointF           m_lastPoint; 
-
-    // Dealing with the horizon for spherical projection.
-    bool              m_firsthorizon;
-    bool              m_lastvisible;
-    bool              m_currentlyvisible;
-    bool              m_horizonpair;
-    QPointF           m_firstHorizonPoint;
-    QPointF           m_horizona;
-    QPointF           m_horizonb;
-	
-    int               m_rlimit;
-
-    // Needed for repetition in the X direction for flat projection
-    int         m_lastSign;
-    int         m_offset;
-    qreal      m_lastLon;
-    qreal      m_lastLat;
 };
 
 }

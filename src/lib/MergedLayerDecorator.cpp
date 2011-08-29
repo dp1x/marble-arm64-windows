@@ -42,7 +42,7 @@
 using namespace Marble;
 
 MergedLayerDecorator::MergedLayerDecorator( TileLoader * const tileLoader,
-                                            SunLocator* sunLocator )
+                                            const SunLocator* sunLocator )
     : m_tileLoader( tileLoader ),
       m_sunLocator( sunLocator ),
       m_themeId(),
@@ -103,7 +103,6 @@ void MergedLayerDecorator::setThemeId( const QString &themeId )
 void MergedLayerDecorator::setShowSunShading( bool show )
 {
     m_showSunShading = show;
-    m_sunLocator->update();
 }
 
 void MergedLayerDecorator::setLevelZeroLayout( int levelZeroColumns, int levelZeroRows )
