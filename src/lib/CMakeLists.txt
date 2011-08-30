@@ -154,7 +154,7 @@ set(marblewidget_SRCS
     AbstractDataPluginItem.cpp
     AbstractWorkerThread.cpp
 
-    TrackerPlugin.cpp
+    TrackerPluginModel.cpp
     TrackerPluginItem.cpp
 
     PluginInterface.cpp

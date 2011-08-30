@@ -8,44 +8,52 @@
 // Copyright 2011 Guillaume Martres <smarter@ubuntu.com>
 //
 
-#include "TrackerPlugin.h"
+#include "TrackerPluginModel.h"
 
 #include "CacheStoragePolicy.h"
 #include "HttpDownloadManager.h"
-#include "MarbleDirs.h"
-#include "MarbleModel.h"
-#include "MarbleDebug.h"
 #include "GeoDataDocument.h"
 #include "GeoDataPlacemark.h"
 #include "GeoDataTreeModel.h"
+#include "MarbleDebug.h"
+#include "MarbleDirs.h"
+#include "MarbleModel.h"
+#include "PluginManager.h"
 #include "TrackerPluginItem.h"
-#include "ViewportParams.h"
 
 #include <QtCore/QTimer>
 
 namespace Marble
 {
 
-class TrackerPluginPrivate
+class TrackerPluginModelPrivate
 {
 public:
-    TrackerPluginPrivate( TrackerPlugin *parent )
+    TrackerPluginModelPrivate( TrackerPluginModel *parent, GeoDataTreeModel *treeModel )
         : m_parent( parent ),
+          m_treeModel( treeModel ),
           m_document( new GeoDataDocument() ),
           m_storagePolicy( MarbleDirs::localPath() + "/cache/" ),
           m_timer( new QTimer() )
     {
-        m_document->setDocumentRole( TrackingDocument );
     }
 
-    void downloaded(const QString& relativeUrlString, const QString& id)
+    void downloaded(const QString &relativeUrlString, const QString &id)
     {
         Q_UNUSED( relativeUrlString );
 
         m_parent->parseFile( id, m_storagePolicy.data( id ) );
     }
 
-    TrackerPlugin *m_parent;
+    void update()
+    {
+        foreach( TrackerPluginItem *item, m_parent->items() ) {
+            item->update();
+        }
+    }
+
+    TrackerPluginModel *m_parent;
+    GeoDataTreeModel *m_treeModel;
     GeoDataDocument *m_document;
     QHash<QString, TrackerPluginItem *> m_itemHash;
     CacheStoragePolicy m_storagePolicy;
@@ -53,35 +61,21 @@ public:
     QTimer *m_timer;
 };
 
-TrackerPlugin::TrackerPlugin()
-    : d( new TrackerPluginPrivate( this ) )
+TrackerPluginModel::TrackerPluginModel( GeoDataTreeModel *treeModel, PluginManager *pluginManager )
+    : d( new TrackerPluginModelPrivate( this, treeModel ) )
 {
-}
+    d->m_document->setDocumentRole( TrackingDocument );
 
-void TrackerPlugin::initialize()
-{
-    d->m_downloadManager = new HttpDownloadManager( &d->m_storagePolicy, marbleModel()->pluginManager() );
+    connect( d->m_timer, SIGNAL(timeout()), this, SLOT(update()) );
+    d->update();
+    d->m_timer->start( 1000 );
+        
+    d->m_downloadManager = new HttpDownloadManager( &d->m_storagePolicy, pluginManager );
     connect( d->m_downloadManager, SIGNAL(downloadComplete(QString,QString)),
              this, SLOT(downloaded(QString,QString)) );
-    d->m_timer->setInterval( 1000 );
-    connect( d->m_timer, SIGNAL(timeout()), this, SLOT(update()) );
-    update();
-    d->m_timer->start();
 }
 
-
-bool TrackerPlugin::render( GeoPainter *painter, ViewportParams *viewport, const QString &renderPos, GeoSceneLayer *layer )
-{
-    foreach( TrackerPluginItem *item, items() ) {
-        if ( viewport->viewLatLonAltBox().contains( item->placemark()->coordinate() ) ) {
-            item->render( painter, viewport, renderPos, layer );
-        }
-    }
-
-    return true;
-}
-
-TrackerPluginItem *TrackerPlugin::item( const QString &name )
+TrackerPluginItem *TrackerPluginModel::item( const QString &name )
 {
     if ( !d->m_itemHash.contains( name ) ) {
         return 0;
@@ -89,12 +83,12 @@ TrackerPluginItem *TrackerPlugin::item( const QString &name )
     return d->m_itemHash[ name ];
 }
 
-QList<TrackerPluginItem *> TrackerPlugin::items()
+QList<TrackerPluginItem *> TrackerPluginModel::items()
 {
     return d->m_itemHash.values();
 }
 
-void TrackerPlugin::addItem( TrackerPluginItem *mark )
+void TrackerPluginModel::addItem( TrackerPluginItem *mark )
 {
     if ( mark == 0 ) {
         return;
@@ -107,7 +101,7 @@ void TrackerPlugin::addItem( TrackerPluginItem *mark )
     d->m_itemHash[ mark->placemark()->name() ] = mark;
 }
 
-bool TrackerPlugin::removeItem( const QString &name )
+bool TrackerPluginModel::removeItem( const QString &name )
 {
     if ( !d->m_itemHash.contains( name ) ) {
         return false;
@@ -117,29 +111,22 @@ bool TrackerPlugin::removeItem( const QString &name )
     return true;
 }
 
-void TrackerPlugin::update()
+void TrackerPluginModel::beginUpdatePlacemarks()
 {
-    foreach( TrackerPluginItem *item, items() ) {
-        item->update();
-    }
+    d->m_treeModel->removeDocument( d->m_document );
 }
 
-void TrackerPlugin::beginUpdatePlacemarks()
+void TrackerPluginModel::endUpdatePlacemarks()
 {
-    marbleModel()->treeModel()->removeDocument( d->m_document );
+    d->m_treeModel->addDocument( d->m_document );
 }
 
-void TrackerPlugin::endUpdatePlacemarks()
-{
-    marbleModel()->treeModel()->addDocument( d->m_document );
-}
-
-void TrackerPlugin::downloadFile(const QUrl &url, const QString &id)
+void TrackerPluginModel::downloadFile(const QUrl &url, const QString &id)
 {
     d->m_downloadManager->addJob( url, id, id, DownloadBrowse );
 }
 
-void TrackerPlugin::parseFile( const QString &id, const QByteArray &file )
+void TrackerPluginModel::parseFile( const QString &id, const QByteArray &file )
 {
     Q_UNUSED( id );
     Q_UNUSED( file );
@@ -147,4 +134,4 @@ void TrackerPlugin::parseFile( const QString &id, const QByteArray &file )
 
 }
 
-#include "TrackerPlugin.moc"
+#include "TrackerPluginModel.moc"
