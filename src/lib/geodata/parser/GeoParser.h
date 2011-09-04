@@ -22,11 +22,11 @@
 #ifndef MARBLE_GEOPARSER_H
 #define MARBLE_GEOPARSER_H
 
+#include <QtCore/QPair>
 #include <QtCore/QStack>
 #include <QtXml/QXmlStreamReader>
 
 #include <geodata_export.h>
-#include "GeoTagHandler.h"
 
 namespace Marble
 {
@@ -34,12 +34,14 @@ namespace Marble
 typedef int GeoDataGenericSourceType;
 
 class GeoDocument;
-class GeoGraphicsItem;
+class GeoNode;
 class GeoStackItem;
 
 class GEODATA_EXPORT GeoParser : public QXmlStreamReader
 {
  public:
+    typedef QPair<QString, QString> QualifiedName; // Tag Name & Namespace pair
+
     explicit GeoParser( GeoDataGenericSourceType sourceType );
     virtual ~GeoParser();
 
@@ -59,14 +61,11 @@ class GEODATA_EXPORT GeoParser : public QXmlStreamReader
     GeoDocument* releaseDocument();
     GeoDocument* activeDocument() { return m_document; }
 
-    QList<GeoGraphicsItem*>* releaseModel();
-    QList<GeoGraphicsItem*>* activeModel();
-
     // Used by tag handlers, to be overridden by GeoDataParser/GeoSceneParser
     virtual bool isValidElement( const QString& tagName ) const;
 
     // Used by tag handlers, to access a parent element's associated GeoStackItem
-    GeoStackItem parentElement( unsigned int depth = 0 );
+    GeoStackItem parentElement( unsigned int depth = 0 ) const;
 
     // Used by tag handlers, to emit a warning while parsing
     void raiseWarning( const QString& );
@@ -90,7 +89,6 @@ protected:
 
 protected:
     GeoDocument* m_document;
-    QList<GeoGraphicsItem*>* m_itemModel;
     GeoDataGenericSourceType m_source;
 
 private:
@@ -98,44 +96,48 @@ private:
     QStack<GeoStackItem> m_nodeStack;
 };
 
-class GeoStackItem : public QPair<GeoTagHandler::QualifiedName, GeoNode*>
+class GeoStackItem
 {
  public:
     GeoStackItem()
-        : QPair<GeoTagHandler::QualifiedName, GeoNode*>()
+        : m_qualifiedName(),
+          m_node( 0 )
     {
     }
 
-    GeoStackItem( const GeoTagHandler::QualifiedName& qName, GeoNode* node )
-        : QPair<GeoTagHandler::QualifiedName, GeoNode*>( qName, node )
+    GeoStackItem( const GeoParser::QualifiedName& qualifiedName, GeoNode* node )
+        : m_qualifiedName( qualifiedName ),
+          m_node( node )
     {
     }
 
     // Fast path for tag handlers
     bool represents( const char* tagName ) const
     {
-        return second && tagName == first.first;
+        return m_node && tagName == m_qualifiedName.first;
     }
 
     // Helper for tag handlers. Does NOT guard against miscasting. Use with care.
     template<class T>
     T* nodeAs()
     {
-        return static_cast<T*>(second);
+        return static_cast<T*>(m_node);
     }
     
     template<class T>
     bool is() const
     {
-        return 0 != dynamic_cast<T*>(second);
+        return 0 != dynamic_cast<T*>(m_node);
     }
 
-    GeoTagHandler::QualifiedName qualifiedName() const { return first; }
-    GeoNode* associatedNode() const { return second; }
+    GeoParser::QualifiedName qualifiedName() const { return m_qualifiedName; }
+    GeoNode* associatedNode() const { return m_node; }
 
 private:
     friend class GeoParser;
-    void assignNode( GeoNode* node ) { second = node; }
+    void assignNode( GeoNode* node ) { m_node = node; }
+    GeoParser::QualifiedName m_qualifiedName;
+    GeoNode* m_node;
 };
 
 }

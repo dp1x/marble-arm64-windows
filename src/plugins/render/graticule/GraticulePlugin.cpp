@@ -311,6 +311,11 @@ bool GraticulePlugin::render( GeoPainter *painter, ViewportParams *viewport,
     return true;
 }
 
+qreal GraticulePlugin::zValue() const
+{
+    return 1.0;
+}
+
 void GraticulePlugin::renderGrid( GeoPainter *painter, ViewportParams *viewport,
                                   const QPen& equatorCirclePen,
                                   const QPen& tropicsCirclePen,
@@ -551,7 +556,7 @@ void GraticulePlugin::renderLongitudeLines( GeoPainter *painter,
             }
 
             // Paint all longitude coordinate lines except for the meridians
-            if ( itStep != 0.0 || itStep != 180.0 || itStep != -180.0 ) {
+            if ( itStep != 0.0 && itStep != 180.0 && itStep != -180.0 ) {
                 renderLongitudeLine( painter, itStep, viewLatLonAltBox, polarGap, 
                                     label, labelPositionFlags );           
             }
@@ -577,7 +582,7 @@ void GraticulePlugin::renderLongitudeLines( GeoPainter *painter,
             }
 
             // Paint all longitude coordinate lines except for the meridians
-            if ( itStep != 0.0 || itStep != 180.0 || itStep != -180.0 ) {
+            if ( itStep != 0.0 && itStep != 180.0 && itStep != -180.0 ) {
                 renderLongitudeLine( painter, itStep, viewLatLonAltBox, polarGap, 
                                     label, labelPositionFlags );           
             }
@@ -599,7 +604,7 @@ void GraticulePlugin::renderLongitudeLines( GeoPainter *painter,
             }
 
             // Paint all longitude coordinate lines except for the meridians
-            if ( itStep != 0.0 || itStep != 180.0 || itStep != -180.0 ) {
+            if ( itStep != 0.0 && itStep != 180.0 && itStep != -180.0 ) {
                 renderLongitudeLine( painter, itStep, viewLatLonAltBox, polarGap, 
                                     label, labelPositionFlags );           
             }
