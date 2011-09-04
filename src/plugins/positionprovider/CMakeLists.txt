@@ -18,5 +18,7 @@ IF(QTLOCATION_FOUND)
      ADD_SUBDIRECTORY( qtmobility )
 ENDIF(QTLOCATION_FOUND)
 
+ADD_SUBDIRECTORY( placemark )
+
 # experimental implementation
 # ADD_SUBDIRECTORY( geoclue )
