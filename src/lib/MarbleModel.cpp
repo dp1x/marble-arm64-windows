@@ -198,7 +198,7 @@ MarbleModel::MarbleModel( QObject *parent )
      //Initializing Bookmark manager
     d->m_bookmarkManager = new BookmarkManager();
 
-    d->m_altitudeModel = new AltitudeModel( d->m_mapThemeManager, d->m_downloadManager, this );
+    d->m_altitudeModel = new AltitudeModel( this );
 
 }
 
