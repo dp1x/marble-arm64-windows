@@ -137,6 +137,7 @@ void PositionTracking::setPositionProviderPlugin( PositionProviderPlugin* plugin
 
     if ( d->m_positionProvider ) {
         d->m_positionProvider->setParent( this );
+        d->m_positionProvider->setMarbleModel( d->m_marbleModel );
         mDebug() << "Initializing position provider:" << d->m_positionProvider->name();
         connect( d->m_positionProvider, SIGNAL( statusChanged( PositionProviderStatus ) ),
                 d, SLOT( setStatus(PositionProviderStatus) ) );

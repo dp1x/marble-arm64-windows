@@ -49,8 +49,6 @@ MarbleWidgetPopupMenu::MarbleWidgetPopupMenu(MarbleWidget *widget,
       m_smallScreenMenu( new QMenu( m_widget ) ),
       m_runnerManager( 0 )
 {
-    connect( m_lmbMenu, SIGNAL( triggered( QAction* ) ),
-             this,      SLOT( showFeatureInfo( QAction* ) ) );
     createActions();
 }
 
@@ -61,6 +59,16 @@ void MarbleWidgetPopupMenu::createActions()
     m_planetAction = new QAction( tr( "&Earth" ), this );
     m_planetAction->setData( 0 );
     m_copyCoordinateAction = new QAction( tr( "0 N 0 W" ), this );
+
+    m_infoDialogAction = new QAction( this );
+    m_infoDialogAction->setData( 0 );
+
+    m_showOrbitAction = new QAction( tr( "Display orbit" ), this );
+    m_showOrbitAction->setCheckable( true );
+    m_showOrbitAction->setData( 0 );
+
+    m_trackPlacemarkAction = new QAction( tr( "Follow path" ), this );
+    m_trackPlacemarkAction->setData( 0 );
 
     //	Tool actions (Right mouse button)
     QAction* fromHere = new QAction( tr( "Directions &from here" ), this );
@@ -100,7 +108,10 @@ void MarbleWidgetPopupMenu::createActions()
     connect( m_setHomePointAction, SIGNAL( triggered() ), SLOT( slotSetHomePoint() ) );
     connect( addBookmark, SIGNAL( triggered( ) ), SLOT( addBookmark() ) );
     connect( m_aboutDialogAction, SIGNAL( triggered() ), SLOT( slotAboutDialog() ) );
-    connect( m_copyCoordinateAction,SIGNAL( triggered() ), SLOT( slotCopyCoordinates() ) );
+    connect( m_copyCoordinateAction, SIGNAL( triggered() ), SLOT( slotCopyCoordinates() ) );
+    connect( m_infoDialogAction, SIGNAL( triggered() ), SLOT( slotInfoDialog() ) );
+    connect( m_showOrbitAction, SIGNAL( triggered(bool) ), SLOT( slotShowOrbit() ) );
+    connect( m_trackPlacemarkAction, SIGNAL( triggered(bool) ), SLOT( slotTrackPlacemark() ) );
     connect( fullscreenAction, SIGNAL( triggered( bool ) ), this, SLOT( toggleFullscreen( bool ) ) );
 }
 
@@ -143,10 +154,30 @@ void MarbleWidgetPopupMenu::showLmbMenu( int xpos, int ypos )
     QVector<const GeoDataPlacemark*>::const_iterator const itEnd = m_featurelist.constEnd();
     for (; it != itEnd; ++it )
     {
-        QAction *action = new QAction( (*it)->name(), m_lmbMenu );
-        action->setData( actionidx );
-        action->setIcon( (*it)->style()->iconStyle().icon() );
-        m_lmbMenu->addAction( action );
+        QString name = (*it)->name();
+        QPixmap icon = (*it)->style()->iconStyle().icon();
+        m_infoDialogAction->setData( actionidx );
+
+        //TODO: don't hardcode this check ?
+        if ( (*it)->visualCategory() != GeoDataFeature::Satellite ) {
+            m_infoDialogAction->setText( name );
+            m_infoDialogAction->setIcon( icon );
+
+            m_lmbMenu->addAction( m_infoDialogAction );
+        } else {
+            QMenu *subMenu = new QMenu( name, m_lmbMenu );
+            subMenu->setIcon( icon );
+            m_infoDialogAction->setText( tr( "Satellite informations" ) );
+            subMenu->addAction( m_infoDialogAction );
+
+            m_showOrbitAction->setChecked( false );
+            subMenu->addAction( m_showOrbitAction );
+
+            m_trackPlacemarkAction->setData( actionidx );
+            subMenu->addAction( m_trackPlacemarkAction );
+
+            m_lmbMenu->addAction( subMenu->menuAction() );
+        }
         actionidx++;
     }
     
@@ -198,9 +229,14 @@ void MarbleWidgetPopupMenu::showRmbMenu( int xpos, int ypos )
     m_rmbMenu->popup( m_widget->mapToGlobal( curpos ) );
 }
 
-
-void MarbleWidgetPopupMenu::showFeatureInfo( QAction* action )
+void MarbleWidgetPopupMenu::slotInfoDialog()
 {
+    QAction *action = qobject_cast<QAction *>( sender() );
+    if ( action == 0 ) {
+        mDebug() << "Warning: slotInfoDialog should be called by a QAction signal";
+        return;
+    }
+
     int actionidx = action->data().toInt();
 
     if ( actionidx > 0 ) {
@@ -210,6 +246,28 @@ void MarbleWidgetPopupMenu::showFeatureInfo( QAction* action )
         dialog->setWindowModality( Qt::WindowModal );
         dialog->exec();
         delete dialog;
+    }
+}
+
+void MarbleWidgetPopupMenu::slotShowOrbit()
+{
+    //TODO
+}
+
+void MarbleWidgetPopupMenu::slotTrackPlacemark()
+{
+    QAction *action = qobject_cast<QAction *>( sender() );
+    if ( action == 0 ) {
+        mDebug() << "Warning: slotTrackPlacemark should be called by a QAction signal";
+        return;
+    }
+
+    int actionidx = action->data().toInt();
+
+    if ( actionidx > 0 ) {
+        mDebug() << actionidx;
+        const GeoDataPlacemark *index = m_featurelist.at( actionidx -1 );
+        emit trackPlacemark( index );
     }
 }
 
