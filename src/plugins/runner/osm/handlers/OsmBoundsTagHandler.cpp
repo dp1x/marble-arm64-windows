@@ -8,7 +8,7 @@
 // Copyright 2011      Konstantin Oblaukhov <oblaukhov.konstantin@gmail.com>
 //
 
-#include "OsmBoundTagHandler.h"
+#include "OsmBoundsTagHandler.h"
 
 #include "GeoParser.h"
 #include "OsmNodeFactory.h"
@@ -25,21 +25,20 @@ namespace Marble
 namespace osm
 {
 
-static GeoTagHandlerRegistrar osmBoundTagHandler( GeoTagHandler::QualifiedName( osmTag_bound, "" ),
-        new OsmBoundTagHandler() );
+static GeoTagHandlerRegistrar osmBoundsTagHandler( GeoParser::QualifiedName( osmTag_bounds, "" ),
+        new OsmBoundsTagHandler() );
 
-GeoNode* OsmBoundTagHandler::parse( GeoParser& parser ) const
+GeoNode* OsmBoundsTagHandler::parse( GeoParser& parser ) const
 {
     Q_ASSERT( parser.isStartElement() );
 
     GeoDataDocument* doc = geoDataDoc( parser );
     GeoDataLinearRing r;
     GeoDataPolygon *p = new GeoDataPolygon();
-    QStringList l = parser.attribute( "box" ).split( ',' );
-    qreal minlat = l[0].toFloat();
-    qreal minlon = l[1].toFloat();
-    qreal maxlat = l[2].toFloat();
-    qreal maxlon = l[3].toFloat();
+    qreal minlat = parser.attribute("minlat").toFloat();
+    qreal minlon = parser.attribute("minlon").toFloat();
+    qreal maxlat = parser.attribute("maxlat").toFloat();
+    qreal maxlon = parser.attribute("maxlon").toFloat();
     r.append( GeoDataCoordinates( minlon, minlat, 0, GeoDataCoordinates::Degree ) );
     r.append( GeoDataCoordinates( maxlon, minlat, 0, GeoDataCoordinates::Degree ) );
     r.append( GeoDataCoordinates( maxlon, maxlat, 0, GeoDataCoordinates::Degree ) );

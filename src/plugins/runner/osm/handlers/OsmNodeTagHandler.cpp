@@ -25,16 +25,12 @@ namespace Marble
 namespace osm
 {
 
-static GeoTagHandlerRegistrar osmNodeTagHandler( GeoTagHandler::QualifiedName( osmTag_node, "" ),
+static GeoTagHandlerRegistrar osmNodeTagHandler( GeoParser::QualifiedName( osmTag_node, "" ),
         new OsmNodeTagHandler() );
 
 GeoNode* OsmNodeTagHandler::parse( GeoParser& parser ) const
 {
     Q_ASSERT( parser.isStartElement() );
-
-    GeoStackItem parentItem = parser.parentElement();
-
-    GeoDataDocument* doc = geoDataDoc( parser );
 
     qreal lon = parser.attribute( "lon" ).toDouble();
     qreal lat = parser.attribute( "lat" ).toDouble();

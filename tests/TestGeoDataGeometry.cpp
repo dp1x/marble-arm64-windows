@@ -46,8 +46,8 @@ void TestGeoDataGeometry::downcastPointTest()
 
     QVERIFY( ! point.toString().isEmpty() );
 
-    GeoDataGeometry tmpGeometry( point );
-    GeoDataPoint newPoint( tmpGeometry );
+    GeoDataCoordinates tmp( point );
+    GeoDataPoint newPoint( tmp );
 
     QCOMPARE( newPoint.toString() , point.toString());
 }

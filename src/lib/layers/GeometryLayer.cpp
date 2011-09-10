@@ -22,7 +22,6 @@
 #include "GeoDataStyle.h"
 #include "GeoDataStyleMap.h"
 #include "MarbleDebug.h"
-#include "GeoDataTypes.h"
 #include "GeoDataFeature.h"
 #include "GeoPainter.h"
 #include "ViewportParams.h"
@@ -237,13 +236,11 @@ void GeometryLayerPrivate::createGraphicsItemFromGeometry( GeoDataGeometry* obje
     }
     else if ( GeoDataLineString* line = dynamic_cast<GeoDataLineString*>( object ) )
     {
-        item = new GeoLineStringGraphicsItem();
-        static_cast<GeoLineStringGraphicsItem*>( item )->setLineString( *line );
+        item = new GeoLineStringGraphicsItem( line );
     }
     else if ( GeoDataPolygon *poly = dynamic_cast<GeoDataPolygon*>( object ) )
     {
-        item = new GeoPolygonGraphicsItem();
-        static_cast<GeoPolygonGraphicsItem*>( item )->setPolygon( *poly );
+        item = new GeoPolygonGraphicsItem( poly );
     }
     else if ( dynamic_cast<GeoDataMultiGeometry*>( object ) )
     {

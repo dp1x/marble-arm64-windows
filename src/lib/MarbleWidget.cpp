@@ -225,6 +225,8 @@ void MarbleWidgetPrivate::construct()
                        m_widget, SIGNAL( pluginSettingsChanged() ) );
     m_widget->connect( m_map,    SIGNAL( renderPluginInitialized( RenderPlugin * ) ),
                        m_widget, SIGNAL( renderPluginInitialized( RenderPlugin * ) ) );
+    m_widget->connect( m_map,    SIGNAL( themeChanged( QString ) ),
+                       m_widget, SIGNAL( themeChanged( QString ) ) );
 
     // react to some signals of m_map
     m_widget->connect( m_map,    SIGNAL( repaintNeeded( QRegion ) ),
@@ -232,8 +234,6 @@ void MarbleWidgetPrivate::construct()
 
     // When some fundamental things change in the model, we got to
     // show this in the view, i.e. here.
-    m_widget->connect( m_model,  SIGNAL( themeChanged( QString ) ),
-		       m_widget, SIGNAL( themeChanged( QString ) ) );
     m_widget->connect( m_model, SIGNAL( modelChanged() ),
                        m_widget, SLOT( update() ) );
 
@@ -334,12 +334,6 @@ MarbleWidgetInputHandler *MarbleWidget::inputHandler() const
 {
   return d->m_inputhandler;
 }
-
-Quaternion MarbleWidget::planetAxis() const
-{
-    return viewport()->planetAxis();
-}
-
 
 int MarbleWidget::radius() const
 {
@@ -631,7 +625,7 @@ void MarbleWidget::rotateBy( const qreal deltaLon, const qreal deltaLat, FlyToMo
     Quaternion  rotPhi( 1.0, deltaLat / 180.0, 0.0, 0.0 );
     Quaternion  rotTheta( 1.0, 0.0, deltaLon / 180.0, 0.0 );
 
-    Quaternion  axis = planetAxis();
+    Quaternion  axis = d->m_map->viewport()->planetAxis();
     qreal lon( 0.0 ), lat( 0.0 );
     axis.getSpherical( lon, lat );
     axis = rotTheta * axis;
@@ -1353,11 +1347,9 @@ void MarbleWidget::downloadRegion( QString const & sourceDir, QVector<TileCoords
 GeoDataLookAt MarbleWidget::lookAt() const
 {
     GeoDataLookAt result;
-    qreal lon( 0.0 ), lat( 0.0 );
 
-    d->m_map->viewport()->centerCoordinates( lon, lat );
-    result.setLongitude( lon );
-    result.setLatitude( lat );
+    result.setLongitude( d->m_map->viewport()->centerLongitude() );
+    result.setLatitude( d->m_map->viewport()->centerLatitude() );
     result.setAltitude( 0.0 );
     result.setRange( distance() * KM2METER );
 
