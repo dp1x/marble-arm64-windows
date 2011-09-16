@@ -22,7 +22,7 @@
 #ifndef MARBLE_GEODATAPARSER_H
 #define MARBLE_GEODATAPARSER_H
 
-#include <geodata_export.h>
+#include "geodata_export.h"
 #include "GeoParser.h"
 
 namespace Marble
@@ -33,10 +33,8 @@ class GeoDataDocument;
 
 enum GeoDataSourceType {
     GeoData_UNKNOWN = -1,
-    GeoData_GPX    = 0,
     GeoData_KML    = 1,
-    GeoData_GeoRSS = 2,
-    GeoData_OSM    = 3
+    GeoData_GeoRSS = 2
 };
 
 class GEODATA_EXPORT GeoDataParser : public GeoParser
@@ -54,7 +52,7 @@ private:
 };
 
 // Global helper function for the tag handlers
-GeoDataDocument* geoDataDoc(GeoParser& parser);
+GeoDataDocument* geoDataDoc(GeoParser& parser) GEODATA_EXPORT;
 
 }
 

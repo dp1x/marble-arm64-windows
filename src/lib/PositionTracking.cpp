@@ -40,12 +40,13 @@ void PositionTrackingPrivate::setPosition( GeoDataCoordinates position,
         PositionProviderStatusAvailable )
     {
         GeoDataPlacemark *placemark = static_cast<GeoDataPlacemark*>(m_document->child(m_document->size()-1));
-        //GeoDataMultiGeometry *geometry = static_cast<GeoDataMultiGeometry*>(placemark->geometry());
-        m_currentLineString->append(position);
+
+        if ( accuracy.horizontal < 250 ) {
+            m_currentLineString->append(position);
+        }
 
         //if the position has moved then update the current position
-        if ( !( m_gpsCurrentPosition ==
-                position ) )
+        if ( m_gpsCurrentPosition != position )
         {
             placemark = static_cast<GeoDataPlacemark*>(m_document->child(0));
             placemark->setCoordinate(position);
@@ -173,12 +174,16 @@ qreal PositionTracking::direction() const
 
 bool PositionTracking::trackVisible() const
 {
-    return d->m_document->isVisible();
+    GeoDataPlacemark *placemark = static_cast<GeoDataPlacemark*>(d->m_document->child(d->m_document->size()-1));
+    return placemark->isVisible();
 }
 
 void PositionTracking::setTrackVisible( bool visible )
 {
-    d->m_document->setVisible( visible );
+    d->m_marbleModel->treeModel()->removeDocument(d->m_document);
+    GeoDataPlacemark *placemark = static_cast<GeoDataPlacemark*>(d->m_document->child(d->m_document->size()-1));
+    placemark->setVisible( visible );
+    d->m_marbleModel->treeModel()->addDocument(d->m_document);
 }
 
 bool PositionTracking::saveTrack(QString& fileName)

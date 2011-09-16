@@ -35,19 +35,16 @@ public Q_SLOTS:
     void setValue(qreal newvalue);
     void setDimension( Dimension dimension );
 Q_SIGNALS:
-    void dimensionChanged( Dimension dimension );
     void valueChanged( qreal value );
 private Q_SLOTS:
     // changes value based on combobox
-    void signChanged();
+    void onSignChanged();
+    void checkSecOverflow();
+    void checkMinOverflow();
+    void checkDegOverflow();
+private:
     // recalculates m_value based on spinboxes
     void recalculate();
-    // recalculates spinboxes based on m_value
-    void reverseRecalculate();
-    // changes combobox based on value
-    void checkSign();
-    void secOverflow();
-    void minOverflow();
 private:
     LatLonEditPrivate * const d;
 };

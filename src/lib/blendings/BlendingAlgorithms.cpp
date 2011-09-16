@@ -20,9 +20,23 @@
 #include <cmath>
 
 #include <QtGui/QImage>
+#include <QtGui/QPainter>
 
 namespace Marble
 {
+
+void OverpaintBlending::blend( QImage * const bottom, TextureTile const * const top ) const
+{
+    Q_ASSERT( bottom );
+    Q_ASSERT( top );
+    Q_ASSERT( top->image() );
+    Q_ASSERT( bottom->size() == top->image()->size() );
+    Q_ASSERT( bottom->format() == QImage::Format_ARGB32_Premultiplied );
+
+    QPainter painter( bottom );
+
+    painter.drawImage( 0, 0, *top->image() );
+}
 
 // pre-conditions:
 // - bottom and top image have the same size
@@ -168,28 +182,6 @@ qreal SubtractiveBlending::blendChannel( qreal const bottomColorIntensity,
 
 
 // Lightening blendings
-
-void AlphaBlending::blend( QImage * const bottom, TextureTile const * const top ) const
-{
-    QImage const * const topImage = top->image();
-    Q_ASSERT( topImage );
-    Q_ASSERT( bottom->size() == topImage->size() );
-    int const width = bottom->width();
-    int const height = bottom->height();
-    for ( int y = 0; y < height; ++y ) {
-        for ( int x = 0; x < width; ++x ) {
-            qreal const c = qRed( topImage->pixel( x, y )) / 255.0;
-            qreal const alpha = qAlpha(topImage->pixel( x, y )) / 255.0;
-            QRgb const bottomPixel = bottom->pixel( x, y );
-            int const bottomRed = qRed( bottomPixel );
-            int const bottomGreen = qGreen( bottomPixel );
-            int const bottomBlue = qBlue( bottomPixel );
-            bottom->setPixel( x, y, qRgb(( int )( c * alpha + ( 1 - alpha ) * bottomRed ),
-                                         ( int )( c * alpha + ( 1 - alpha ) * bottomGreen ),
-                                         ( int )( c * alpha + ( 1 - alpha ) * bottomBlue )));
-        }
-    }
-}
 
 qreal AdditiveBlending::blendChannel( qreal const bottomColorIntensity,
                                       qreal const topColorIntensity ) const
