@@ -540,7 +540,12 @@ void MarbleModel::addDownloadPolicies( GeoSceneDocument *mapTheme )
     }
 }
 
-RoutingManager* MarbleModel::routingManager() const
+RoutingManager* MarbleModel::routingManager()
+{
+    return d->m_routingManager;
+}
+
+const RoutingManager* MarbleModel::routingManager() const
 {
     return d->m_routingManager;
 }
@@ -600,7 +605,12 @@ void MarbleModel::removeGeoData( const QString& fileName )
     d->m_fileManager->removeFile( fileName );
 }
 
-AltitudeModel* MarbleModel::altitudeModel() const
+AltitudeModel* MarbleModel::altitudeModel()
+{
+    return d->m_altitudeModel;
+}
+
+const AltitudeModel* MarbleModel::altitudeModel() const
 {
     return d->m_altitudeModel;
 }

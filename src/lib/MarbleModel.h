@@ -248,7 +248,8 @@ class MARBLE_EXPORT MarbleModel : public QObject
      */
     const Planet *planet() const;
 
-    RoutingManager* routingManager() const;
+    RoutingManager* routingManager();
+    const RoutingManager* routingManager() const;
 
     void setClockDateTime( const QDateTime& datetime );
 
@@ -271,8 +272,9 @@ class MARBLE_EXPORT MarbleModel : public QObject
 
     void setLegend( QTextDocument * document );
 
-    AltitudeModel* altitudeModel() const;
-    
+    AltitudeModel* altitudeModel();
+    const AltitudeModel* altitudeModel() const;
+
     bool workOffline() const;
 
     void setWorkOffline( bool workOffline );
