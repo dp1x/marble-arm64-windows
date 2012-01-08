@@ -100,7 +100,7 @@ void PlacemarkPainter::drawPlacemarks( QPainter* painter,
 }
 
 inline void PlacemarkPainter::drawLabelText(QPainter &labelPainter, const QString &text,
-                                            const QFont &labelFont, LabelStyle labelStyle )
+                                            const QFont &labelFont, LabelStyle labelStyle, const QColor &color )
 {
     QFont font = labelFont;
     QFontMetrics metrics = QFontMetrics( font );
@@ -108,6 +108,7 @@ inline void PlacemarkPainter::drawLabelText(QPainter &labelPainter, const QStrin
 
     switch ( labelStyle ) {
     case Selected: {
+        labelPainter.setPen( color );
         labelPainter.setFont( font );
         QRect textRect( 0, 0, metrics.width( text ), metrics.height() );
         labelPainter.fillRect( textRect, QApplication::palette().highlight() );
@@ -121,7 +122,7 @@ inline void PlacemarkPainter::drawLabelText(QPainter &labelPainter, const QStrin
 
         QPen outlinepen( Qt::white );
         outlinepen.setWidthF( s_labelOutlineWidth );
-        QBrush  outlinebrush( Qt::black );
+        QBrush  outlinebrush( color );
 
         QPainterPath outlinepath;
 
@@ -137,6 +138,7 @@ inline void PlacemarkPainter::drawLabelText(QPainter &labelPainter, const QStrin
         break;
     }
     default: {
+        labelPainter.setPen( color );
         labelPainter.setFont( font );
         labelPainter.drawText( 0, fontAscent, text );
     }
@@ -185,8 +187,7 @@ inline void PlacemarkPainter::drawLabelPixmap( VisiblePlacemark *mark )
 
         labelPainter.begin( &labelPixmap );
 
-        labelPainter.setPen( labelColor );
-        drawLabelText( labelPainter, labelName, labelFont, labelStyle );
+        drawLabelText( labelPainter, labelName, labelFont, labelStyle, labelColor );
 
         labelPainter.end();
     } else {
@@ -197,8 +198,7 @@ inline void PlacemarkPainter::drawLabelPixmap( VisiblePlacemark *mark )
 
         labelPainter.begin( &image );
 
-        labelPainter.setPen( labelColor );
-        drawLabelText( labelPainter, labelName, labelFont, labelStyle );
+        drawLabelText( labelPainter, labelName, labelFont, labelStyle, labelColor );
 
         labelPainter.end();
 
