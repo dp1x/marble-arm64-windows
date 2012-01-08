@@ -54,7 +54,7 @@ class NavigationWidgetPrivate
     m_document->setDocumentRole( SearchResultDocument );
     m_document->setName("Search Results");
     m_treeModel.setRootDocument( m_document );
-    };
+    }
 
 };
 
@@ -66,6 +66,9 @@ NavigationWidget::NavigationWidget( QWidget *parent, Qt::WindowFlags f )
     d->m_widget = 0;
 
     d->m_navigationUi.setupUi( this );
+    d->m_navigationUi.m_splitter->setStretchFactor( 0, 1 );
+    d->m_navigationUi.m_splitter->setStretchFactor( 1, 2 );
+    d->m_navigationUi.locationListView->setVisible( false );
 
     d->m_sortproxy = new QSortFilterProxyModel( this );
     d->m_navigationUi.locationListView->setModel( d->m_sortproxy );
@@ -97,11 +100,6 @@ NavigationWidget::NavigationWidget( QWidget *parent, Qt::WindowFlags f )
     connect( d->m_navigationUi.locationListView, SIGNAL( activated( const QModelIndex& ) ),
              this,                               SLOT( mapCenterOnSignal( const QModelIndex& ) ) );
 
-    connect( d->m_navigationUi.searchLineEdit,   SIGNAL( textChanged( const QString& ) ),
-             this,                               SLOT( searchLineChanged( const QString& ) ) );
-    connect( d->m_navigationUi.searchLineEdit,   SIGNAL( returnPressed() ),
-             this,                               SLOT( searchReturnPressed() ) );
-
     connect( d->m_navigationUi.zoomSlider,       SIGNAL( sliderPressed() ),
              this,                               SLOT( adjustForAnimation() ) );
     connect( d->m_navigationUi.zoomSlider,       SIGNAL( sliderReleased() ),
@@ -118,6 +116,7 @@ void NavigationWidget::setMarbleWidget( MarbleWidget *widget )
     d->m_runnerManager = new MarbleRunnerManager( widget->model()->pluginManager(), this );
     connect( d->m_runnerManager, SIGNAL( searchResultChanged( QVector<GeoDataPlacemark*> ) ),
              this,               SLOT( setLocations( QVector<GeoDataPlacemark*> ) ) );
+    connect( d->m_runnerManager, SIGNAL( searchFinished( QString ) ), this, SIGNAL( searchFinished() ) );
 
     d->m_widget = widget;
     d->m_runnerManager->setModel( widget->model() );
@@ -149,6 +148,26 @@ void NavigationWidget::setMarbleWidget( MarbleWidget *widget )
              this,        SLOT( selectTheme( QString ) ) );
 }
 
+void NavigationWidget::search(const QString &searchTerm)
+{
+    d->m_searchTerm = searchTerm;
+    d->m_navigationUi.locationListView->setVisible( !searchTerm.isEmpty() );
+
+    if ( !searchTerm.isEmpty() ) {
+        d->m_runnerManager->findPlacemarks( d->m_searchTerm );
+    } else {
+        // set the proxy list to the placemarkModel
+        d->m_sortproxy->setSourceModel( d->m_widget->model()->placemarkModel() );
+        d->m_sortproxy->sort( 0 );
+        d->m_widget->model()->placemarkSelectionModel()->clear();
+
+        // clear the local document
+        d->m_widget->model()->treeModel()->removeDocument( d->m_document );
+        d->m_document->clear();
+        d->m_widget->model()->treeModel()->addDocument( d->m_document );
+    }
+}
+
 void NavigationWidget::changeZoom( int zoom )
 {
     // There exists a circular signal/slot connection between MarbleWidget and this widget's
@@ -171,6 +190,7 @@ void NavigationWidget::changeZoom( int zoom )
 
 void NavigationWidget::searchLineChanged( const QString &search )
 {
+    /** @todo: Use for autocompletion */
     d->m_searchTerm = search;
     // if search line is empty, restore original geonames
     if ( d->m_searchTerm.isEmpty() ) {
@@ -185,14 +205,6 @@ void NavigationWidget::searchLineChanged( const QString &search )
         d->m_widget->model()->treeModel()->addDocument( d->m_document );
     }
     d->m_deferSearch.start( 500 );
-}
-
-void NavigationWidget::searchReturnPressed()
-{
-    // do nothing if search term empty
-    if ( !d->m_searchTerm.isEmpty() ) {
-        d->m_runnerManager->findPlacemarks( d->m_searchTerm );
-    }
 }
 
 void NavigationWidget::search()

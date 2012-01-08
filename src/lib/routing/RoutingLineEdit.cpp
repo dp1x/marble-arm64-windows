@@ -20,6 +20,9 @@
 #include <QtGui/QLabel>
 #include <QtGui/QStyle>
 #include <QtGui/QMouseEvent>
+#include <QtGui/QPainter>
+#include <QtCore/QTimer>
+#include <QtCore/QDebug>
 
 namespace Marble
 {
@@ -29,16 +32,63 @@ class RoutingLineEditPrivate
 public:
     QLabel* m_clearButton;
 
+    QLabel* m_decoratorButton;
+
     QPixmap m_clearPixmap;
 
+    QPixmap m_decoratorPixmap;
+
+    QTimer m_progressTimer;
+
+    QVector<QPixmap> m_progressAnimation;
+
+    int m_currentFrame;
+
+    int m_iconSize;
+
     RoutingLineEditPrivate( RoutingLineEdit* parent );
+
+    void createProgressAnimation();
 };
 
 RoutingLineEditPrivate::RoutingLineEditPrivate( RoutingLineEdit* parent ) :
-        m_clearButton( new QLabel( parent ) )
+    m_clearButton( new QLabel( parent ) ), m_decoratorButton( new QLabel( parent ) ),
+    m_iconSize( 16 )
 {
     m_clearButton->setCursor( Qt::ArrowCursor );
     m_clearButton->setToolTip( QObject::tr( "Clear" ) );
+    m_decoratorButton->setCursor( Qt::ArrowCursor );
+    createProgressAnimation();
+    m_progressTimer.setInterval( 100 );
+    if ( MarbleGlobal::getInstance()->profiles() & MarbleGlobal::SmallScreen ) {
+        m_iconSize = 32;
+    }
+}
+
+void RoutingLineEditPrivate::createProgressAnimation()
+{
+    // Size parameters
+    qreal const h = m_iconSize / 2.0; // Half of the icon size
+    qreal const q = h / 2.0; // Quarter of the icon size
+    qreal const d = 7.5; // Circle diameter
+    qreal const r = d / 2.0; // Circle radius
+
+    // Canvas parameters
+    QImage canvas( m_iconSize, m_iconSize, QImage::Format_ARGB32 );
+    QPainter painter( &canvas );
+    painter.setRenderHint( QPainter::Antialiasing, true );
+    painter.setPen( QColor ( Qt::gray ) );
+    painter.setBrush( QColor( Qt::white ) );
+
+    // Create all frames
+    for( double t = 0.0; t < 2 * M_PI; t += M_PI / 8.0 ) {
+        canvas.fill( Qt::transparent );
+        QRectF firstCircle( h - r + q * cos( t ), h - r + q * sin( t ), d, d );
+        QRectF secondCircle( h - r + q * cos( t + M_PI ), h - r + q * sin( t + M_PI ), d, d );
+        painter.drawEllipse( firstCircle );
+        painter.drawEllipse( secondCircle );
+        m_progressAnimation.push_back( QPixmap::fromImage( canvas ) );
+    }
 }
 
 RoutingLineEdit::RoutingLineEdit( QWidget *parent ) :
@@ -47,18 +97,46 @@ RoutingLineEdit::RoutingLineEdit( QWidget *parent ) :
     updateClearButtonIcon( text() );
     updateClearButton();
 
-    // Padding for clear button to avoid text underflow
-    QString const direction = layoutDirection() == Qt::LeftToRight ? "right" : "left";
-    if ( !MarbleGlobal::getInstance()->profiles() & MarbleGlobal::SmallScreen ) {
-        setStyleSheet( QString( ":enabled { padding-%1: %2; }").arg( direction).arg( 18 ) );
-    }
-
-    connect( this, SIGNAL( textChanged( QString ) ), SLOT( updateClearButtonIcon( QString ) ) );
+    setDecorator( d->m_decoratorPixmap );
+    connect( this, SIGNAL( textChanged( QString ) ),
+             SLOT( updateClearButtonIcon( QString ) ) );
+    connect( &d->m_progressTimer, SIGNAL( timeout() ),
+             this, SLOT( updateProgress() ) );
 }
 
 RoutingLineEdit::~RoutingLineEdit()
 {
     delete d;
+}
+
+void RoutingLineEdit::setDecorator(const QPixmap &decorator)
+{
+    d->m_decoratorPixmap = decorator;
+    d->m_decoratorButton->setPixmap( d->m_decoratorPixmap );
+
+    QString const prefixDirection = layoutDirection() == Qt::LeftToRight ? "left" : "right";
+    QString decoratorStyleSheet;
+    if ( !d->m_decoratorPixmap.isNull() ) {
+        decoratorStyleSheet = QString( "; padding-%1: %2" ).arg( prefixDirection ).arg( 18 );
+    }
+    // Padding for clear button to avoid text underflow
+    QString const postfixDirection  = layoutDirection() == Qt::LeftToRight ? "right" : "left";
+    QString styleSheet = QString( ":enabled { padding-%1: %2; %3}").arg( postfixDirection ).arg( 18 ).arg( decoratorStyleSheet );
+    qDebug() << "Style sheet: " << styleSheet;
+
+    if ( !MarbleGlobal::getInstance()->profiles() & MarbleGlobal::SmallScreen ) {
+        setStyleSheet( styleSheet );
+    }
+}
+
+void RoutingLineEdit::setBusy(bool busy)
+{
+    if ( busy ) {
+        d->m_progressTimer.start();
+    } else {
+        d->m_progressTimer.stop();
+        d->m_decoratorButton->setPixmap( d->m_decoratorPixmap );
+    }
 }
 
 void RoutingLineEdit::updateClearButtonIcon( const QString& text )
@@ -78,13 +156,25 @@ void RoutingLineEdit::updateClearButton()
 {
     const QSize geom = size();
     const int frameWidth = style()->pixelMetric( QStyle::PM_DefaultFrameWidth, 0, this );
-    const int pixmapSize = d->m_clearButton->pixmap()->width();
+    const int pixmapSize = d->m_clearButton->pixmap()->width() + 1;
+    const int decoratorSize = d->m_decoratorPixmap.width() + 1;
 
     int y = ( geom.height() - pixmapSize ) / 2;
     if ( layoutDirection() == Qt::LeftToRight ) {
-        d->m_clearButton->move( geom.width() - frameWidth - pixmapSize - 1, y );
+        d->m_clearButton->move( geom.width() - frameWidth - pixmapSize - decoratorSize, y );
+        d->m_decoratorButton->move( frameWidth - decoratorSize + 1, y );
     } else {
-        d->m_clearButton->move( frameWidth + 1, y );
+        d->m_clearButton->move( frameWidth - decoratorSize + 1, y );
+        d->m_decoratorButton->move( geom.width() - frameWidth - pixmapSize - decoratorSize, y );
+    }
+}
+
+void RoutingLineEdit::updateProgress()
+{
+    if ( !d->m_progressAnimation.isEmpty() ) {
+        d->m_currentFrame = ( d->m_currentFrame + 1 ) % d->m_progressAnimation.size();
+        QPixmap frame = d->m_progressAnimation[d->m_currentFrame];
+        d->m_decoratorButton->setPixmap( frame );
     }
 }
 
@@ -101,6 +191,10 @@ void RoutingLineEdit::mouseReleaseEvent( QMouseEvent* e )
             emit clearButtonClicked();
         }
         emit textChanged( newText );
+    }
+
+    if ( d->m_decoratorButton == childAt( e->pos() ) ) {
+        emit decoratorButtonClicked();
     }
 
     QLineEdit::mouseReleaseEvent( e );

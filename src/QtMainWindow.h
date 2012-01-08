@@ -23,6 +23,7 @@ class QAction;
 class QLabel;
 class QMenu;
 class QPrinter;
+class QModelIndex;
 
 namespace Marble
 {
@@ -35,6 +36,7 @@ class DownloadRegionDialog;
 class RoutingWidget;
 class StackableWindow;
 class GoToDialog;
+class RoutingLineEdit;
 
 class MainWindow : public QMainWindow
 {
@@ -56,6 +58,7 @@ protected:
     void  closeEvent(QCloseEvent *event);
 
 private:
+    void  createToolBar();
     void  createActions();
     void  createMenus();
     void  createStatusBar();
@@ -132,6 +135,9 @@ private Q_SLOTS:
     void showGoToDialog();
 
     void showZoomLevel( bool show );
+    void search();
+    void disableSearchAnimation();
+    void centerOnSearchSuggestion( const QModelIndex &suggestionIndex );
 
 private:
     void setupZoomButtons();
@@ -219,6 +225,7 @@ private:
     RoutingWidget *m_routingWidget;
 
     QString m_lastFileOpenPath;
+    RoutingLineEdit* m_searchField;
 };
 
 } // namespace Marble

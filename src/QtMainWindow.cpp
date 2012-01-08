@@ -37,6 +37,12 @@
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QScrollArea>
 #include <QtGui/QClipboard>
+#include "routing/RoutingLineEdit.h"
+#include <QtGui/QCompleter>
+#include <QtGui/QShortcut>
+#include <QtCore/QModelIndex>
+#include "GeoDataTreeModel.h"
+#include "MarblePlacemarkModel.h"
 
 #include <QtNetwork/QNetworkProxy>
 
@@ -101,7 +107,8 @@ MainWindow::MainWindow(const QString& marbleDataPath, const QVariantMap& cmdLine
         m_routingWindow( 0 ),
         m_trackingWindow( 0 ),
         m_gotoDialog( 0 ),
-        m_routingWidget( 0 )
+        m_routingWidget( 0 ),
+        m_searchField( 0 )
 {
 #ifdef Q_WS_MAEMO_5
     setAttribute( Qt::WA_Maemo5StackedWindow );
@@ -130,6 +137,7 @@ MainWindow::MainWindow(const QString& marbleDataPath, const QVariantMap& cmdLine
     // Load bookmark file. If it does not exist, a default one will be used.
     m_controlView->marbleModel()->bookmarkManager()->loadFile( "bookmarks/bookmarks.kml" );
 
+    createToolBar();
     createActions();
     createMenus();
     createStatusBar();
@@ -921,6 +929,31 @@ void MainWindow::closeEvent(QCloseEvent *event)
     event->accept();
 }
 
+void MainWindow::createToolBar()
+{
+    QToolBar* toolBar = addToolBar( tr( "Main ToolBar" ) );
+    m_searchField = new RoutingLineEdit( this );
+    m_searchField->setMinimumWidth( 200 );
+    m_searchField->setMaximumWidth( 400 );
+    m_searchField->setMinimumHeight( 24 );
+    QKeySequence searchShortcut( Qt::CTRL + Qt::Key_F );
+    m_searchField->setPlaceholderText( tr( "Search" ) );
+    m_searchField->setToolTip( QString( "Search for cities, addresses, points of interest and more (%1)" ).arg( searchShortcut.toString() ) );
+    QPixmap const decorator = QPixmap( ":/icons/16x16/edit-find.png" );
+    Q_ASSERT( !decorator.isNull() );
+    m_searchField->setDecorator( decorator );
+    QCompleter* completer = new QCompleter( m_controlView->marbleWidget()->model()->placemarkModel(), this );
+    completer->setCompletionRole( Qt::DisplayRole );
+    m_searchField->setCompleter(completer);
+    connect( completer, SIGNAL( activated( QModelIndex ) ), this, SLOT( centerOnSearchSuggestion( QModelIndex ) ) );
+    connect( m_searchField, SIGNAL( clearButtonClicked() ), this, SLOT( search() ) );
+    connect( m_searchField, SIGNAL( returnPressed() ), this, SLOT( search() ) );
+    connect( m_controlView, SIGNAL( searchFinished() ), this, SLOT( disableSearchAnimation() ) );
+    connect( m_searchField, SIGNAL( decoratorButtonClicked() ), this, SLOT( search() ) );
+    toolBar->addWidget( m_searchField );
+    new QShortcut( searchShortcut, m_searchField, SLOT( setFocus() ) );
+}
+
 QString MainWindow::readMarbleDataPath()
 {
      QSettings settings("kde.org", "Marble Desktop Globe");
@@ -1537,6 +1570,29 @@ void MainWindow::showZoomLevel(bool show)
     } else {
         statusBar()->removeWidget( m_zoomLabel );
     }
+}
+
+void MainWindow::search()
+{
+    Q_ASSERT( m_searchField );
+    QString const searchTerm = m_searchField->text();
+    if ( !searchTerm.isEmpty() ) {
+        m_searchField->setBusy( true );
+    }
+    m_controlView->search( searchTerm );
+}
+
+void MainWindow::disableSearchAnimation()
+{
+    m_searchField->setBusy( false );
+}
+
+void MainWindow::centerOnSearchSuggestion( const QModelIndex &index )
+{
+    QAbstractItemModel const * model = m_searchField->completer()->completionModel();
+    QVariant const value = model->data( index, MarblePlacemarkModel::CoordinateRole );
+    GeoDataCoordinates const coordinates = qVariantValue<GeoDataCoordinates>( value );
+    m_controlView->marbleWidget()->centerOn( coordinates );
 }
 
 #include "QtMainWindow.moc"

@@ -87,6 +87,12 @@ class ControlView : public QWidget
       */
     void setExternalMapEditor( const QString &editor );
 
+    /**
+      * Search for the given term and display the results in the search result lists,
+      * which is brought to the front
+      */
+    void search( const QString &searchTerm );
+
  public slots:
     void setSideBarShown( bool );    
     void setNavigationTabShown( bool );
@@ -107,6 +113,7 @@ class ControlView : public QWidget
  signals:
      void showMapWizard();
      void showUploadDialog();
+     void searchFinished();
     
  private:
     /**

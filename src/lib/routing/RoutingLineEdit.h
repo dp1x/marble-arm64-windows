@@ -38,9 +38,15 @@ public:
     /** Destructor */
     ~RoutingLineEdit();
 
+    void setDecorator( const QPixmap &decorator );
+
+    void setBusy( bool busy );
+
 Q_SIGNALS:
     /** The clear button was clicked with the left mouse button */
     void clearButtonClicked();
+
+    void decoratorButtonClicked();
 
 protected:
     virtual void mouseReleaseEvent( QMouseEvent* event );
@@ -51,6 +57,8 @@ private Q_SLOTS:
     void updateClearButtonIcon( const QString& text );
 
     void updateClearButton();
+
+    void updateProgress();
 
 private:
     RoutingLineEditPrivate* const d;
