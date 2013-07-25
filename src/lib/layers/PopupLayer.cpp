@@ -15,8 +15,8 @@
 #include "PopupItem.h"
 
 #include <QtGui/QMouseEvent>
-#include <QtGui/QApplication>
-#include <QtGui/QAction>
+#include <QApplication>
+#include <QAction>
 
 namespace Marble
 {
@@ -156,4 +156,5 @@ void PopupLayer::hidePopupItem()
 
 }
 
-#include "PopupLayer.moc"
+//FIXME mzanetti
+//#include "PopupLayer.moc"

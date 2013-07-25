@@ -14,7 +14,7 @@
 
 // Qt
 #include <QtCore/QPointer>
-#include <QtGui/QDialog>
+#include <QDialog>
 
 // Marble
 #include "DialogConfigurationInterface.h"
@@ -124,4 +124,5 @@ void MarblePluginSettingsWidget::setModel( RenderPluginModel* pluginModel )
 
 } // namespace Marble
 
-#include "MarblePluginSettingsWidget.moc"
+//FIXME mzanetti
+//#include "MarblePluginSettingsWidget.moc"

@@ -16,7 +16,7 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QString>
 #include <QtCore/QUrl>
-#include <QtWebKit/QWebView>
+#include <QWebView>
 
 // Marble
 #include "marble_export.h"

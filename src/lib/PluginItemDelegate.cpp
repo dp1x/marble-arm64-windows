@@ -19,10 +19,10 @@
 #include <QtCore/QEvent>
 #include <QtCore/QSize>
 #include <QtCore/QVariant>
-#include <QtGui/QAbstractItemView>
+#include <QAbstractItemView>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QStandardItemModel>
-#include <QtGui/QApplication>
+#include <QApplication>
 #include <QtGui/QPainter>
 #include <QtGui/QStandardItem>
 
@@ -418,4 +418,5 @@ QRect PluginItemDelegate::alignRect( QRect object,
 }
 
 
-#include "PluginItemDelegate.moc"
+//FIXME mzanetti
+//#include "PluginItemDelegate.moc"

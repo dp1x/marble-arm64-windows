@@ -142,4 +142,5 @@ QString FileStoragePolicy::lastErrorMessage() const
     return m_errorMsg;
 }
 
-#include "FileStoragePolicy.moc"
+//FIXME mzanetti
+//#include "FileStoragePolicy.moc"

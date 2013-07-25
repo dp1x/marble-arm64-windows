@@ -66,6 +66,9 @@ class MARBLE_EXPORT MarblePlacemarkModel : public QAbstractListModel
       LongitudeRole,                   ///< The longitude in degree (for use in QML)
       LatitudeRole                     ///< The latitude in degree (for use in QML)
     };
+#if QT_VERSION >= 0x050000
+    QHash<int, QByteArray> roleNames() const;
+#endif
 
     /**
      * Creates a new place mark model.

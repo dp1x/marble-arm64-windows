@@ -17,7 +17,7 @@
 
 #include <QtCore/QChar>
 #include <QtCore/QDateTime>
-#include <QtXml/QXmlStreamWriter>
+#include <QXmlStreamWriter>
 
 #include "GeoDataPoint.h"
 #include "GeoDataLineString.h"

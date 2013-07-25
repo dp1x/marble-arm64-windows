@@ -34,8 +34,8 @@ using namespace Marble;
 #include "ui_CurrentLocationWidget.h"
 
 #include <QtCore/QDateTime>
-#include <QtGui/QFileDialog>
-#include <QtGui/QMessageBox>
+#include <QFileDialog>
+#include <QMessageBox>
 
 namespace Marble
 {
@@ -446,4 +446,5 @@ void CurrentLocationWidget::setLastSavePath( const QString &path )
 
 }
 
-#include "CurrentLocationWidget.moc"
+//FIXME mzanetti
+//#include "CurrentLocationWidget.moc"

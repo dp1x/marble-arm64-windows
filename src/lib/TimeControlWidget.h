@@ -13,7 +13,7 @@
 
 // Qt
 #include <QtCore/QDateTime>
-#include <QtGui/QDialog>
+#include <QDialog>
 
 // Marble
 #include "marble_export.h"

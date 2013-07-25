@@ -4,7 +4,9 @@ include_directories(
  ${CMAKE_CURRENT_BINARY_DIR}
  ${QT_INCLUDE_DIR}
 )
-include( ${QT_USE_FILE} )
+if(NOT QT5BUILD)
+  include( ${QT_USE_FILE} )
+endif(NOT QT5BUILD)
 
 set( routing-instructions_SRC
         ../lib/routing/instructions/InstructionTransformation.cpp
@@ -15,7 +17,7 @@ set( routing-instructions_SRC
         ../routing-instructions/main.cpp
 )
 
-qt4_automoc(${routing-instructions_SRC})
+#qt4_automoc(${routing-instructions_SRC})
 
 add_definitions( -DMAKE_MARBLE_LIB )
 add_executable( routing-instructions ${routing-instructions_SRC} )

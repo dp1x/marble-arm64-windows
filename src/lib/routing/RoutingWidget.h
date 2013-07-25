@@ -17,7 +17,7 @@
 #include "marble_export.h"
 
 #include <QtCore/QModelIndex>
-#include <QtGui/QWidget>
+#include <QWidget>
 
 namespace Marble
 {

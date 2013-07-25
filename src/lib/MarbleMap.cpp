@@ -23,9 +23,9 @@
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QTime>
 #include <QtCore/QTimer>
-#include <QtGui/QItemSelectionModel>
-#include <QtGui/QSizePolicy>
-#include <QtGui/QRegion>
+#include <QItemSelectionModel>
+#include <QSizePolicy>
+#include <QRegion>
 
 #ifdef MARBLE_DBUS
 #include <QtDBus/QDBusConnection>
@@ -1307,4 +1307,5 @@ const TextureLayer *MarbleMap::textureLayer() const
 
 }
 
-#include "MarbleMap.moc"
+//FIXME mzanetti
+//#include "MarbleMap.moc"

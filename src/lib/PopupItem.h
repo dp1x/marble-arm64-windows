@@ -15,7 +15,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
-#include <QtGui/QLabel>
+#include <QLabel>
 
 #include "BillboardGraphicsItem.h"
 #include "ui_WebPopupWidget.h"

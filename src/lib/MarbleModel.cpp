@@ -22,8 +22,8 @@
 #include <QtCore/QTimer>
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QSet>
-#include <QtGui/QItemSelectionModel>
-#include <QtGui/QSortFilterProxyModel>
+#include <QItemSelectionModel>
+#include <QSortFilterProxyModel>
 
 #if (QT_VERSION >= 0x040700 && QT_VERSION < 0x040800)
 // See comment below why this is needed
@@ -700,4 +700,5 @@ const ElevationModel* MarbleModel::elevationModel() const
 
 }
 
-#include "MarbleModel.moc"
+//FIXME mzanetti
+//#include "MarbleModel.moc"

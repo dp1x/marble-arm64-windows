@@ -14,7 +14,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 #include <QtCore/QTime>
-#include <QtGui/QMessageBox>
+#include <QMessageBox>
 
 #include "FileLoader.h"
 #include "MarbleDebug.h"
@@ -212,4 +212,5 @@ void FileManagerPrivate::cleanupLoader( FileLoader* loader )
     }
 }
 
-#include "FileManager.moc"
+//FIXME mzanetti
+//#include "FileManager.moc"

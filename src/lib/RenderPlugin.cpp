@@ -21,7 +21,7 @@
 #include "RenderPluginModel.h"
 
 // Qt
-#include <QtGui/QAction>
+#include <QAction>
 #include <QtGui/QStandardItem>
 
 
@@ -241,4 +241,5 @@ QVariant RenderPlugin::setting( const QString & name )
 
 } // namespace Marble
 
-#include "RenderPlugin.moc"
+//FIXME mzanetti
+//#include "RenderPlugin.moc"

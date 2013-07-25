@@ -17,7 +17,7 @@
 #include "PluginInterface.h"
 
 #include <QtCore/QHash>
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "routing/RoutingProfilesModel.h"
 

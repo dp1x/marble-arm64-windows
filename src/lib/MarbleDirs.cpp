@@ -17,7 +17,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QString>
 #include <QtCore/QStringList>
-#include <QtGui/QApplication>
+#include <QApplication>
 
 #include <stdlib.h>
 

@@ -14,7 +14,7 @@
 
 #include <QtCore/QtAlgorithms>
 #include <QtCore/QTimer>
-#include <QtGui/QStringListModel>
+#include <QStringListModel>
 
 #include "MarbleDebug.h"
 
@@ -104,4 +104,5 @@ void MarbleNavigator::resizeEvent ( QResizeEvent * )
 
 }
 
-#include "MarbleNavigator.moc"
+//FIXME mzanetti
+//#include "MarbleNavigator.moc"

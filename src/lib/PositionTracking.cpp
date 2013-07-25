@@ -397,4 +397,5 @@ PositionProviderStatus PositionTracking::status() const
 
 }
 
-#include "PositionTracking.moc"
+//FIXME mzanetti
+//#include "PositionTracking.moc"

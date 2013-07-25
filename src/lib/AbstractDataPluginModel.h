@@ -97,6 +97,10 @@ class MARBLE_EXPORT AbstractDataPluginModel : public QObject
      */
     bool itemExists( const QString& id ) const;
 
+#if QT_VERSION >= 0x050000
+    virtual QHash<int, QByteArray> roleNames() const;
+#endif
+
 public Q_SLOTS:
     /**
      * Adds the @p items to the list of initialized items. It checks if items with the same id are

@@ -212,4 +212,5 @@ bool HttpDownloadManager::hasDownloadPolicy( const DownloadPolicy& policy ) cons
     return found;
 }
 
-#include "HttpDownloadManager.moc"
+//FIXME mzanetti
+//#include "HttpDownloadManager.moc"

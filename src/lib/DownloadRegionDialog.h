@@ -14,7 +14,7 @@
 #ifndef MARBLE_DOWNLOADREGIONDIALOG_H
 #define MARBLE_DOWNLOADREGIONDIALOG_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 #include <QtCore/QVector>
 
 #include "TileCoordsPyramid.h"

@@ -320,4 +320,5 @@ RoutingProfile RouteRequest::routingProfile() const
 
 } // namespace Marble
 
-#include "RouteRequest.moc"
+//FIXME mzanetti
+//#include "RouteRequest.moc"

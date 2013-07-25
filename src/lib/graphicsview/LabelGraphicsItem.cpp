@@ -14,7 +14,7 @@
 
 // Qt
 #include <QtCore/QString>
-#include <QtGui/QApplication>
+#include <QApplication>
 #include <QtGui/QFont>
 #include <QtGui/QPainter>
 

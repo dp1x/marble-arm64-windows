@@ -252,12 +252,48 @@ endif(APPLE)
 # Specific options for if building with Qt or kde4 libs
 
 if(QTONLY)
-  find_package(Qt4 REQUIRED)
-  set( QT_USE_QTXML      ON )
-  set( QT_USE_QTNETWORK  ON )
-  set( QT_USE_QTTEST     ON )
-  set( QT_USE_QTSCRIPT   ON )
-  include( ${QT_USE_FILE} )
+  if(QT5BUILD)
+    find_package(Qt5Xml REQUIRED)
+    find_package(Qt5Network REQUIRED)
+    find_package(Qt5Test REQUIRED)
+    find_package(Qt5Script REQUIRED)
+    find_package(Qt5Widgets REQUIRED)
+    find_package(Qt5WebKitWidgets REQUIRED)
+    
+    macro(qt_add_resources)
+        qt5_add_resources(${ARGN})
+    endmacro()
+    
+    macro(qt_wrap_ui)
+        qt5_wrap_ui(${ARGN})
+    endmacro()
+
+    macro(qt_add_resources)
+        qt5_add_resources(${ARGN})
+    endmacro()
+    
+  else(QT5BUILD)
+    find_package(Qt4 REQUIRED)
+    set( QT_USE_QTXML      ON )
+    set( QT_USE_QTNETWORK  ON )
+    set( QT_USE_QTTEST     ON )
+    set( QT_USE_QTSCRIPT   ON )
+    include( ${QT_USE_FILE} )
+
+    macro(qt_add_resources)
+        qt4_add_resources(${ARGN})
+    endmacro()
+
+    macro(qt_wrap_ui)
+        qt4_wrap_ui(${ARGN})
+    endmacro()
+
+    macro(qt_add_resources)
+        qt4_add_resources(${ARGN})
+    endmacro()
+    
+  endif(QT5BUILD)
+    
   marble_set_package_properties( Qt4 PROPERTIES DESCRIPTION "cross-platform application framework" )
   marble_set_package_properties( Qt4 PROPERTIES URL "http://qt.digia.com/" )
   marble_set_package_properties( Qt4 PROPERTIES TYPE REQUIRED PURPOSE "core framework" )
@@ -336,7 +372,8 @@ add_subdirectory(data)
 
 include(DistTarget)
 
-add_subdirectory(tests)
+# FIXME!
+#add_subdirectory(tests)
 
 ####################################################
 # Install extra files

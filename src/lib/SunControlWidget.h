@@ -15,7 +15,7 @@
 
 #include <QtCore/QDateTime>
 #include <QtCore/QTime>
-#include <QtGui/QDialog>
+#include <QDialog>
 
 #include "marble_export.h"
 

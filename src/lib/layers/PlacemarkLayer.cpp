@@ -187,5 +187,6 @@ bool PlacemarkLayer::testXBug()
     return true;
 }
 
-#include "PlacemarkLayer.moc"
+//FIXME mzanetti
+//#include "PlacemarkLayer.moc"
 

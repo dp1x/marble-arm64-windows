@@ -17,10 +17,10 @@
 #include "MarbleDebug.h"
 
 // Qt
-#include <QtGui/QApplication>
+#include <QApplication>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
-#include <QtGui/QWidget>
+#include <QWidget>
 
 using namespace Marble;
 

@@ -12,9 +12,9 @@
 #include "AbstractFloatItem.h"
 
 // Qt
-#include <QtGui/QMenu>
-#include <QtGui/QAction>
-#include <QtGui/QDialog>
+#include <QMenu>
+#include <QAction>
+#include <QDialog>
 
 // Marble
 #include "DialogConfigurationInterface.h"
@@ -259,4 +259,5 @@ QMenu* AbstractFloatItem::contextMenu()
 
 }
 
-#include "AbstractFloatItem.moc"
+// FIXME mzanetti
+//#include "AbstractFloatItem.moc"

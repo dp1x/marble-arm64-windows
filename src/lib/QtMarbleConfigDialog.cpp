@@ -20,13 +20,13 @@
 #include <QtCore/QList>
 #include <QtCore/QSettings>
 #include <QtNetwork/QNetworkProxy>
-#include <QtGui/QApplication>
-#include <QtGui/QDialogButtonBox>
-#include <QtGui/QMessageBox>
-#include <QtGui/QStandardItem>
-#include <QtGui/QTabWidget>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QWidget>
+#include <QApplication>
+#include <QDialogButtonBox>
+#include <QMessageBox>
+#include <QStandardItem>
+#include <QTabWidget>
+#include <QVBoxLayout>
+#include <QWidget>
 #include <QtCore/QDateTime>
 
 // Marble
@@ -578,4 +578,5 @@ void QtMarbleConfigDialog::initializeCustomTimezone()
 
 }
 
-#include "QtMarbleConfigDialog.moc"
+//FIXME mzanetti
+//#include "QtMarbleConfigDialog.moc"

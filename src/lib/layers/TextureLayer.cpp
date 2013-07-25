@@ -434,4 +434,5 @@ int TextureLayer::preferredRadiusFloor( int radius ) const
 
 }
 
-#include "TextureLayer.moc"
+// FIXME mzanetti
+//#include "TextureLayer.moc"

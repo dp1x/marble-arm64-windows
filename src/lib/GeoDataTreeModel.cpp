@@ -17,7 +17,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QList>
 #include <QtGui/QPixmap>
-#include <QtGui/QItemSelectionModel>
+#include <QItemSelectionModel>
 
 // Marble
 #include "GeoDataObject.h"
@@ -676,4 +676,5 @@ GeoDataDocument * GeoDataTreeModel::rootDocument()
     return d->m_rootDocument;
 }
 
-#include "GeoDataTreeModel.moc"
+//FIXME mzanetti
+//#include "GeoDataTreeModel.moc"

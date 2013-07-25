@@ -27,7 +27,7 @@
 
 #include <QtCore/QFile>
 #include <QtGui/QTextFrame>
-#include <QtGui/QTabWidget>
+#include <QTabWidget>
 #include <QtCore/QTextStream>
 #include <QtGui/QPixmap>
 
@@ -343,4 +343,5 @@ void MarbleAboutDialog::setInitialTab( MarbleAboutDialog::Tab tab )
 
 }
 
-#include "MarbleAboutDialog.moc"
+//FIXME mzanetti
+//#include "MarbleAboutDialog.moc"

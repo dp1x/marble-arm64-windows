@@ -9,8 +9,8 @@
 //
 
 #include "WikipediaService.h"
-#include <QtWebKit/QWebPage>
-#include <QtWebKit/QWebFrame>
+#include <QWebPage>
+#include <QWebFrame>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
@@ -43,4 +43,5 @@ void WikipediaService::handleNetworkReply(QNetworkReply *reply)
 
 } // namespace Marble
 
-#include "WikipediaService.moc"
+//FIXME mzanetti
+//#include "WikipediaService.moc"

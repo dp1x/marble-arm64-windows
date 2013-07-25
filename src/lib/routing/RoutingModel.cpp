@@ -31,7 +31,7 @@
 #include <QtCore/QVector>
 #include <QtCore/QHash>
 #include <QtCore/QByteArray>
-#include <QtGui/QMessageBox>
+#include <QMessageBox>
 #include <QtGui/QPixmap>
 #include <QtXml/QDomDocument>
 
@@ -403,4 +403,5 @@ const Route & RoutingModel::route() const
 
 } // namespace Marble
 
-#include "RoutingModel.moc"
+//FIXME mzanetti
+//#include "RoutingModel.moc"

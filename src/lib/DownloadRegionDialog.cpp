@@ -12,17 +12,17 @@
 
 #include <cmath>
 
-#include <QtGui/QDialogButtonBox>
-#include <QtGui/QGroupBox>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QHideEvent>
-#include <QtGui/QLabel>
-#include <QtGui/QPushButton>
-#include <QtGui/QRadioButton>
-#include <QtGui/QShowEvent>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QSpinBox>
-#include <QtGui/QScrollArea>
+#include <QDialogButtonBox>
+#include <QGroupBox>
+#include <QHBoxLayout>
+#include <QHideEvent>
+#include <QLabel>
+#include <QPushButton>
+#include <QRadioButton>
+#include <QShowEvent>
+#include <QVBoxLayout>
+#include <QSpinBox>
+#include <QScrollArea>
 #include <QtCore/QSet>
 
 #include "GeoDataLatLonAltBox.h"
@@ -497,4 +497,5 @@ void DownloadRegionDialog::setOffsetUnit()
 
 }
 
-#include "DownloadRegionDialog.moc"
+//FIXME mzanetti
+//#include "DownloadRegionDialog.moc"

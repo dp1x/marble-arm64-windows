@@ -21,13 +21,13 @@
 #include <QtCore/QFileInfo>
 #include <QtGui/QPainter>
 #include <QtGui/QTextFrame>
-#include <QtGui/QScrollBar>
-#include <QtGui/QStyle>
-#include <QtGui/QStyleOptionButton>
+#include <QScrollBar>
+#include <QStyle>
+#include <QStyleOptionButton>
 #include <QtGui/QDesktopServices>
 #include <QtCore/QRegExp>
-#include <QtWebKit/QWebFrame>
-#include <QtWebKit/QWebElement>
+#include <QWebFrame>
+#include <QWebElement>
 #include <QTextDocument>
 
 #include "GeoSceneDocument.h"
@@ -371,4 +371,5 @@ void MarbleLegendBrowser::setCheckedProperty( const QString& name, bool checked 
 
 }
 
-#include "MarbleLegendBrowser.moc"
+//FIXME mzanetti
+//#include "MarbleLegendBrowser.moc"

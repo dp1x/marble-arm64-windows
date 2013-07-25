@@ -23,8 +23,8 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QPointer>
 #include <QtCore/QStack>
-#include <QtGui/QDialog>
-#include <QtGui/QProgressDialog>
+#include <QDialog>
+#include <QProgressDialog>
 
 // std
 #include <limits>
@@ -191,4 +191,5 @@ void DataMigration::moveFiles( const QString& source, const QString& target )
 
 }
 
-#include "DataMigration.moc"
+//FIXME mzanetti
+//#include "DataMigration.moc"

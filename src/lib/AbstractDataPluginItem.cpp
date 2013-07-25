@@ -17,7 +17,7 @@
 #include "MarbleDebug.h"
 
 // Qt
-#include <QtGui/QAction>
+#include <QAction>
 #include <QtCore/QRect>
 #include <QtCore/QSize>
 
@@ -159,4 +159,5 @@ QList<QAction*> AbstractDataPluginItem::actions()
 
 } // Marble namespace
 
-#include "AbstractDataPluginItem.moc"
+//FIXME mzanetti
+//#include "AbstractDataPluginItem.moc"

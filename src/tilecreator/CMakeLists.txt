@@ -4,7 +4,12 @@ include_directories(
  ${CMAKE_CURRENT_BINARY_DIR}
  ${QT_INCLUDE_DIR}
 )
-include( ${QT_USE_FILE} )
+
+
+if(NOT QT5BUILD)
+  include( ${QT_USE_FILE} )
+endif(NOT QT5BUILD)
+
 
 set( tilecreator_SRCS
             ../lib/DownloadPolicy.cpp
@@ -25,7 +30,8 @@ set( tilecreator_SRCS
             tccore.cpp
 )
 
-qt4_automoc(${tilecreator_SRCS})
+#qt4_automoc(${tilecreator_SRCS})
+set(CMAKE_AUTOMOC ON)
 
 add_definitions( -DMAKE_MARBLE_LIB -DTILECREATOR )
 add_executable( tilecreator ${tilecreator_SRCS} )

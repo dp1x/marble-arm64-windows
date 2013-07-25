@@ -40,10 +40,10 @@
 #include <QApplication>
 #include <QtCore/QMimeData>
 #include <QtCore/QPointer>
-#include <QtGui/QAction>
+#include <QAction>
 #include <QtGui/QClipboard>
-#include <QtGui/QMenu>
-#include <QtGui/QMessageBox>
+#include <QMenu>
+#include <QMessageBox>
 
 using namespace Marble;
 /* TRANSLATOR Marble::MarbleWidgetPopupMenu */
@@ -638,4 +638,5 @@ QPoint MarbleWidgetPopupMenu::mousePosition() const
     return m_mousePosition;
 }
 
-#include "MarbleWidgetPopupMenu.moc"
+//FIXME mzanetti
+//#include "MarbleWidgetPopupMenu.moc"

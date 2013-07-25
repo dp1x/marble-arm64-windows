@@ -21,8 +21,18 @@ INCLUDE_DIRECTORIES(
  ${CMAKE_CURRENT_SOURCE_DIR}/graphicsview
  ${CMAKE_CURRENT_SOURCE_DIR}/layers
  ${QT_INCLUDE_DIR}
+ 
+if(QT5BUILD)
+ ${Qt5Core_INCLUDE_DIRS}
+ ${Qt5Xml_INCLUDE_DIRS}
+ ${Qt5Widgets_INCLUDE_DIRS}
+ ${Qt5WebKitWidgets_INCLUDE_DIRS}
+endif(QT5BUILD)
 )
-INCLUDE(${QT_USE_FILE})
+if(NOT QT5BUILD)
+  INCLUDE(${QT_USE_FILE})
+endif(NOT QT5BUILD)
+
 INCLUDE(geodata/CMakeLists.txt)
 INCLUDE(graphicsview/CMakeLists.txt)
 INCLUDE(layers/CMakeLists.txt)
@@ -271,11 +281,8 @@ set (marblewidget_UI
 )
 
 # FIXME: cleaner approach of src/lib/MarbleControlBox.* vs. marble.qrc
-qt4_add_resources(marblewidget_SRCS libmarble.qrc ../marble.qrc)
-
-qt4_wrap_ui(marblewidget_SRCS ${marblewidget_UI})
-qt4_automoc(${marblewidget_SRCS})
-
+qt_add_resources(marblewidget_SRCS libmarble.qrc ../marble.qrc)
+qt_wrap_ui(marblewidget_SRCS ${marblewidget_UI})
 
 # link with release version of Qt libs
 ADD_LIBRARY(marblewidget SHARED ${marblewidget_SRCS} ${SOURCES_UI_HDRS})

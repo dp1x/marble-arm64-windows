@@ -16,16 +16,16 @@
 #include "MarbleWebView.h"
 
 #include <QtCore/QPointer>
-#include <QtWebKit/QWebView>
-#include <QtWebKit/QWebHistory>
-#include <QtGui/QPrinter>
-#include <QtGui/QPrintDialog>
-#include <QtGui/QMouseEvent>
-#include <QtGui/QApplication>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QLabel>
-#include <QtGui/QPushButton>
-#include <QtGui/QPixmapCache>
+#include <QWebView>
+#include <QWebHistory>
+#include <QPrinter>
+#include <QPrintDialog>
+#include <QMouseEvent>
+#include <QApplication>
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QPushButton>
+#include <QPixmapCache>
 #include <QMenu>
 #include <QKeyEvent>
 #include <QClipboard>
@@ -384,4 +384,5 @@ QPixmap PopupItem::pixmap( const QString &imageId ) const
 
 }
 
-#include "PopupItem.moc"
+//FIXME mzanetti
+//#include "PopupItem.moc"

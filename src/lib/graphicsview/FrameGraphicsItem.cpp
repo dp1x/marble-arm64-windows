@@ -19,6 +19,8 @@
 #include <QtCore/QSizeF>
 #include <QtGui/QPainter>
 #include <QtGui/QPixmapCache>
+#include <QMargins>
+#include <qdrawutil.h>
 
 using namespace Marble;
 

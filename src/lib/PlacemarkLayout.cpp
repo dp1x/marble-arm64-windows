@@ -19,7 +19,7 @@
 #include <QtCore/QVectorIterator>
 #include <QtGui/QFont>
 #include <QtGui/QFontMetrics>
-#include <QtGui/QItemSelectionModel>
+#include <QItemSelectionModel>
 #include <QtCore/qmath.h>
 
 #include "GeoDataPlacemark.h"
@@ -690,4 +690,5 @@ bool PlacemarkLayout::placemarksOnScreenLimit( const QSize &screenSize ) const
 
 }
 
-#include "PlacemarkLayout.moc"
+//FIXME mzuanetti
+//#include "PlacemarkLayout.moc"
