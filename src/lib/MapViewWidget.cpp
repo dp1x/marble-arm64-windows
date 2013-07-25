@@ -673,7 +673,7 @@ void MapViewItemDelegate::paint( QPainter *painter, const QStyleOptionViewItem &
     QRect const rect = option.rect;
     QSize const iconSize = option.decorationSize;
     QRect const iconRect( rect.topLeft(), iconSize );
-    QIcon const icon = qVariantValue<QIcon>( index.data( Qt::DecorationRole ) );
+    QIcon const icon = index.data( Qt::DecorationRole ).value<QIcon>();
     painter->drawPixmap( iconRect, icon.pixmap( iconSize ) );
 
     int const padding = 5;
@@ -721,4 +721,5 @@ QString MapViewItemDelegate::text( const QModelIndex &index ) const
 
 }
 
-#include "MapViewWidget.moc"
+//FIXME mzanetti
+//#include "MapViewWidget.moc"

@@ -21,7 +21,7 @@
 #include <QtGui/QFont>
 #include <QtGui/QContextMenuEvent>
 #include <QtGui/QHelpEvent>
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "RenderPlugin.h"
 #include "FrameGraphicsItem.h"

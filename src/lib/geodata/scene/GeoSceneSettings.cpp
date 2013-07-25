@@ -277,4 +277,5 @@ QVector<GeoSceneProperty*> GeoSceneSettings::rootProperties()
 
 }
 
-#include "GeoSceneSettings.moc"
+//FIXME mzanetti
+//#include "GeoSceneSettings.moc"

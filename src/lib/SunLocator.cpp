@@ -268,4 +268,5 @@ qreal SunLocator::getLat() const
 
 }
 
-#include "SunLocator.moc"
+//FIXME mzanetti
+//#include "SunLocator.moc"

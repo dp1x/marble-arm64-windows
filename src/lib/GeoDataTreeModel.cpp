@@ -676,4 +676,5 @@ GeoDataDocument * GeoDataTreeModel::rootDocument()
     return d->m_rootDocument;
 }
 
-#include "GeoDataTreeModel.moc"
+//FIXME mzanetti
+//#include "GeoDataTreeModel.moc"

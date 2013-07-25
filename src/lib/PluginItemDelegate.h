@@ -11,7 +11,7 @@
 #ifndef MARBLE_PLUGINITEMDELEGATE_H
 #define MARBLE_PLUGINITEMDELEGATE_H
 
-#include <QtGui/QAbstractItemDelegate>
+#include <QAbstractItemDelegate>
 
 #include <QtCore/QModelIndex>
 #include <QtGui/QIcon>

@@ -23,7 +23,7 @@
 #include <QtCore/QRect>
 #include <QtCore/QSet>
 #include <QtCore/QVector>
-#include <QtGui/QSortFilterProxyModel>
+#include <QSortFilterProxyModel>
 
 #include "GeoDataFeature.h"
 

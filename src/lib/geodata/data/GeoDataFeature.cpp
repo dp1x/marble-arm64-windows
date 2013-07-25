@@ -749,8 +749,8 @@ void GeoDataFeature::resetDefaultStyles()
 
 void GeoDataFeature::detach()
 {
-    if(d->ref == 1)
-        return;
+//    if(d->ref == 1)
+//        return;
 
     GeoDataFeaturePrivate* new_d = d->copy();
 

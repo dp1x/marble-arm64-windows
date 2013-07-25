@@ -700,4 +700,5 @@ const ElevationModel* MarbleModel::elevationModel() const
 
 }
 
-#include "MarbleModel.moc"
+//FIXME mzanetti
+//#include "MarbleModel.moc"

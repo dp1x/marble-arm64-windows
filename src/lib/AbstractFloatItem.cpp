@@ -259,4 +259,5 @@ QMenu* AbstractFloatItem::contextMenu()
 
 }
 
-#include "AbstractFloatItem.moc"
+// FIXME mzanetti
+//#include "AbstractFloatItem.moc"

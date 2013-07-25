@@ -83,4 +83,5 @@ void GeoSceneProperty::setValue( bool value )
 
 }
 
-#include "GeoSceneProperty.moc"
+// FIXME mzanetti
+//#include "GeoSceneProperty.moc"

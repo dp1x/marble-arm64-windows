@@ -146,4 +146,5 @@ void MarbleClock::setTimezone( int timezoneInSec )
 
 }
 
-#include "MarbleClock.moc"
+//FIXME mzanetti
+//#include "MarbleClock.moc"

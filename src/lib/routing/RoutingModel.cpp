@@ -403,4 +403,5 @@ const Route & RoutingModel::route() const
 
 } // namespace Marble
 
-#include "RoutingModel.moc"
+//FIXME mzanetti
+//#include "RoutingModel.moc"

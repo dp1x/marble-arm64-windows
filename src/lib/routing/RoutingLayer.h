@@ -17,7 +17,7 @@
 
 #include <QtCore/QModelIndex>
 #include <QtCore/QRect>
-#include <QtGui/QItemSelection>
+#include <QItemSelection>
 
 class QAbstractProxyModel;
 

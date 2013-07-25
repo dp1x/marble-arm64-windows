@@ -251,24 +251,60 @@ endif(APPLE)
 ####################################################
 # Specific options for if building with Qt or kde4 libs
 
-find_package(Qt4 REQUIRED)
-set( QT_USE_QTXML         ON )
-set( QT_USE_QTNETWORK     ON )
-set( QT_USE_QTTEST        ON )
-set( QT_USE_QTSCRIPT      ON )
-set( QT_USE_QTWEBKIT      ON )
-set( QT_USE_QTSVG         ON )
-set( QT_USE_QTDECLARATIVE ON )
-set( QT_USE_QTSQL         ON )
-include( ${QT_USE_FILE} )
-marble_set_package_properties( Qt4 PROPERTIES DESCRIPTION "cross-platform application framework" )
-marble_set_package_properties( Qt4 PROPERTIES URL "http://qt.digia.com/" )
-marble_set_package_properties( Qt4 PROPERTIES TYPE REQUIRED PURPOSE "core framework" )
-IF ( NOT QT_QTDECLARATIVE_LIBRARY )
-  # older cmake versions have a FindQt4.cmake without support for declarative,
-  # but the library may still be available
-  FIND_LIBRARY(QT_QTDECLARATIVE_LIBRARY NAMES QtDeclarative HINTS ${QT_LIBRARY_DIR})
-ENDIF()
+if(QT5BUILD)
+  find_package(Qt5Xml REQUIRED)
+  find_package(Qt5Network REQUIRED)
+  find_package(Qt5Test REQUIRED)
+  find_package(Qt5Script REQUIRED)
+  find_package(Qt5Widgets REQUIRED)
+  find_package(Qt5WebKitWidgets REQUIRED)
+    
+  macro(qt_add_resources)
+    qt5_add_resources(${ARGN})
+  endmacro()
+   
+  macro(qt_wrap_ui)
+    qt5_wrap_ui(${ARGN})
+  endmacro()
+
+  macro(qt_add_resources)
+    qt5_add_resources(${ARGN})
+  endmacro()
+    
+else(QT5BUILD)
+
+  find_package(Qt4 REQUIRED)
+  set( QT_USE_QTXML         ON )
+  set( QT_USE_QTNETWORK     ON )
+  set( QT_USE_QTTEST        ON )
+  set( QT_USE_QTSCRIPT      ON )
+  set( QT_USE_QTWEBKIT      ON )
+  set( QT_USE_QTSVG         ON )
+  set( QT_USE_QTDECLARATIVE ON )
+  set( QT_USE_QTSQL         ON )
+  include( ${QT_USE_FILE} )
+  marble_set_package_properties( Qt4 PROPERTIES DESCRIPTION "cross-platform application framework" )
+  marble_set_package_properties( Qt4 PROPERTIES URL "http://qt.digia.com/" )
+  marble_set_package_properties( Qt4 PROPERTIES TYPE REQUIRED PURPOSE "core framework" )
+  IF ( NOT QT_QTDECLARATIVE_LIBRARY )
+    # older cmake versions have a FindQt4.cmake without support for declarative,
+    # but the library may still be available
+    FIND_LIBRARY(QT_QTDECLARATIVE_LIBRARY NAMES QtDeclarative HINTS ${QT_LIBRARY_DIR})
+  ENDIF()
+
+  macro(qt_add_resources)
+    qt4_add_resources(${ARGN})
+  endmacro()
+
+  macro(qt_wrap_ui)
+    qt4_wrap_ui(${ARGN})
+  endmacro()
+
+  macro(qt_add_resources)
+    qt4_add_resources(${ARGN})
+  endmacro()
+    
+endif(QT5BUILD)
 
 if(QTONLY)
   # add a flag to be able to distinguish between qt 
@@ -340,7 +376,8 @@ add_subdirectory(data)
 
 include(DistTarget)
 
-add_subdirectory(tests)
+# FIXME!
+#add_subdirectory(tests)
 
 ####################################################
 # Install extra files

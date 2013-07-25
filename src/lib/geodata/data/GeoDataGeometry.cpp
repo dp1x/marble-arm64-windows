@@ -21,7 +21,6 @@
 
 #include "MarbleDebug.h"
 
-
 namespace Marble
 {
 
@@ -53,8 +52,8 @@ GeoDataGeometry::~GeoDataGeometry()
 
 void  GeoDataGeometry::detach()
 {
-    if(d->ref == 1)
-        return;
+//    if(d->ref == 1)
+//        return;
 
      GeoDataGeometryPrivate* new_d = d->copy();
 

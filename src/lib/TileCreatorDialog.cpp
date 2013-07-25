@@ -90,4 +90,5 @@ void TileCreatorDialog::setSummary( const QString& name,
 
 }
 
-#include "TileCreatorDialog.moc"
+//FIXME mzanetti
+//#include "TileCreatorDialog.moc"

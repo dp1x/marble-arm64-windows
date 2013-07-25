@@ -11,7 +11,7 @@
 #ifndef MARBLE_PLUGINABOUTDIALOG_H
 #define MARBLE_PLUGINABOUTDIALOG_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 #include <QtCore/QList>
 
 // Marble

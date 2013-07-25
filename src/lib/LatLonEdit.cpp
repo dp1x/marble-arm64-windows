@@ -663,4 +663,5 @@ void LatLonEdit::recalculate()
 }
 
 
-#include "LatLonEdit.moc"
+//FIXME mzanetti
+//#include "LatLonEdit.moc"

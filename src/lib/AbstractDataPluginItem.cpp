@@ -159,4 +159,5 @@ QList<QAction*> AbstractDataPluginItem::actions()
 
 } // Marble namespace
 
-#include "AbstractDataPluginItem.moc"
+//FIXME mzanetti
+//#include "AbstractDataPluginItem.moc"

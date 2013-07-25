@@ -635,8 +635,8 @@ bool GeoDataCoordinates::isValid() const
  */
 void GeoDataCoordinates::detach()
 {
-    if(d->ref == 1)
-        return;
+//    if(d->ref == 1)
+//        return;
 
     GeoDataCoordinatesPrivate *new_d = new GeoDataCoordinatesPrivate( *d );
 

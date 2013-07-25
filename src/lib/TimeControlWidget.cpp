@@ -93,4 +93,5 @@ void TimeControlWidget::showEvent(QShowEvent* event)
     }
 }
 
-#include "TimeControlWidget.moc"
+//FIXME mzanetti
+//#include "TimeControlWidget.moc"

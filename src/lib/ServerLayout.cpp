@@ -15,6 +15,10 @@
 #include "MarbleGlobal.h"
 #include "TileId.h"
 
+#if QT_VERSION >= 0x050000
+#include <QUrlQuery>
+#endif
+
 #include <math.h>
 
 namespace Marble
@@ -118,30 +122,41 @@ QUrl WmsServerLayout::downloadUrl( const QUrl &prototypeUrl, const Marble::TileI
     const qreal lonLeft   = ( x - radius ) / radius * 180.0;
     const qreal lonRight  = ( x - radius + 1 ) / radius * 180.0;
 
-    QUrl url = prototypeUrl;
-    url.addQueryItem( "service", "WMS" );
-    url.addQueryItem( "request", "GetMap" );
-    url.addQueryItem( "version", "1.1.1" );
-    if ( !url.hasQueryItem( "styles" ) )
-        url.addQueryItem( "styles", "" );
-    if ( !url.hasQueryItem( "format" ) ) {
+#if QT_VERSION < 0x050000
+    QUrl urlQuery = prototypeUrl;
+#else
+    QUrlQuery urlQuery(prototypeUrl.query());
+#endif
+
+    urlQuery.addQueryItem( "service", "WMS" );
+    urlQuery.addQueryItem( "request", "GetMap" );
+    urlQuery.addQueryItem( "version", "1.1.1" );
+    if ( !urlQuery.hasQueryItem( "styles" ) )
+        urlQuery.addQueryItem( "styles", "" );
+    if ( !urlQuery.hasQueryItem( "format" ) ) {
         if ( m_textureLayer->fileFormat().toLower() == "jpg" )
-            url.addQueryItem( "format", "image/jpeg" );
+            urlQuery.addQueryItem( "format", "image/jpeg" );
         else
-            url.addQueryItem( "format", "image/" + m_textureLayer->fileFormat().toLower() );
+            urlQuery.addQueryItem( "format", "image/" + m_textureLayer->fileFormat().toLower() );
     }
-    if ( !url.hasQueryItem( "srs" ) ) {
-        url.addQueryItem( "srs", epsgCode() );
+    if ( !urlQuery.hasQueryItem( "srs" ) ) {
+        urlQuery.addQueryItem( "srs", epsgCode() );
     }
-    if ( !url.hasQueryItem( "layers" ) )
-        url.addQueryItem( "layers", m_textureLayer->name() );
-    url.addQueryItem( "width", QString::number( m_textureLayer->tileSize().width() ) );
-    url.addQueryItem( "height", QString::number( m_textureLayer->tileSize().height() ) );
-    url.addQueryItem( "bbox", QString( "%1,%2,%3,%4" ).arg( QString::number( lonLeft, 'f', 12 ) )
+    if ( !urlQuery.hasQueryItem( "layers" ) )
+        urlQuery.addQueryItem( "layers", m_textureLayer->name() );
+    urlQuery.addQueryItem( "width", QString::number( m_textureLayer->tileSize().width() ) );
+    urlQuery.addQueryItem( "height", QString::number( m_textureLayer->tileSize().height() ) );
+    urlQuery.addQueryItem( "bbox", QString( "%1,%2,%3,%4" ).arg( QString::number( lonLeft, 'f', 12 ) )
                                                       .arg( QString::number( latBottom( tileId ), 'f', 12 ) )
                                                       .arg( QString::number( lonRight, 'f', 12 ) )
                                                       .arg( QString::number( latTop( tileId ), 'f', 12 ) ) );
 
+#if QT_VERSION < 0x050000
+    QUrl url = urlQuery;
+#else
+    QUrl url = prototypeUrl;
+    url.setQuery(urlQuery);
+#endif
     return url;
 }
 

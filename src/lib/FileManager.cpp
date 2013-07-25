@@ -212,4 +212,5 @@ void FileManagerPrivate::cleanupLoader( FileLoader* loader )
     }
 }
 
-#include "FileManager.moc"
+//FIXME mzanetti
+//#include "FileManager.moc"

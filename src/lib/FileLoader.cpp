@@ -548,5 +548,6 @@ int FileLoaderPrivate::areaPopIdx( qreal area ) const
 
 
 
-#include "FileLoader.moc"
+//FIXME mzanetti
+//#include "FileLoader.moc"
 } // namespace Marble

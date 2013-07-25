@@ -24,6 +24,10 @@
 #include <QSizePolicy>
 #include <QNetworkProxy>
 
+#if QT_VERSION >= 0x050000
+#include <QMetaMethod>
+#endif
+
 #ifdef MARBLE_DBUS
 #include <QDBusConnection>
 #endif
@@ -735,18 +739,30 @@ void MarbleWidget::resizeEvent( QResizeEvent *event )
     QWidget::resizeEvent( event );
 }
 
+#if QT_VERSION < 0x050000
 void MarbleWidget::connectNotify( const char * signal )
 {
     if ( QByteArray( signal ) == 
          QMetaObject::normalizedSignature ( SIGNAL(mouseMoveGeoPosition(QString)) ) )
+#else
+void MarbleWidget::connectNotify( const QMetaMethod &signal )
+{
+    if ( signal == QMetaMethod::fromSignal(&Marble::MarbleWidget::mouseMoveGeoPosition) )
+#endif
         if ( d->m_inputhandler )
             d->m_inputhandler->setPositionSignalConnected( true );
 }
 
+#if QT_VERSION < 0x050000
 void MarbleWidget::disconnectNotify( const char * signal )
 {
     if ( QByteArray( signal ) == 
          QMetaObject::normalizedSignature ( SIGNAL(mouseMoveGeoPosition(QString)) ) )
+#else
+void MarbleWidget::disconnectNotify( const QMetaMethod &signal )
+{
+    if ( signal == QMetaMethod::fromSignal(&Marble::MarbleWidget::mouseMoveGeoPosition) )
+#endif
         if ( d->m_inputhandler )
             d->m_inputhandler->setPositionSignalConnected( false );
 }
@@ -1408,4 +1424,5 @@ PopupLayer *MarbleWidget::popupLayer()
 
 }
 
-#include "MarbleWidget.moc"
+//FIXME mzanetti
+//#include "MarbleWidget.moc"

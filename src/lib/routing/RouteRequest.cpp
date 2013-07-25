@@ -335,4 +335,5 @@ const GeoDataPlacemark &RouteRequest::operator [](int index) const
 
 } // namespace Marble
 
-#include "RouteRequest.moc"
+//FIXME mzanetti
+//#include "RouteRequest.moc"

@@ -124,4 +124,5 @@ void MarblePluginSettingsWidget::setModel( RenderPluginModel* pluginModel )
 
 } // namespace Marble
 
-#include "MarblePluginSettingsWidget.moc"
+//FIXME mzanetti
+//#include "MarblePluginSettingsWidget.moc"

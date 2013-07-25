@@ -158,4 +158,5 @@ QString GeoSceneGroup::name() const
 
 }
 
-#include "GeoSceneGroup.moc"
+//FIXME mzanetti
+//#include "GeoSceneGroup.moc"

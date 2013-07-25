@@ -49,11 +49,23 @@ MarblePlacemarkModel::MarblePlacemarkModel( QObject *parent )
     : QAbstractListModel( parent ),
       d( new Private )
 {
+#if QT_VERSION < 0x050000
     QHash<int,QByteArray> roles = roleNames();
     roles[DescriptionRole] = "description";
     roles[LongitudeRole] = "longitude";
     roles[LatitudeRole] = "latitude";
     setRoleNames( roles );
+#else
+}
+
+QHash<int, QByteArray> MarblePlacemarkModel::roleNames() const
+{
+    QHash<int,QByteArray> roles = roleNames();
+    roles[DescriptionRole] = "description";
+    roles[LongitudeRole] = "longitude";
+    roles[LatitudeRole] = "latitude";
+    return roles;
+#endif
 }
 
 MarblePlacemarkModel::~MarblePlacemarkModel()
@@ -185,7 +197,9 @@ void MarblePlacemarkModel::addPlacemarks( int start,
 //    beginInsertRows( QModelIndex(), start, start + length );
     d->m_size += length;
 //    endInsertRows();
-    reset();
+    beginResetModel();
+    endResetModel();
+
     emit countChanged();
     mDebug() << "addPlacemarks: Time elapsed:" << t.elapsed() << "ms for" << length << "Placemarks.";
 }
@@ -206,4 +220,5 @@ void  MarblePlacemarkModel::removePlacemarks( const QString &containerName,
     }
 }
 
-#include "MarblePlacemarkModel.moc"
+//FIXME mzanetti
+//#include "MarblePlacemarkModel.moc"

@@ -57,4 +57,5 @@ void DeferredFlag::slotDrawFlag()
 }
 
 
-#include "DeferredFlag.moc"
+//FIXME mzanetti
+//#include "DeferredFlag.moc"

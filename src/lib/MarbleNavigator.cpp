@@ -104,4 +104,5 @@ void MarbleNavigator::resizeEvent ( QResizeEvent * )
 
 }
 
-#include "MarbleNavigator.moc"
+//FIXME mzanetti
+//#include "MarbleNavigator.moc"

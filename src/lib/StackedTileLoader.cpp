@@ -220,4 +220,5 @@ void StackedTileLoader::clear()
 
 }
 
-#include "StackedTileLoader.moc"
+//FIXME mzanetti
+//#include "StackedTileLoader.moc"

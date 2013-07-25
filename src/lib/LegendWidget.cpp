@@ -62,4 +62,5 @@ void LegendWidget::setMarbleModel( MarbleModel *model )
 
 }
 
-#include "LegendWidget.moc"
+//FIXME mzanetti
+//#include "LegendWidget.moc"

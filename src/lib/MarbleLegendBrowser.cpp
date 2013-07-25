@@ -371,4 +371,5 @@ void MarbleLegendBrowser::setCheckedProperty( const QString& name, bool checked 
 
 }
 
-#include "MarbleLegendBrowser.moc"
+//FIXME mzanetti
+//#include "MarbleLegendBrowser.moc"

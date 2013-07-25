@@ -523,4 +523,5 @@ void MapThemeManager::Private::addMapThemePaths( const QString& mapPathName, QSt
 
 }
 
-#include "MapThemeManager.moc"
+//FIXME mzanetti
+//#include "MapThemeManager.moc"

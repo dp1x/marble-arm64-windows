@@ -43,4 +43,5 @@ void WikipediaService::handleNetworkReply(QNetworkReply *reply)
 
 } // namespace Marble
 
-#include "WikipediaService.moc"
+//FIXME mzanetti
+//#include "WikipediaService.moc"

@@ -638,4 +638,5 @@ QPoint MarbleWidgetPopupMenu::mousePosition() const
     return m_mousePosition;
 }
 
-#include "MarbleWidgetPopupMenu.moc"
+//FIXME mzanetti
+//#include "MarbleWidgetPopupMenu.moc"

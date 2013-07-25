@@ -156,4 +156,5 @@ void PopupLayer::hidePopupItem()
 
 }
 
-#include "PopupLayer.moc"
+//FIXME mzanetti
+//#include "PopupLayer.moc"

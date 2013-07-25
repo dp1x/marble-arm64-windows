@@ -1011,4 +1011,5 @@ Qt::DropActions KDescendantsProxyModel::supportedDropActions() const
   return sourceModel()->supportedDropActions();
 }
 
-#include "kdescendantsproxymodel.moc"
+//FIXME mzanetti
+//#include "kdescendantsproxymodel.moc"
