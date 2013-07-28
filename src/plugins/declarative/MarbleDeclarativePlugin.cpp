@@ -76,6 +76,5 @@ void MarbleDeclarativePlugin::initializeEngine( QDeclarativeEngine *engine, cons
     }
 }
 
-#include "MarbleDeclarativePlugin.moc"
 
 Q_EXPORT_PLUGIN2( MarbleDeclarativePlugin, MarbleDeclarativePlugin )

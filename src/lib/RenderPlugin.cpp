@@ -241,4 +241,3 @@ QVariant RenderPlugin::setting( const QString & name )
 
 } // namespace Marble
 
-#include "RenderPlugin.moc"

@@ -253,4 +253,3 @@ void CompassFloatItem::writeSettings()
 
 Q_EXPORT_PLUGIN2( CompassFloatItem, Marble::CompassFloatItem )
 
-#include "CompassFloatItem.moc"

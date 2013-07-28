@@ -189,4 +189,4 @@ void SearchWidgetPrivate::centerMapOn( const QModelIndex &index )
 
 }
 
-#include "SearchWidget.moc"
+#include "moc_SearchWidget.cpp"

@@ -125,4 +125,3 @@ GeoSceneLegend* GeoSceneDocument::legend()
 
 }
 
-#include "GeoSceneDocument.moc"

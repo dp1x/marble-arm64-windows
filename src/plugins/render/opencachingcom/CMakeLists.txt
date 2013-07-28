@@ -20,7 +20,5 @@ QT4_WRAP_UI(my_SRCS ${cachedetailsdialog_UI})
 
 qt4_add_resources(my_SRCS opencachingcom.qrc)
 
-QT4_AUTOMOC( ${my_SRCS} )
-
 MARBLE_ADD_PLUGIN( OpenCachingComPlugin ${my_SRCS} )
-
+set_target_properties( OpenCachingComPlugin PROPERTIES AUTOMOC ON )

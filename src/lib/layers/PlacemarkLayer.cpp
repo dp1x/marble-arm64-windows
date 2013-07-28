@@ -187,5 +187,4 @@ bool PlacemarkLayer::testXBug()
     return true;
 }
 
-#include "PlacemarkLayer.moc"
 

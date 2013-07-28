@@ -72,4 +72,3 @@ bool YoursPlugin::supportsTemplate( RoutingProfilesModel::ProfileTemplate profil
 
 Q_EXPORT_PLUGIN2( YoursPlugin, Marble::YoursPlugin )
 
-#include "YoursPlugin.moc"

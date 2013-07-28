@@ -436,4 +436,3 @@ void GeometryLayer::resetCacheData()
 
 }
 
-#include "GeometryLayer.moc"

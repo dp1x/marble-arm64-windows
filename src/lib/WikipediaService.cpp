@@ -43,4 +43,3 @@ void WikipediaService::handleNetworkReply(QNetworkReply *reply)
 
 } // namespace Marble
 
-#include "WikipediaService.moc"

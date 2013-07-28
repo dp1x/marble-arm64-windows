@@ -29,4 +29,3 @@ void StackableWindow::closeEvent ( QCloseEvent *event )
 
 }
 
-#include "StackableWindow.moc"

@@ -597,4 +597,4 @@ QDialog *RoutingPlugin::configDialog()
 
 Q_EXPORT_PLUGIN2( RoutingPlugin, Marble::RoutingPlugin )
 
-#include "RoutingPlugin.moc"
+#include "moc_RoutingPlugin.cpp"

@@ -465,4 +465,3 @@ void AlternativeRoutesModel::clear()
 
 } // namespace Marble
 
-#include "AlternativeRoutesModel.moc"

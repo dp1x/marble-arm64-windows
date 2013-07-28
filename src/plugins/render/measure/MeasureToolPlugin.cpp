@@ -401,5 +401,4 @@ bool MeasureToolPlugin::eventFilter( QObject *object, QEvent *e )
 
 Q_EXPORT_PLUGIN2( MeasureToolPlugin, Marble::MeasureToolPlugin )
 
-#include "MeasureToolPlugin.moc"
 

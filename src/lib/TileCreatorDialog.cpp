@@ -90,4 +90,3 @@ void TileCreatorDialog::setSummary( const QString& name,
 
 }
 
-#include "TileCreatorDialog.moc"

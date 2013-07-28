@@ -134,4 +134,3 @@ bool OfflineDataModel::filterAcceptsRow( int source_row, const QModelIndex &sour
     return false;
 }
 
-#include "OfflineDataModel.moc"

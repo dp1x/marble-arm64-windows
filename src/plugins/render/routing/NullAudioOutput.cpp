@@ -82,4 +82,3 @@ bool AudioOutput::isSoundEnabled() const
 
 }
 
-#include "AudioOutput.moc"

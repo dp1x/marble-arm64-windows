@@ -108,4 +108,3 @@ void WikipediaModel::setMarbleWidget(MarbleWidget *widget)
     m_marbleWidget = widget;
 }
 
-#include "WikipediaModel.moc"

@@ -397,4 +397,4 @@ PositionProviderStatus PositionTracking::status() const
 
 }
 
-#include "PositionTracking.moc"
+#include "moc_PositionTracking.cpp"

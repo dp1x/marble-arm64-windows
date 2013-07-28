@@ -68,4 +68,3 @@ void JsonRunner::parseFile( const QString &fileName, DocumentRole role = Unknown
 
 }
 
-#include "JsonRunner.moc"

@@ -277,4 +277,4 @@ QList<LayerInterface *> LayerManager::internalLayers() const
 
 }
 
-#include "LayerManager.moc"
+#include "moc_LayerManager.cpp"

@@ -124,4 +124,4 @@ void BBCWeatherService::setupList()
     }
 }
 
-#include "BBCWeatherService.moc"
+#include "moc_BBCWeatherService.cpp"

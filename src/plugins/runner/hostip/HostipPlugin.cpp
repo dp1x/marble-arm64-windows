@@ -74,4 +74,3 @@ bool HostipPlugin::canWork() const
 
 Q_EXPORT_PLUGIN2( HostipPlugin, Marble::HostipPlugin )
 
-#include "HostipPlugin.moc"

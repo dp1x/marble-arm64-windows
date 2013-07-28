@@ -268,4 +268,3 @@ qreal SunLocator::getLat() const
 
 }
 
-#include "SunLocator.moc"

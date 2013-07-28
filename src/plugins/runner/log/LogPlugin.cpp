@@ -68,4 +68,3 @@ ParsingRunner* LogfilePlugin::newRunner() const
 
 Q_EXPORT_PLUGIN2( LogfilePlugin, Marble::LogfilePlugin )
 
-#include "LogPlugin.moc"

@@ -20,4 +20,3 @@ ParsingRunner::ParsingRunner( QObject *parent )
 
 }
 
-#include "ParsingRunner.moc"

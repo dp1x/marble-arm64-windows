@@ -523,4 +523,4 @@ void MapThemeManager::Private::addMapThemePaths( const QString& mapPathName, QSt
 
 }
 
-#include "MapThemeManager.moc"
+#include "moc_MapThemeManager.cpp"

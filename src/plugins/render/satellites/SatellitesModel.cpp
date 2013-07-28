@@ -249,4 +249,3 @@ void SatellitesModel::parseTLE( const QString &id,
 
 } // namespace Marble
 
-#include "SatellitesModel.moc"

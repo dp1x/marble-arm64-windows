@@ -29,4 +29,3 @@ const MarbleModel *ReverseGeocodingRunner::model() const
 
 }
 
-#include "ReverseGeocodingRunner.moc"

@@ -191,4 +191,3 @@ void AtmospherePlugin::repaintPixmap(const ViewportParams *viewParams)
 
 Q_EXPORT_PLUGIN2( AtmospherePlugin, Marble::AtmospherePlugin )
 
-#include "AtmospherePlugin.moc"

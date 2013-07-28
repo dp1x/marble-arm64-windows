@@ -16,9 +16,9 @@ set(GeoCute_SRCS
     Server/ProviderApplication.cpp
 )
 
-qt4_automoc(${GeoCute_SRCS})
-
 add_library(GeoCute SHARED ${GeoCute_SRCS})
+
+set_target_properties( GeoCute PROPERTIES AUTOMOC ON )
 
 target_link_libraries(GeoCute
     ${QT_QTCORE_LIBRARY}

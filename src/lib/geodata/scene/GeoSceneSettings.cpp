@@ -277,4 +277,3 @@ QVector<GeoSceneProperty*> GeoSceneSettings::rootProperties()
 
 }
 
-#include "GeoSceneSettings.moc"

@@ -301,5 +301,3 @@ void AbstractDataPlugin::delayedUpdate()
 }
 
 } // namespace Marble
-
-#include "AbstractDataPlugin.moc"

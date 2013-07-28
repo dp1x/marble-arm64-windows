@@ -207,4 +207,3 @@ void PntRunner::parseFile( const QString &fileName, DocumentRole role = UnknownD
 
 }
 
-#include "PntRunner.moc"

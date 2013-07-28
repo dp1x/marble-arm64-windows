@@ -175,4 +175,3 @@ void FoursquareItem::paint( QPainter* painter )
 
 }
 
-#include "FoursquareItem.moc"

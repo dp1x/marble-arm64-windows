@@ -419,4 +419,3 @@ bool MarbleWidget::containsFloatItem( const QString & name )
     return false;
 }
 
-#include "MarbleDeclarativeWidget.moc"

@@ -220,4 +220,3 @@ void StackedTileLoader::clear()
 
 }
 
-#include "StackedTileLoader.moc"

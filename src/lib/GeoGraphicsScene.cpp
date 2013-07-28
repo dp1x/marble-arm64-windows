@@ -178,4 +178,3 @@ void GeoGraphicsScenePrivate::addItems( const TileId &tileId, QList<GeoGraphicsI
 
 }
 
-#include "GeoGraphicsScene.moc"

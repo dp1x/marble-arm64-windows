@@ -62,4 +62,3 @@ void LegendWidget::setMarbleModel( MarbleModel *model )
 
 }
 
-#include "LegendWidget.moc"

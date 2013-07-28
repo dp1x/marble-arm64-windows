@@ -705,4 +705,3 @@ void ElevationProfileFloatItem::toggleZoomToViewport()
 
 Q_EXPORT_PLUGIN2(ElevationProfileFloatItem, Marble::ElevationProfileFloatItem)
 
-#include "ElevationProfileFloatItem.moc"

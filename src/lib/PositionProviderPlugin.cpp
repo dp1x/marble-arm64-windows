@@ -46,4 +46,3 @@ void PositionProviderPlugin::setMarbleModel( const MarbleModel* marbleModel )
 
 }
 
-#include "PositionProviderPlugin.moc"

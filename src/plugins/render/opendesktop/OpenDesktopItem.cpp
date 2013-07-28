@@ -157,4 +157,3 @@ void OpenDesktopItem::setMarbleWidget(MarbleWidget *widget)
 }
 
 // This is needed for all QObjects (see MOC)
-#include "OpenDesktopItem.moc"

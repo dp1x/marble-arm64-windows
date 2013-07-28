@@ -232,4 +232,3 @@ void ArrowDiscWidget::paintEvent( QPaintEvent * )
 
 }
 
-#include "ArrowDiscWidget.moc"

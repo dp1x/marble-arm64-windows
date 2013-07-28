@@ -68,4 +68,3 @@ SearchRunner* NominatimPlugin::newRunner() const
 
 Q_EXPORT_PLUGIN2( NominatimSearchPlugin, Marble::NominatimPlugin )
 
-#include "NominatimSearchPlugin.moc"

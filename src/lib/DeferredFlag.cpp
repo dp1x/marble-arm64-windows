@@ -57,4 +57,3 @@ void DeferredFlag::slotDrawFlag()
 }
 
 
-#include "DeferredFlag.moc"

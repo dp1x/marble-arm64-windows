@@ -175,4 +175,3 @@ QString InhibitScreensaverPlugin::renderPolicy() const
 
 Q_EXPORT_PLUGIN2( InhibitScreensaverPlugin, Marble::InhibitScreensaverPlugin )
 
-#include "InhibitScreensaverPlugin.moc"

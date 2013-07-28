@@ -418,4 +418,3 @@ QRect PluginItemDelegate::alignRect( QRect object,
 }
 
 
-#include "PluginItemDelegate.moc"

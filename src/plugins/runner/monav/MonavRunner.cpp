@@ -271,4 +271,3 @@ void MonavRunner::reverseGeocoding( const GeoDataCoordinates &coordinates )
 
 } // namespace Marble
 
-#include "MonavRunner.moc"

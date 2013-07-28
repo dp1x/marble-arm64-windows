@@ -409,4 +409,3 @@ void FileStorageWatcher::run()
 }
 // End of all methods
 
-#include "FileStorageWatcher.moc"

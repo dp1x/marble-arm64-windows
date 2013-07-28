@@ -206,4 +206,3 @@ void  MarblePlacemarkModel::removePlacemarks( const QString &containerName,
     }
 }
 
-#include "MarblePlacemarkModel.moc"

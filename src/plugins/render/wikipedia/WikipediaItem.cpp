@@ -256,4 +256,3 @@ bool WikipediaItem::showThumbnail() const
     return m_showThumbnail && !m_thumbnail.isNull();
 }
 
-#include "WikipediaItem.moc"

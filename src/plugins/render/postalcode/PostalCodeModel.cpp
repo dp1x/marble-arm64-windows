@@ -128,4 +128,3 @@ void PostalCodeModel::addLine(QString *string, const QString &line)
     }
 }
 
-#include "PostalCodeModel.moc"

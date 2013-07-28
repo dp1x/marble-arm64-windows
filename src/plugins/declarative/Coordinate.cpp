@@ -93,4 +93,3 @@ bool Coordinate::operator != ( const Coordinate &other ) const
     return !operator == ( other );
 }
 
-#include "Coordinate.moc"

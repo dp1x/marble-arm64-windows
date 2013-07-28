@@ -228,5 +228,4 @@ double SatellitesTLEItem::square( double x )
 
 } // namespace Marble
 
-#include "SatellitesTLEItem.moc"
 

@@ -15,8 +15,6 @@ set( routing-instructions_SRC
         ../routing-instructions/main.cpp
 )
 
-qt4_automoc(${routing-instructions_SRC})
-
 add_definitions( -DMAKE_MARBLE_LIB )
 add_executable( routing-instructions ${routing-instructions_SRC} )
 target_link_libraries( routing-instructions ${QT_QTCORE_LIBRARY} ${QT_QTMAIN_LIBRARY} )
@@ -37,3 +35,5 @@ else(WIN32 AND QTONLY)
       endif(NOT QTONLY)
     endif (APPLE AND QTONLY)
 endif(WIN32 AND QTONLY)
+
+set_target_properties( routing-instructions PROPERTIES AUTOMOC ON )

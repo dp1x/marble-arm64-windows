@@ -85,4 +85,3 @@ void KmlRunner::parseFile( const QString &fileName, DocumentRole role = UnknownD
 
 }
 
-#include "KmlRunner.moc"

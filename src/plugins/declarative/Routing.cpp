@@ -191,4 +191,3 @@ void Routing::saveRoute( const QString &fileName )
     }
 }
 
-#include "Routing.moc"

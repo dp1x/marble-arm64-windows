@@ -112,4 +112,3 @@ void ExternalEditorDialog::updateDefaultEditor( int index )
 
 }
 
-#include "ExternalEditorDialog.moc"

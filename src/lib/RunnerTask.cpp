@@ -99,4 +99,3 @@ void ParsingTask::run()
 
 }
 
-#include "RunnerTask.moc"

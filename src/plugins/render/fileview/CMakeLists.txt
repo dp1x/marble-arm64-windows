@@ -10,10 +10,13 @@ set( fileview_SRCS FileViewFloatItem.cpp )
 
 #if (QTONLY)
 #  qt4_wrap_ui( fileview_SRCS ${fileview_UI} )
-#  qt4_automoc( ${fileview_SRCS} )
 #else (QTONLY)
 #  include_directories( ${KDE4_INCLUDES} )
 #  kde4_add_ui_files( fileview_SRCS ${fileview_UI} )
 #endif (QTONLY)
 
 marble_add_plugin( FileViewFloatItem ${fileview_SRCS} )
+
+#if (QTONLY)
+#  set_target_properties( FileViewFloatItem PROPERTIES AUTOMOC ON )
+#endif (QTONLY)

@@ -264,4 +264,3 @@ bool TestPlugin::render( GeoPainter *painter, ViewportParams *viewport, const QS
 
 Q_EXPORT_PLUGIN2( TestPlugin, Marble::TestPlugin )
 
-#include "TestPlugin.moc"

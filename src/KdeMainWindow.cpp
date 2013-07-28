@@ -91,4 +91,3 @@ void MainWindow::setMapTitle()
 
 }
 
-#include "KdeMainWindow.moc"

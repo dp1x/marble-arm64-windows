@@ -136,4 +136,4 @@ bool AudioOutput::isSoundEnabled() const
 
 }
 
-#include "AudioOutput.moc"
+#include "moc_AudioOutput.cpp"

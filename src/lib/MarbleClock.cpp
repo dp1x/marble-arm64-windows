@@ -146,4 +146,4 @@ void MarbleClock::setTimezone( int timezoneInSec )
 
 }
 
-#include "MarbleClock.moc"
+#include "moc_MarbleClock.cpp"

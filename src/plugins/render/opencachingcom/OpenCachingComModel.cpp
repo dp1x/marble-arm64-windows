@@ -132,4 +132,3 @@ void OpenCachingComModel::updateHome()
 
 } // namespace Marble
 
-#include "OpenCachingComModel.moc"

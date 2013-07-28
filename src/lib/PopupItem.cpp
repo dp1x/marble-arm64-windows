@@ -384,4 +384,3 @@ QPixmap PopupItem::pixmap( const QString &imageId ) const
 
 }
 
-#include "PopupItem.moc"

@@ -103,4 +103,3 @@ void TextEditor::updateDescription()
 }
 }
 
-#include "TextEditor.moc"

@@ -138,4 +138,3 @@ void OsmNominatimRunner::addData( const QDomNodeList &node, const QString &key, 
 
 } // namespace Marble
 
-#include "OsmNominatimReverseGeocodingRunner.moc"

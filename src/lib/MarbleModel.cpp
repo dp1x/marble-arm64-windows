@@ -700,4 +700,3 @@ const ElevationModel* MarbleModel::elevationModel() const
 
 }
 
-#include "MarbleModel.moc"

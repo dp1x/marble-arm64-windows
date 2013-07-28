@@ -188,4 +188,3 @@ void OsmNominatimRunner::handleResult( QNetworkReply* reply )
 
 } // namespace Marble
 
-#include "OsmNominatimSearchRunner.moc"

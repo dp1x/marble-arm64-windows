@@ -106,4 +106,3 @@ void RenderPluginModel::applyPluginState()
 
 }
 
-#include "RenderPluginModel.moc"

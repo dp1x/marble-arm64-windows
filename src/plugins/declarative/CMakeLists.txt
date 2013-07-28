@@ -34,7 +34,7 @@ ZoomButtonInterceptor.cpp
 marble_add_project_resources(qmldir)
 
 marble_add_declarative_plugin( MarbleDeclarativePlugin . ${marbleplugin_SRCS})
-qt4_automoc(${marbleplugin_SRCS})
+set_target_properties( MarbleDeclarativePlugin PROPERTIES AUTOMOC ON )
 target_link_libraries( MarbleDeclarativePlugin ${QT_QTDECLARATIVE_LIBRARY} ${QT_QTWEBKIT_LIBRARY} )
 OPTION(BUILD_HARMATTAN_ZOOMINTERCEPTOR "Add support for intercepting volume keys for zooming")
 IF( BUILD_HARMATTAN_ZOOMINTERCEPTOR )

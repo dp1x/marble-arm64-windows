@@ -771,4 +771,3 @@ void RoutingLayer::setViewContext( ViewContext viewContext )
 
 } // namespace Marble
 
-#include "RoutingLayer.moc"

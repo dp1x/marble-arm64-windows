@@ -95,4 +95,3 @@ void AbstractWorkerThread::run()
 
 }
 
-#include "AbstractWorkerThread.moc"

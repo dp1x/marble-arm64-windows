@@ -390,4 +390,3 @@ bool AutoNavigation::autoZoom() const
 
 } // namespace Marble
 
-#include "AutoNavigation.moc"

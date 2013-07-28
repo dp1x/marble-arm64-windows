@@ -458,4 +458,3 @@ QAction* AprsPlugin::action() const
 
 Q_EXPORT_PLUGIN2( AprsPlugin, Marble::AprsPlugin )
 
-#include "AprsPlugin.moc"

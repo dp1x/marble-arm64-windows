@@ -690,4 +690,3 @@ bool PlacemarkLayout::placemarksOnScreenLimit( const QSize &screenSize ) const
 
 }
 
-#include "PlacemarkLayout.moc"

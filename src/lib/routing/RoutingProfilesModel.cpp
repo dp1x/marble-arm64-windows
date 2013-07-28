@@ -169,4 +169,3 @@ void RoutingProfilesModel::loadDefaultProfiles()
 
 }
 
-#include "RoutingProfilesModel.moc"

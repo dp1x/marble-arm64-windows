@@ -33,4 +33,3 @@ QMap<QString, QVariant> RelatedActivities::relatedActivities() const
     return m_relatedActivities;
 }
 
-#include "RelatedActivities.moc"

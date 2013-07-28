@@ -434,4 +434,4 @@ int TextureLayer::preferredRadiusFloor( int radius ) const
 
 }
 
-#include "TextureLayer.moc"
+#include "moc_TextureLayer.cpp"

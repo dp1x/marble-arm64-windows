@@ -191,4 +191,3 @@ void DataMigration::moveFiles( const QString& source, const QString& target )
 
 }
 
-#include "DataMigration.moc"

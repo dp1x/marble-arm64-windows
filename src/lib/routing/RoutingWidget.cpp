@@ -730,4 +730,3 @@ void RoutingWidget::resizeEvent(QResizeEvent *e)
 
 } // namespace Marble
 
-#include "RoutingWidget.moc"

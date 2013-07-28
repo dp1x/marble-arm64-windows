@@ -217,4 +217,4 @@ int SpeakersModel::count()
 
 }
 
-#include "SpeakersModel.moc"
+#include "moc_SpeakersModel.cpp"

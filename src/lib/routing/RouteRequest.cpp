@@ -320,4 +320,3 @@ RoutingProfile RouteRequest::routingProfile() const
 
 } // namespace Marble
 
-#include "RouteRequest.moc"

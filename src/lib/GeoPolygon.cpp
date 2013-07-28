@@ -389,4 +389,3 @@ void PntMapLoader::run()
     emit pntMapLoaded( true );
 }
 
-#include "GeoPolygon.moc"

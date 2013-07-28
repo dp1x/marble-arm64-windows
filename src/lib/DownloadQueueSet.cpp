@@ -276,4 +276,3 @@ inline void DownloadQueueSet::JobStack::push( HttpJob * const job )
 
 }
 
-#include "DownloadQueueSet.moc"

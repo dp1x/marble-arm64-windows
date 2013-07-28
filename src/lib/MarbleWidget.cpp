@@ -1408,4 +1408,4 @@ PopupLayer *MarbleWidget::popupLayer()
 
 }
 
-#include "MarbleWidget.moc"
+#include "moc_MarbleWidget.cpp"

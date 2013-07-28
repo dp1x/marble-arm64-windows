@@ -1011,4 +1011,4 @@ Qt::DropActions KDescendantsProxyModel::supportedDropActions() const
   return sourceModel()->supportedDropActions();
 }
 
-#include "kdescendantsproxymodel.moc"
+#include "moc_kdescendantsproxymodel.cpp"

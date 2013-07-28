@@ -18,7 +18,7 @@ FILE (GLOB QML_FILES *.qml)
 marble_add_project_resources(${QML_FILES} qmldir)
 
 MARBLE_ADD_DECLARATIVE_PLUGIN( QtComponentsPlugin qtcomponents ${my_SRCS} )
-QT4_AUTOMOC(${my_SRCS})
+SET_TARGET_PROPERTIES( QtComponentsPlugin PROPERTIES AUTOMOC ON )
 TARGET_LINK_LIBRARIES( QtComponentsPlugin ${QT_QTDECLARATIVE_LIBRARY} ${QT_QTWEBKIT_LIBRARY} )
 INSTALL( FILES qmldir DESTINATION ${MARBLE_QT_IMPORTS_DIR}/org/kde/edu/marble/qtcomponents )
 INSTALL( FILES SearchField.qml DESTINATION ${MARBLE_QT_IMPORTS_DIR}/org/kde/edu/marble/qtcomponents )

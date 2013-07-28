@@ -663,4 +663,3 @@ void LatLonEdit::recalculate()
 }
 
 
-#include "LatLonEdit.moc"

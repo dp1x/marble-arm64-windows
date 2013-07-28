@@ -383,4 +383,3 @@ void TestTrack::extendedDataHeartRateTest()
 QTEST_MAIN( TestTrack )
 
 #include "TestTrack.moc"
-
