@@ -1424,5 +1424,4 @@ PopupLayer *MarbleWidget::popupLayer()
 
 }
 
-//FIXME mzanetti
-//#include "MarbleWidget.moc"
+#include "moc_MarbleWidget.cpp"

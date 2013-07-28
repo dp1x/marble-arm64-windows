@@ -101,4 +101,3 @@ void LogRunner::parseFile( const QString &fileName, DocumentRole role = UnknownD
 
 }
 
-#include "LogRunner.moc"

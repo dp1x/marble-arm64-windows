@@ -287,4 +287,4 @@ qreal EditBookmarkDialog::range() const {
 
 }
 
-#include "EditBookmarkDialog.moc"
+#include "moc_EditBookmarkDialog.cpp"

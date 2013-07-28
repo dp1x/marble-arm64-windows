@@ -78,4 +78,3 @@ bool ReverseGeocodingRunnerPlugin::canWork() const
 
 }
 
-#include "ReverseGeocodingRunnerPlugin.moc"

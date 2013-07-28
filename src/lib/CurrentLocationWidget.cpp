@@ -446,5 +446,4 @@ void CurrentLocationWidget::setLastSavePath( const QString &path )
 
 }
 
-//FIXME mzanetti
-//#include "CurrentLocationWidget.moc"
+#include "moc_CurrentLocationWidget.cpp"

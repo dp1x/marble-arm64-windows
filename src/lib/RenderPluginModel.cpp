@@ -106,5 +106,3 @@ void RenderPluginModel::applyPluginState()
 
 }
 
-//FIXME mzanetti
-//#include "RenderPluginModel.moc"

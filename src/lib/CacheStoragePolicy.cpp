@@ -71,5 +71,3 @@ quint64 CacheStoragePolicy::cacheLimit() const
     return m_cache.cacheLimit();
 }
 
-//FIXME mzanetti
-//#include "CacheStoragePolicy.moc"

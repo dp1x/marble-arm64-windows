@@ -1307,5 +1307,4 @@ const TextureLayer *MarbleMap::textureLayer() const
 
 }
 
-//FIXME mzanetti
-//#include "MarbleMap.moc"
+#include "moc_MarbleMap.cpp"

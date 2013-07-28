@@ -95,5 +95,3 @@ void AbstractWorkerThread::run()
 
 }
 
-//FIXME mzanetti
-//#include "AbstractWorkerThread.moc"

@@ -13,7 +13,5 @@ set( my_SRCS
   FoursquareItem.cpp
  )
 
-qt4_automoc( ${my_SRCS} )
-
 marble_add_plugin( FoursquarePlugin ${my_SRCS} )
-
+set_target_properties( FoursquarePlugin PROPERTIES AUTOMOC ON)

@@ -288,6 +288,8 @@ qt_wrap_ui(marblewidget_SRCS ${marblewidget_UI})
 ADD_LIBRARY(marblewidget SHARED ${marblewidget_SRCS} ${SOURCES_UI_HDRS})
 TARGET_LINK_LIBRARIES (marblewidget ${QT_QTCORE_LIBRARY} ${QT_QTDBUS_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTSVG_LIBRARY} ${QT_QTNETWORK_LIBRARY} ${QT_QTSCRIPT_LIBRARY} ${QT_QTMAIN_LIBRARY} ${QT_QTWEBKIT_LIBRARY} ${QT_QTDECLARATIVE_LIBRARY} )
 
+set_target_properties( marblewidget PROPERTIES AUTOMOC ON )
+
 if (APPLE)
   #defined in top level makefile
   TARGET_LINK_LIBRARIES(marblewidget ${MAC_EXTRA_LIBS} )

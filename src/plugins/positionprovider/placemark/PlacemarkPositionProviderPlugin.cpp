@@ -189,4 +189,3 @@ void PlacemarkPositionProviderPlugin::updatePosition()
 
 Q_EXPORT_PLUGIN2( PlacemarkPositionProviderPlugin, Marble::PlacemarkPositionProviderPlugin )
 
-#include "PlacemarkPositionProviderPlugin.moc"

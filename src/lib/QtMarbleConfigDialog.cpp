@@ -578,5 +578,3 @@ void QtMarbleConfigDialog::initializeCustomTimezone()
 
 }
 
-//FIXME mzanetti
-//#include "QtMarbleConfigDialog.moc"

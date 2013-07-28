@@ -314,4 +314,3 @@ void NavigationFloatItem::centerOnCurrentLocation()
 
 Q_EXPORT_PLUGIN2( NavigationFloatItem, Marble::NavigationFloatItem )
 
-#include "NavigationFloatItem.moc"

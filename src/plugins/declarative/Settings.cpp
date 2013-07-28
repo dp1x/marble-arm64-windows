@@ -54,4 +54,3 @@ void Settings::setValue( const QString &group, const QString &key, const QVarian
     settings.endGroup();
 }
 
-#include "Settings.moc"

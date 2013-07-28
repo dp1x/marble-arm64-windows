@@ -277,5 +277,4 @@ QList<LayerInterface *> LayerManager::internalLayers() const
 
 }
 
-//FIXME mzanetti
-//#include "LayerManager.moc"
+#include "moc_LayerManager.cpp"

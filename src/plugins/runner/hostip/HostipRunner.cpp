@@ -126,4 +126,3 @@ void HostipRunner::slotRequestFinished( QNetworkReply* reply )
 
 } // namespace Marble
 
-#include "HostipRunner.moc"

@@ -861,6 +861,4 @@ bool MarbleWidgetDefaultInputHandler::keyEvent( MarbleWidget * widget, QEvent* e
 
 }
 
-//FIXME mzanetti
-//#include "MarbleWidgetInputHandler.moc"
 

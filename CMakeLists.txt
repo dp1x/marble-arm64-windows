@@ -258,6 +258,7 @@ if(QT5BUILD)
   find_package(Qt5Script REQUIRED)
   find_package(Qt5Widgets REQUIRED)
   find_package(Qt5WebKitWidgets REQUIRED)
+  find_package(Qt5Svg REQUIRED)
     
   macro(qt_add_resources)
     qt5_add_resources(${ARGN})

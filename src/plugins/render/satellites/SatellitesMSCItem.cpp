@@ -213,5 +213,4 @@ void SatellitesMSCItem::addTrackPointAt( const QDateTime &dateTime )
 
 } // namespace Marble
 
-#include "SatellitesMSCItem.moc"
 

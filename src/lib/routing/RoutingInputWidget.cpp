@@ -504,4 +504,3 @@ void RoutingInputWidget::showMenu()
 
 } // namespace Marble
 
-#include "RoutingInputWidget.moc"

@@ -72,4 +72,3 @@ QWidget *LatLonEditPlugin::createWidget(QWidget *parent)
 
 Q_EXPORT_PLUGIN2(LatLonEditPlugin, LatLonEditPlugin)
 
-#include "LatLonEditPlugin.moc"

@@ -144,5 +144,3 @@ void PluginAboutDialog::setLicenseAgreementText( const QString& license )
 
 } // namespace Marble
 
-//FIXME mzanetti
-//#include "PluginAboutDialog.moc"

@@ -213,4 +213,3 @@ void Pn2Runner::parseFile( const QString &fileName, DocumentRole role = UnknownD
 
 }
 
-#include "Pn2Runner.moc"

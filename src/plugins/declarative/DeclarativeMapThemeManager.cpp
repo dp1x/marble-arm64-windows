@@ -54,4 +54,3 @@ QStringList MapThemeManager::mapThemeIds() const
     return m_mapThemeManager.mapThemeIds();
 }
 
-#include "DeclarativeMapThemeManager.moc"

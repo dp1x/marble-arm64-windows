@@ -60,4 +60,3 @@ void AbstractWeatherService::parseFile( const QByteArray& file )
 
 } // namespace Marble
 
-#include "AbstractWeatherService.moc"

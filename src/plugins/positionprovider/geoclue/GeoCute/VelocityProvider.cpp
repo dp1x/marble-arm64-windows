@@ -62,4 +62,3 @@ Velocity VelocityProvider::velocity()
 
 
 
-#include "VelocityProvider.moc"

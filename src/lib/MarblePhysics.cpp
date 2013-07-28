@@ -206,5 +206,3 @@ void MarblePhysics::startStillMode()
 
 }
 
-//FIXME mzanetti
-//#include "MarblePhysics.moc"

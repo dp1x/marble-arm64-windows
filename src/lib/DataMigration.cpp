@@ -191,5 +191,3 @@ void DataMigration::moveFiles( const QString& source, const QString& target )
 
 }
 
-//FIXME mzanetti
-//#include "DataMigration.moc"

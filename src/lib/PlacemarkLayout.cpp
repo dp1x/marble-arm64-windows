@@ -689,6 +689,3 @@ bool PlacemarkLayout::placemarksOnScreenLimit( const QSize &screenSize ) const
 }
 
 }
-
-//FIXME mzuanetti
-//#include "PlacemarkLayout.moc"

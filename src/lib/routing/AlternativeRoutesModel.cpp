@@ -465,6 +465,3 @@ void AlternativeRoutesModel::clear()
 }
 
 } // namespace Marble
-
-//FIXME mzanetti
-//#include "AlternativeRoutesModel.moc"

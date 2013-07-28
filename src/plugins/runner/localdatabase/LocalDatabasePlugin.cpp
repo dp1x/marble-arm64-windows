@@ -64,4 +64,3 @@ SearchRunner* LocalDatabasePlugin::newRunner() const
 
 Q_EXPORT_PLUGIN2( LocalDatabasePlugin, Marble::LocalDatabasePlugin )
 
-#include "LocalDatabasePlugin.moc"

@@ -47,4 +47,3 @@ QIcon PanoramioPlugin::icon() const
 }
 Q_EXPORT_PLUGIN2(PanoramioPlugin, Marble::PanoramioPlugin)
 
-#include "PanoramioPlugin.moc"

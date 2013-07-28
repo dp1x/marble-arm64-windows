@@ -70,5 +70,3 @@ QDateTime MapThemeSortFilterProxyModel::favoriteDateTime( const QModelIndex& ind
 
 }
 
-//FIXME mzanetti
-//#include "MapThemeSortFilterProxyModel.moc"

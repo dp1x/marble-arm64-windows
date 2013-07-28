@@ -613,5 +613,3 @@ void ControlView::showSearch()
 }
 
 }
-
-#include "ControlView.moc"

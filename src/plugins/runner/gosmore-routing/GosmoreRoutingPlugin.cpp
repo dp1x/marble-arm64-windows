@@ -84,4 +84,3 @@ bool GosmorePlugin::supportsTemplate( RoutingProfilesModel::ProfileTemplate prof
 
 Q_EXPORT_PLUGIN2( GosmoreRoutingPlugin, Marble::GosmorePlugin )
 
-#include "GosmoreRoutingPlugin.moc"

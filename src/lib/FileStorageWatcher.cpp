@@ -409,5 +409,3 @@ void FileStorageWatcher::run()
 }
 // End of all methods
 
-//FIXME mzanetti
-//#include "FileStorageWatcher.moc"

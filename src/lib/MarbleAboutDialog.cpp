@@ -343,5 +343,4 @@ void MarbleAboutDialog::setInitialTab( MarbleAboutDialog::Tab tab )
 
 }
 
-//FIXME mzanetti
-//#include "MarbleAboutDialog.moc"
+#include "moc_MarbleAboutDialog.cpp"

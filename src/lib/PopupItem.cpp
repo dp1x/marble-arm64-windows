@@ -384,5 +384,3 @@ QPixmap PopupItem::pixmap( const QString &imageId ) const
 
 }
 
-//FIXME mzanetti
-//#include "PopupItem.moc"

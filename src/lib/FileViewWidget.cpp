@@ -166,5 +166,4 @@ void FileViewWidget::mapCenterOnTreeViewModel( const QModelIndex &index )
 
 }
 
-//FIXME mzanetti+
-//#include "FileViewWidget.moc"
+#include "moc_FileViewWidget.cpp"

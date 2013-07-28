@@ -375,4 +375,3 @@ QVariant DeclarativeDataPlugin::declarativeModel()
     return d->m_model;
 }
 
-#include "DeclarativeDataPlugin.moc"

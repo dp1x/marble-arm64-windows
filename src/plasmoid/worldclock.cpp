@@ -499,4 +499,3 @@ void WorldClock::configAccepted()
 
 } //ns Marble
 
-#include "worldclock.moc"

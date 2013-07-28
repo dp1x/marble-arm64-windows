@@ -90,4 +90,3 @@ QString SimpleDBusInterface::service() const
 
 
 
-#include "SimpleDBusInterface.moc"

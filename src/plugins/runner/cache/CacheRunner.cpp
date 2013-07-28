@@ -113,4 +113,3 @@ void CacheRunner::parseFile( const QString &fileName, DocumentRole role = Unknow
 
 }
 
-#include "CacheRunner.moc"

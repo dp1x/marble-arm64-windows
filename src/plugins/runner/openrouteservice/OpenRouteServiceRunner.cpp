@@ -404,4 +404,3 @@ RoutingInstruction::TurnType OpenRouteServiceRunner::parseTurnType( const QStrin
 
 } // namespace Marble
 
-#include "OpenRouteServiceRunner.moc"

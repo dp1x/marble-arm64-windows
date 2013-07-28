@@ -55,5 +55,3 @@ void MarbleWebView::keyPressEvent(QKeyEvent *event)
     QWebView::keyPressEvent(event);
 }
 
-//FIXME mzanetti
-//#include "MarbleWebView.moc"

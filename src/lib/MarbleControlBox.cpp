@@ -242,5 +242,3 @@ void MarbleControlBox::search(const QString &searchTerm, SearchMode searchMode )
 
 }
 
-//FIXME mzanetti
-//#include "MarbleControlBox.moc"

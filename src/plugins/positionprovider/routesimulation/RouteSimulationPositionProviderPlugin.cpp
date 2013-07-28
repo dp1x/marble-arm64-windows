@@ -190,4 +190,3 @@ void RouteSimulationPositionProviderPlugin::update()
 
 Q_EXPORT_PLUGIN2( RouteSimulationPositionProviderPlugin, Marble::RouteSimulationPositionProviderPlugin )
 
-#include "RouteSimulationPositionProviderPlugin.moc"

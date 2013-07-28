@@ -207,4 +207,3 @@ void MarbleLineEdit::resizeEvent( QResizeEvent * event )
 
 } // namespace Marble
 
-#include "MarbleLineEdit.moc"

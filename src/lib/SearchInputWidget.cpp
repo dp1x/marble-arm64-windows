@@ -103,4 +103,3 @@ void SearchInputWidget::updatePlaceholderText()
 
 }
 
-#include "SearchInputWidget.moc"

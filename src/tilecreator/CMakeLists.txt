@@ -30,9 +30,6 @@ set( tilecreator_SRCS
             tccore.cpp
 )
 
-#qt4_automoc(${tilecreator_SRCS})
-set(CMAKE_AUTOMOC ON)
-
 add_definitions( -DMAKE_MARBLE_LIB -DTILECREATOR )
 add_executable( tilecreator ${tilecreator_SRCS} )
 target_link_libraries( tilecreator ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTMAIN_LIBRARY} )
@@ -54,6 +51,8 @@ else(WIN32 AND QTONLY)
       endif(NOT QTONLY)
     endif (APPLE AND QTONLY)
 endif(WIN32 AND QTONLY)
+
+set_target_properties( tilecreator PROPERTIES AUTOMOC ON )
 
 if( TILES_AT_COMPILETIME )
     set(ENV{QT_PLUGIN_PATH} ${QT_PLUGINS_DIR})

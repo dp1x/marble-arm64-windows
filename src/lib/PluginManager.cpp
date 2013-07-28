@@ -242,5 +242,3 @@ void PluginManagerPrivate::loadPlugins()
 
 }
 
-//FIXME mzanetti
-//#include "PluginManager.moc"

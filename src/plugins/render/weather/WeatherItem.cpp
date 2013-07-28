@@ -579,4 +579,3 @@ double WeatherItem::temperature() const
 
 } // namespace Marble
 
-#include "WeatherItem.moc"

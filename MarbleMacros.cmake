@@ -24,8 +24,8 @@ endif()
 macro( marble_add_plugin _target_name )
 set( _src ${ARGN} )
 if( QTONLY )
-    qt4_automoc( ${_src} )
     add_library( ${_target_name} MODULE ${_src} )
+    set_target_properties( ${_target_name} PROPERTIES AUTOMOC ON )
     target_link_libraries( ${_target_name} ${QT_QTCORE_LIBRARY}
                                            ${QT_QTDBUS_LIBRARY}
                                            ${QT_QTGUI_LIBRARY}
@@ -69,8 +69,8 @@ set( _src ${ARGN} )
 qt4_add_resources( _src ../../../marble.qrc )
 
 if( QTONLY )
-    qt4_automoc( ${_src} )
     add_library( ${_target_name} MODULE ${_src} )
+    set_target_properties( ${_target_name} PROPERTIES AUTOMOC ON)
     target_link_libraries( ${_target_name} ${QT_QTCORE_LIBRARY}
                                            ${QT_QTDBUS_LIBRARY}
                                            ${QT_QTGUI_LIBRARY}
@@ -108,8 +108,8 @@ endmacro( marble_add_designer_plugin _target_name )
 
 macro( marble_add_declarative_plugin _target_name _install_path )
 set( _src ${ARGN} )
-qt4_automoc( ${_src} )
 add_library( ${_target_name} MODULE ${_src} )
+set_target_properties( ${_target_name} PROPERTIES AUTOMOC ON)
 target_link_libraries( ${_target_name} ${QT_QTCORE_LIBRARY}
                                            ${QT_QTDBUS_LIBRARY}
                                            ${QT_QTGUI_LIBRARY}

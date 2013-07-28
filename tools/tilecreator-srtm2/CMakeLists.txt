@@ -31,11 +31,11 @@ set( tilecreator_SRCS
             tccore.cpp
 )
 
-qt4_automoc(${tilecreator_SRCS})
-
 add_definitions( -DMAKE_MARBLE_LIB -DTILECREATOR )
 add_executable( tilecreator ${tilecreator_SRCS} )
 target_link_libraries( tilecreator ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTMAIN_LIBRARY} )
 if (APPLE)
   target_link_libraries (tilecreator ${APP_SERVICES_LIBRARY})
 endif (APPLE)
+
+set_target_properties( tilecreator PROPERTIES AUTOMOC ON )

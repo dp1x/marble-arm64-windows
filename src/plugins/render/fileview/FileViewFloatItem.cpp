@@ -247,4 +247,3 @@ void FileViewFloatItem::removeFile()
 
 Q_EXPORT_PLUGIN2(FileViewFloatItem, FileViewFloatItem)
 
-#include "FileViewFloatItem.moc"

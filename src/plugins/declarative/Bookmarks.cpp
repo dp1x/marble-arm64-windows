@@ -186,4 +186,3 @@ QString BookmarksModel::name( int idx )
     return QString();
 }
 
-#include "Bookmarks.moc"

@@ -198,5 +198,3 @@ void HttpJob::finished()
     d->m_networkReply = 0;
 }
 
-//FIXME mzanetti
-//#include "HttpJob.moc"

@@ -46,5 +46,3 @@ void PositionProviderPlugin::setMarbleModel( const MarbleModel* marbleModel )
 
 }
 
-//FIXME mzanetti
-//#include "PositionProviderPlugin.moc"

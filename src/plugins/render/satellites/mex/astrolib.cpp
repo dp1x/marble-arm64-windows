@@ -1384,7 +1384,7 @@ Vec3 QuickSun (double t)   // low precision position of the Sun at time t
  /*
 	 Ecliptic coordinates (in A.U.) and velocity (in A.U./day)
 	 of the sun for Equinox of Date given in Julian centuries since J2000.
-	 ======================================================================
+         ======================================================================
   */
 Sun200::Sun200 ()
   { }

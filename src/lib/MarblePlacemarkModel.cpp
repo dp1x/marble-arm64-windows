@@ -220,5 +220,3 @@ void  MarblePlacemarkModel::removePlacemarks( const QString &containerName,
     }
 }
 
-//FIXME mzanetti
-//#include "MarblePlacemarkModel.moc"

@@ -207,5 +207,4 @@ void KineticModel::update()
     d->timestamp.start();
 }
 
-#include "kineticmodel.moc"
 

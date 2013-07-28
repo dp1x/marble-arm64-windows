@@ -241,5 +241,3 @@ QVariant RenderPlugin::setting( const QString & name )
 
 } // namespace Marble
 
-//FIXME mzanetti
-//#include "RenderPlugin.moc"

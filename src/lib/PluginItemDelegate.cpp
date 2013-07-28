@@ -418,5 +418,3 @@ QRect PluginItemDelegate::alignRect( QRect object,
 }
 
 
-//FIXME mzanetti
-//#include "PluginItemDelegate.moc"

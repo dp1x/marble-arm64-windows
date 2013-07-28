@@ -72,4 +72,3 @@ bool OSRMPlugin::supportsTemplate( RoutingProfilesModel::ProfileTemplate profile
 
 Q_EXPORT_PLUGIN2( OSRMPlugin, Marble::OSRMPlugin )
 
-#include "OSRMPlugin.moc"

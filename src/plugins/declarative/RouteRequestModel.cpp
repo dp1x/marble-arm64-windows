@@ -121,4 +121,3 @@ void RouteRequestModel::setPosition ( int index, qreal longitude, qreal latitude
     }
 }
 
-#include "RouteRequestModel.moc"

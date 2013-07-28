@@ -389,5 +389,3 @@ void PntMapLoader::run()
     emit pntMapLoaded( true );
 }
 
-//FIXME mzanetti
-//#include "GeoPolygon.moc"

@@ -158,5 +158,4 @@ void VectorTileLayer::setMapTheme( const QVector<const GeoSceneVectorTile *> &te
 
 }
 
-//FIXME mzanetti
-//#include "VectorTileLayer.moc"
+#include "moc_VectorTileLayer.cpp"

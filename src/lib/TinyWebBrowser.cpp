@@ -113,5 +113,3 @@ QByteArray TinyWebBrowser::userAgent(const QString &platform, const QString &com
 
 } // namespace Marble
 
-//FIXME mzanetti
-//#include "TinyWebBrowser.moc"

@@ -165,4 +165,4 @@ void GpsInfo::updateLocation( GeoDataCoordinates coordinates, qreal)
 
 Q_EXPORT_PLUGIN2( GpsInfo, Marble::GpsInfo )
 
-#include "GpsInfo.moc"
+#include "moc_GpsInfo.cpp"

@@ -144,6 +144,7 @@ endif ()
 
 if (WIN32)
     add_executable (marble-qt WIN32 ${marble_SRCS} ${marble_HDRS})
+    set_target_properties( marble-qt PROPERTIES AUTOMOC ON )
 else (WIN32)
     if (APPLE)
         add_executable (marble-qt MACOSX_BUNDLE ${marble_SRCS})
@@ -152,10 +153,12 @@ else (WIN32)
     else (APPLE)
         add_executable (marble-qt ${marble_SRCS} ${marble_HDRS})
     endif (APPLE)
+    set_target_properties( marble-qt PROPERTIES AUTOMOC ON )
 endif (WIN32)
 
 if (NOT QTONLY)
   kde4_add_executable (marble ${marble_kde_SRCS} ${marble_kde_HDRS})
+  set_target_properties( marble PROPERTIES AUTOMOC ON )
 endif ()
 
 target_link_libraries (

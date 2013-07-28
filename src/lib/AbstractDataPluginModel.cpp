@@ -679,5 +679,3 @@ void AbstractDataPluginModel::registerItemProperties( const QMetaObject &item )
 
 } // namespace Marble
 
-//FIXME mzanetti
-//#include "AbstractDataPluginModel.moc"

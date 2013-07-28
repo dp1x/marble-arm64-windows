@@ -162,4 +162,3 @@ qreal YoursRunner::distance( const GeoDataDocument* document ) const
 
 } // namespace Marble
 
-#include "YoursRunner.moc"

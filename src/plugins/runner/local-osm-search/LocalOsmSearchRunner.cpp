@@ -124,4 +124,3 @@ void LocalOsmSearchRunner::search( const QString &searchTerm, const GeoDataLatLo
 
 } // namespace Marble
 
-#include "LocalOsmSearchRunner.moc"

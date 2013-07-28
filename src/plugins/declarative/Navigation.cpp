@@ -259,4 +259,3 @@ void Navigation::update()
     }
 }
 
-#include "Navigation.moc"

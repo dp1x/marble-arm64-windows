@@ -276,5 +276,3 @@ inline void DownloadQueueSet::JobStack::push( HttpJob * const job )
 
 }
 
-//FIXME mzanetti
-//#include "DownloadQueueSet.moc"

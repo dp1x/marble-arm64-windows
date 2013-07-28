@@ -128,5 +128,3 @@ void SunControlWidget::showEvent( QShowEvent* event )
     }
 }
 
-//FIXME mzanetti
-//#include "SunControlWidget.moc"

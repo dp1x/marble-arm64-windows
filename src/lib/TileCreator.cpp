@@ -621,5 +621,3 @@ bool TileCreator::verifyExactResult() const
 
 }
 
-//FIXME mzanetti
-//#include "TileCreator.moc"

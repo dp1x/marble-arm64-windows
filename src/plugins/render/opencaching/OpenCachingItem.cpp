@@ -231,4 +231,3 @@ void OpenCachingItem::previousLogEntry()
 
 }
 
-#include "OpenCachingItem.moc"

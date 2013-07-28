@@ -68,4 +68,3 @@ ParsingRunner* ShpPlugin::newRunner() const
 
 Q_EXPORT_PLUGIN2( ShpPlugin, Marble::ShpPlugin )
 
-#include "ShpPlugin.moc"

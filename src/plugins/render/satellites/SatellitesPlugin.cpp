@@ -426,5 +426,4 @@ void SatellitesPlugin::addBuiltInDataSources()
 
 Q_EXPORT_PLUGIN2( SatellitesPlugin, Marble::SatellitesPlugin )
 
-#include "SatellitesPlugin.moc"
 

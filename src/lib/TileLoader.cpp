@@ -278,5 +278,3 @@ QImage TileLoader::scaledLowerLevelTile( const GeoSceneTextureTile * textureLaye
 
 }
 
-//FIXME mzanetti
-//#include "TileLoader.moc"

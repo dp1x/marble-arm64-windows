@@ -614,4 +614,3 @@ void AnnotatePlugin::setupActions(MarbleWidget* widget)
 
 Q_EXPORT_PLUGIN2( AnnotatePlugin, Marble::AnnotatePlugin )
 
-#include "AnnotatePlugin.moc"

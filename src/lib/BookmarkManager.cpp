@@ -273,4 +273,3 @@ GeoDataDocument* BookmarkManager::openFile( const QString &fileName )
 
 }
 
-#include "BookmarkManager.moc"

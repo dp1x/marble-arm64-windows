@@ -125,5 +125,3 @@ GeoSceneLegend* GeoSceneDocument::legend()
 
 }
 
-// FIXME mzanetti
-//#include "GeoSceneDocument.moc"

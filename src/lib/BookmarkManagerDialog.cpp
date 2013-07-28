@@ -521,4 +521,4 @@ void BookmarkManagerDialog::setButtonBoxVisible( bool visible )
 
 }
 
-#include "BookmarkManagerDialog.moc"
+#include "moc_BookmarkManagerDialog.cpp"

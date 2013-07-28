@@ -89,4 +89,3 @@ QIcon OpenCachingComPlugin::icon() const
 
 Q_EXPORT_PLUGIN2( OpenCachingComPlugin, Marble::OpenCachingComPlugin )
 
-#include "OpenCachingComPlugin.moc"

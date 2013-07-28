@@ -132,4 +132,3 @@ void FoursquareModel::parseFile( const QByteArray& file )
 
 }
 
-#include "FoursquareModel.moc"

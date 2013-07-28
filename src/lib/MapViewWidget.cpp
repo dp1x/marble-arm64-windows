@@ -721,5 +721,4 @@ QString MapViewItemDelegate::text( const QModelIndex &index ) const
 
 }
 
-//FIXME mzanetti
-//#include "MapViewWidget.moc"
+#include "moc_MapViewWidget.cpp"

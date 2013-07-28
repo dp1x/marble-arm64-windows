@@ -305,4 +305,3 @@ void ProgressFloatItem::scheduleRepaint()
 
 Q_EXPORT_PLUGIN2( ProgressFloatItem, Marble::ProgressFloatItem )
 
-#include "ProgressFloatItem.moc"

@@ -25,8 +25,6 @@ MarbleCacheSettingsWidget::MarbleCacheSettingsWidget( QWidget *parent ) : QWidge
     connect( kcfg_proxyAuth, SIGNAL(toggled(bool)), kcfg_proxyPass, SLOT(setEnabled(bool)) );
 }
 
-//FIXME mzanetti
-//#include "MarbleCacheSettingsWidget.moc"
 
 
 

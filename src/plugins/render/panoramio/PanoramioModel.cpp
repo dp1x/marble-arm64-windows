@@ -83,4 +83,3 @@ void PanoramioModel::parseFile( QByteArray file ) {
     }
 }
 
-#include "PanoramioModel.moc"

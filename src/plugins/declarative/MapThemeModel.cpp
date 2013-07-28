@@ -116,4 +116,3 @@ void MapThemeModel::handleChangedThemes()
     reset();
 }
 
-#include "MapThemeModel.moc"

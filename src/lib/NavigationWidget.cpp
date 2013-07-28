@@ -333,5 +333,4 @@ void NavigationWidget::resizeEvent ( QResizeEvent * )
 
 }
 
-//FIXME mzanetti
-//#include "NavigationWidget.moc"
+#include "moc_NavigationWidget.cpp"

@@ -436,5 +436,3 @@ void GeometryLayer::resetCacheData()
 
 }
 
-//FIXME mzanetti
-//#include "GeometryLayer.moc"

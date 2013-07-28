@@ -213,5 +213,3 @@ void TileScalingTextureMapper::clearPixmaps()
     m_cache.clear();
 }
 
-//FIXME mzanetti
-//#include "TileScalingTextureMapper.moc"

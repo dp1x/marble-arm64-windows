@@ -176,4 +176,3 @@ void ShpRunner::parseFile( const QString &fileName, DocumentRole role = UnknownD
 
 }
 
-#include "ShpRunner.moc"

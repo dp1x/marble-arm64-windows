@@ -44,4 +44,3 @@ QIcon ParseRunnerPlugin::icon() const
 
 }
 
-#include "ParseRunnerPlugin.moc"

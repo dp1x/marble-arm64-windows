@@ -497,5 +497,3 @@ void DownloadRegionDialog::setOffsetUnit()
 
 }
 
-//FIXME mzanetti
-//#include "DownloadRegionDialog.moc"

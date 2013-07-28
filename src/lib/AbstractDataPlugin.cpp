@@ -367,5 +367,3 @@ void AbstractDataPlugin::delayedUpdate()
 
 } // namespace Marble
 
-//FIXME mzanetti
-//#include "AbstractDataPlugin.moc"

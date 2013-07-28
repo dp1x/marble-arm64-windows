@@ -87,4 +87,3 @@ void PostalCodeItem::paint( QPainter *painter )
     painter->restore();
 }
 
-#include "PostalCodeItem.moc"

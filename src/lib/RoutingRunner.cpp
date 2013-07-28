@@ -34,4 +34,3 @@ const MarbleModel *RoutingRunner::model() const
 
 }
 
-#include "RoutingRunner.moc"

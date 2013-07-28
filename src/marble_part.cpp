@@ -1744,4 +1744,3 @@ void MarblePart::fallBackToDefaultTheme()
 
 }
 
-#include "marble_part.moc"

@@ -17,5 +17,3 @@ StoragePolicy::StoragePolicy( QObject *parent )
     : QObject( parent )
 {}
 
-//FIXME mzanetti
-//#include "StoragePolicy.moc"

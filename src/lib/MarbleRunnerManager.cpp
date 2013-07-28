@@ -436,4 +436,4 @@ GeoDataDocument* MarbleRunnerManager::openFile( const QString &fileName, Documen
 
 }
 
-#include "MarbleRunnerManager.moc"
+#include "moc_MarbleRunnerManager.cpp"

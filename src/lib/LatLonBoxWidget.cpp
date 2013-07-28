@@ -86,5 +86,3 @@ void LatLonBoxWidget::updateLonSingleStep()
 
 }
 
-//FIXME mzanetti
-//#include "LatLonBoxWidget.moc"

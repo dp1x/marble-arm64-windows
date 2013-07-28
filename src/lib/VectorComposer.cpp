@@ -444,5 +444,3 @@ void VectorComposer::paintVectorMap( GeoPainter *painter,
     // mDebug() << "M_VectorMap calculated nodes: " << m_vectorMap->nodeCount();
 }
 
-//FIXME mzanetti
-//#include "VectorComposer.moc"

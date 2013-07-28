@@ -142,4 +142,3 @@ void EarthquakeItem::updateTooltip()
 
 }
 
-#include "EarthquakeItem.moc"
