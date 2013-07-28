@@ -44,6 +44,10 @@ public:
     /** Overload of QAbstractListModel */
     int rowCount ( const QModelIndex &parent = QModelIndex() ) const;
 
+#if QT_VERSION >= 0x050000
+    QHash<int, QByteArray> roleNames() const;
+#endif
+
     /** Overload of QAbstractListModel */
     QVariant data ( const QModelIndex &index, int role = Qt::DisplayRole ) const;
 
@@ -61,6 +65,10 @@ public Q_SLOTS:
 
     bool isRemote( int index ) const;
 
+#if QT_VERSION >= 0x050000
+    void reset();
+#endif
+
 Q_SIGNALS:
     void countChanged();
 
@@ -71,6 +79,10 @@ Q_SIGNALS:
 private:
     SpeakersModelPrivate* const d;
     friend class SpeakersModelPrivate;
+
+#if QT_VERSION >= 0x050000
+    QHash<int, QByteArray> m_roleNames;
+#endif
 
     Q_PRIVATE_SLOT( d, void fillModel() )
 

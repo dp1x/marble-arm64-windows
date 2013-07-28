@@ -56,6 +56,10 @@ public:
     /** Overload of QAbstractListModel */
     int rowCount ( const QModelIndex &parent = QModelIndex() ) const;
 
+#if QT_VERSION >= 0x050000
+    QHash<int, QByteArray> roleNames() const;
+#endif
+
     /** Overload of QAbstractListModel */
     QVariant headerData ( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
 
@@ -113,6 +117,9 @@ Q_SIGNALS:
 
 private:
     RoutingModelPrivate *const d;
+#if QT_VERSION >= 0x050000
+    QHash<int, QByteArray> m_roleNames;
+#endif
 };
 
 } // namespace Marble

@@ -139,7 +139,11 @@ SpeakersModel::SpeakersModel( QObject *parent ) :
     roles[Name] = "name";
     roles[IsLocal] = "isLocal";
     roles[IsRemote] = "isRemote";
+#if QT_VERSION < 0x050000
     setRoleNames( roles );
+#else
+    m_roleNames = roles;
+#endif
 
     d->fillModel();
 }
@@ -157,6 +161,13 @@ int SpeakersModel::rowCount ( const QModelIndex &parent ) const
 
     return 0;
 }
+
+#if QT_VERSION >= 0x050000
+QHash<int, QByteArray> SpeakersModel::roleNames() const
+{
+    return m_roleNames;
+}
+#endif
 
 QVariant SpeakersModel::data ( const QModelIndex &index, int role ) const
 {
@@ -209,6 +220,14 @@ bool SpeakersModel::isRemote( int idx ) const
 {
     return data( index( idx ), IsRemote ).toBool();
 }
+
+#if QT_VERSION >= 0x050000
+void SpeakersModel::reset()
+{
+    beginResetModel();
+    endResetModel();
+}
+#endif
 
 int SpeakersModel::count()
 {

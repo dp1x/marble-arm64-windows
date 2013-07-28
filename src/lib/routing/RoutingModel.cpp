@@ -101,7 +101,7 @@ void RoutingModelPrivate::importPlacemark( RouteSegment &outline, QVector<RouteS
                 // The enum value is converted to/from an int in the QVariant
                 // because only a limited set of data types can be serialized with QVariant's
                 // toString() method (which is used to serialize <ExtendedData>/<Data> values)
-                maneuver.setDirection( Maneuver::Direction( qVariantValue<int>( turnType ) ) );
+                maneuver.setDirection( Maneuver::Direction( turnType.toInt() ) );
             }
 
             if ( placemark->extendedData().contains( "roadName" ) ) {
@@ -139,7 +139,11 @@ RoutingModel::RoutingModel( RouteRequest* request, MarbleModel *model, QObject *
    roles.insert( RoutingModel::TurnTypeIconRole, "turnTypeIcon" );
    roles.insert( RoutingModel::LongitudeRole, "longitude" );
    roles.insert( RoutingModel::LatitudeRole, "latitude" );
+#if QT_VERSION < 0x050000
    setRoleNames( roles );
+#else
+   m_roleNames = roles;
+#endif
 }
 
 RoutingModel::~RoutingModel()
@@ -151,6 +155,13 @@ int RoutingModel::rowCount ( const QModelIndex &parent ) const
 {
     return parent.isValid() ? 0 : d->m_route.turnPoints().size();
 }
+
+#if QT_VERSION >= 0x050000
+QHash<int, QByteArray> RoutingModel::roleNames() const
+{
+    return m_roleNames;
+}
+#endif
 
 QVariant RoutingModel::headerData ( int section, Qt::Orientation orientation, int role ) const
 {
@@ -268,7 +279,8 @@ bool RoutingModel::setCurrentRoute( GeoDataDocument* document )
 
     d->m_deviation = RoutingModelPrivate::Unknown;
 
-    reset();
+    beginResetModel();
+    endResetModel();
     emit currentRouteChanged();
     return true;
 }
@@ -309,7 +321,8 @@ void RoutingModel::exportGpx( QIODevice *device ) const
 void RoutingModel::clear()
 {
     d->m_route = Route();
-    reset();
+    beginResetModel();
+    endResetModel();
     emit currentRouteChanged();
 }
 

@@ -259,7 +259,8 @@ QVariant TargetModel::data ( const QModelIndex & index, int role ) const
 void TargetModel::setShowRoutingItems( bool show )
 {
     m_showRoutingItems = show;
-    reset();
+    beginResetModel();
+    endResetModel();
 }
 
 void GoToDialogPrivate::createProgressAnimation()
@@ -308,10 +309,10 @@ void GoToDialogPrivate::saveSelection( const QModelIndex &index )
 {
     if ( searchButton->isChecked() && m_searchResult->size() ) {
         QVariant coordinates = m_searchResultModel.data( index, MarblePlacemarkModel::CoordinateRole );
-        m_coordinates = qVariantValue<GeoDataCoordinates>( coordinates );
+        m_coordinates = coordinates.value<GeoDataCoordinates>();
     } else {
         QVariant coordinates = index.data( MarblePlacemarkModel::CoordinateRole );
-        m_coordinates = qVariantValue<GeoDataCoordinates>( coordinates );
+        m_coordinates = coordinates.value<GeoDataCoordinates>();
     }
     m_parent->accept();
 }

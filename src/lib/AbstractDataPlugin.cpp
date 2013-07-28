@@ -34,6 +34,7 @@
 #include <QQmlContext>
 #include <QQuickItem>
 #endif
+#include <QGraphicsItem>
 
 namespace Marble
 {

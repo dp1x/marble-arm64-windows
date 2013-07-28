@@ -252,6 +252,7 @@ endif(APPLE)
 # Specific options for if building with Qt or kde4 libs
 
 if(QT5BUILD)
+  find_package(Qt5Core REQUIRED)
   find_package(Qt5Xml REQUIRED)
   find_package(Qt5Network REQUIRED)
   find_package(Qt5Test REQUIRED)
@@ -259,7 +260,10 @@ if(QT5BUILD)
   find_package(Qt5Widgets REQUIRED)
   find_package(Qt5WebKitWidgets REQUIRED)
   find_package(Qt5Svg REQUIRED)
-    
+  find_package(Qt5Sql REQUIRED)
+
+  include_directories( ${Qt5Svg_INCLUDE_DIRS} )
+
   macro(qt_add_resources)
     qt5_add_resources(${ARGN})
   endmacro()
