@@ -12,7 +12,7 @@
 #define MARBLE_PLUGINABOUTDIALOG_H
 
 #include <QDialog>
-#include <QtCore/QList>
+#include <QList>
 
 // Marble
 #include "marble_export.h"

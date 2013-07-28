@@ -22,8 +22,8 @@
 #ifndef MARBLE_GEOPARSER_H
 #define MARBLE_GEOPARSER_H
 
-#include <QtCore/QPair>
-#include <QtCore/QStack>
+#include <QPair>
+#include <QStack>
 #include <QXmlStreamReader>
 
 #include "geodata_export.h"

@@ -12,7 +12,7 @@
 #define MARBLE_TIMECONTROLWIDGET_H
 
 // Qt
-#include <QtCore/QDateTime>
+#include <QDateTime>
 #include <QDialog>
 
 // Marble

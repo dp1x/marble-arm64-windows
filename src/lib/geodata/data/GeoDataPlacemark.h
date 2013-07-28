@@ -15,8 +15,8 @@
 #define MARBLE_GEODATAPLACEMARK_H
 
 
-#include <QtCore/QChar>
-#include <QtCore/QDateTime>
+#include <QChar>
+#include <QDateTime>
 #include <QXmlStreamWriter>
 
 #include "GeoDataPoint.h"

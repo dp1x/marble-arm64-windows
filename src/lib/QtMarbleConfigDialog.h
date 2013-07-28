@@ -12,7 +12,7 @@
 #define MARBLE_QTMARBLECONFIGDIALOG_H
 
 #include <QDialog>
-#include <QtCore/QLocale>
+#include <QLocale>
 
 #include "marble_export.h"
 #include "MarbleGlobal.h"

@@ -13,10 +13,10 @@
 #ifndef MARBLE_ROUTINGRUNNERPLUGIN_H
 #define MARBLE_ROUTINGRUNNERPLUGIN_H
 
-#include <QtCore/QObject>
+#include <QObject>
 #include "PluginInterface.h"
 
-#include <QtCore/QHash>
+#include <QHash>
 #include <QWidget>
 
 #include "routing/RoutingProfilesModel.h"
