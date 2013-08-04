@@ -270,6 +270,11 @@ IF ( NOT QT_QTDECLARATIVE_LIBRARY )
   FIND_LIBRARY(QT_QTDECLARATIVE_LIBRARY NAMES QtDeclarative HINTS ${QT_LIBRARY_DIR})
 ENDIF()
 
+if( NOT ${CMAKE_VERSION} STRLESS "2.8" AND NOT QT4_FOUND)
+  SET(CMAKE_AUTOMOC TRUE)
+  SET(CMAKE_AUTOMOC_RELAXED_MODE TRUE)
+endif()
+
 if(QTONLY)
   # add a flag to be able to distinguish between qt 
   # and kde mode in the sources
