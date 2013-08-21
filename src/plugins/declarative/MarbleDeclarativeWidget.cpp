@@ -127,12 +127,20 @@ QStringList MarbleWidget::activeRenderPlugins() const
 
 QDeclarativeListProperty<QObject> MarbleWidget::childList()
 {
+#if QT_VERSION < 0x050000
     return QDeclarativeListProperty<QObject>( this, m_children );
+#else
+    return QQmlListProperty<QObject>( this, m_children );
+#endif
 }
 
 QDeclarativeListProperty<DeclarativeDataPlugin> MarbleWidget::dataLayers()
 {
+#if QT_VERSION < 0x050000
     return QDeclarativeListProperty<DeclarativeDataPlugin>( this, 0, &MarbleWidget::addLayer );
+#else
+    return QQmlListProperty<QObject>( this, m_children );
+#endif
 }
 
 void MarbleWidget::setActiveRenderPlugins( const QStringList &items )
@@ -271,7 +279,11 @@ void MarbleWidget::forwardMouseClick(qreal lon, qreal lat, Marble::GeoDataCoordi
     }
 }
 
+#if QT_VERSION < 0x050000
 void MarbleWidget::addLayer( QDeclarativeListProperty<DeclarativeDataPlugin> *list, DeclarativeDataPlugin *layer )
+#else
+void MarbleWidget::addLayer( QQmlListProperty<DeclarativeDataPlugin> *list, DeclarativeDataPlugin *layer )
+#endif
 {
     MarbleWidget *object = qobject_cast<MarbleWidget *>( list->object );
     if ( object ) {
@@ -315,7 +327,11 @@ void MarbleWidget::downloadArea(int topTileLevel, int bottomTileLevel)
     }
 }
 
+#if QT_VERSION < 0x050000
 void MarbleWidget::setDataPluginDelegate( const QString &plugin, QDeclarativeComponent *delegate )
+#else
+void MarbleWidget::setDataPluginDelegate( const QString &plugin, QQmlComponent *delegate )
+#endif
 {
     QList<Marble::RenderPlugin*> renderPlugins = m_marbleWidget->renderPlugins();
     foreach( Marble::RenderPlugin* renderPlugin, renderPlugins ) {

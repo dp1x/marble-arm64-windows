@@ -40,7 +40,7 @@ ENDIF()
 add_subdirectory( tilecreator )
 add_subdirectory( routing-instructions )
 add_subdirectory( lib )
-add_subdirectory( plugins )
+#add_subdirectory( plugins )
 add_subdirectory( bindings )
 
 if( QT_QTDECLARATIVE_FOUND )
@@ -132,9 +132,9 @@ if(MINGW)
    QT4_ADD_RESOURCES2(marble_SRCS marble.rc)
 endif(MINGW)
 
-qt4_add_resources(marble_SRCS marble.qrc)
+qt_add_resources(marble_SRCS marble.qrc)
 
-qt4_wrap_ui(marble_SRCS ${marble_UI})
+qt_wrap_ui(marble_SRCS ${marble_UI})
 marble_qt4_automoc(${marble_SRCS})
 
 if (NOT QTONLY)
@@ -159,17 +159,31 @@ if (NOT QTONLY)
   kde4_add_executable (marble ${marble_kde_SRCS} ${marble_kde_HDRS})
 endif ()
 
-target_link_libraries (
-  marble-qt
-  ${QT_QTCORE_LIBRARY}
-  ${QT_QTDBUS_LIBRARY}
-  ${QT_QTGUI_LIBRARY}
-  ${QT_QTXML_LIBRARY}
-  ${QT_QTSVG_LIBRARY}
-  ${QT_QTNETWORK_LIBRARY}
-  ${QT_QTSCRIPT_LIBRARY}
-  ${QT_QTMAIN_LIBRARY}
-  marblewidget)
+if( QT4_FOUND )
+  target_link_libraries (
+    marble-qt
+    ${QT_QTCORE_LIBRARY}
+    ${QT_QTDBUS_LIBRARY}
+    ${QT_QTGUI_LIBRARY}
+    ${QT_QTXML_LIBRARY}
+    ${QT_QTSVG_LIBRARY}
+    ${QT_QTNETWORK_LIBRARY}
+    ${QT_QTSCRIPT_LIBRARY}
+    ${QT_QTMAIN_LIBRARY}
+    marblewidget)
+else()
+  target_link_libraries (
+    marble-qt
+    ${Qt5Core_LIBRARIES}
+    ${Qt5Xml_LIBRARIES}
+    ${Qt5Widgets_LIBRARIES}
+    ${Qt5PrintSupport_LIBRARIES}
+    ${Qt5Network_LIBRARIES}
+    ${Qt5WebKitWidgets_LIBRARIES}
+    ${Qt5WebKit_LIBRARIES}
+    marblewidget
+    )
+endif()
 
 if (NOT QTONLY)
     target_link_libraries (

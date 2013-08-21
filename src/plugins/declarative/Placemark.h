@@ -16,7 +16,11 @@
 #include "GeoDataPlacemark.h"
 
 #include <QObject>
-#include <QtDeclarative>
+#if QT_VERSION < 0x050000
+  #include <QtDeclarative>
+#else
+  #include <QtQml>
+#endif
 
 /**
   * Wraps a GeoDataPlacemark for QML access

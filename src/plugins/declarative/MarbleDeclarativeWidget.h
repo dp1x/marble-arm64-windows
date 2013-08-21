@@ -17,7 +17,11 @@
 #include <QGraphicsProxyWidget>
 #include <QList>
 #include <QPoint>
-#include <QtDeclarative>
+#if QT_VERSION < 0x050000
+  #include <QtDeclarative>
+#else
+  #include <QtQml>
+#endif
 
 using Marble::GeoDataCoordinates; // Ouch. For signal/slot connection across different namespaces
 
@@ -56,8 +60,13 @@ class MarbleWidget : public QGraphicsProxyWidget
     Q_PROPERTY( QList<QObject*> renderPlugins READ renderPlugins CONSTANT )
     Q_PROPERTY( QList<QObject*> floatItems READ floatItems CONSTANT )
 
+#if QT_VERSION < 0x050000
     Q_PROPERTY(QDeclarativeListProperty<DeclarativeDataPlugin> dataLayers READ dataLayers)
     Q_PROPERTY(QDeclarativeListProperty<QObject> children READ childList)
+#else
+    Q_PROPERTY(QQmlListProperty<DeclarativeDataPlugin> dataLayers READ dataLayers)
+    Q_PROPERTY(QQmlListProperty<QObject> children READ childList)
+#endif
     Q_CLASSINFO("DefaultProperty", "children")
 
 public:
@@ -82,9 +91,16 @@ public:
 
     QStringList activeRenderPlugins() const;
 
+#if QT_VERSION < 0x050000
     QDeclarativeListProperty<QObject> childList();
 
     QDeclarativeListProperty<DeclarativeDataPlugin> dataLayers();
+
+#else
+    QQmlListProperty<QObject> childList();
+
+    QQmlListProperty<DeclarativeDataPlugin> dataLayers();
+#endif
 
 Q_SIGNALS:
     /** Forwarded from MarbleWidget. Zoom value and/or center position have changed */
@@ -187,7 +203,11 @@ public Q_SLOTS:
 
     void downloadArea( int topTileLevel, int bottomTileLevel );
 
+#if QT_VERSION < 0x050000
     void setDataPluginDelegate( const QString &plugin, QDeclarativeComponent* delegate );
+#else
+    void setDataPluginDelegate( const QString &plugin, QQmlComponent* delegate );
+#endif
 
 protected:
     virtual bool event ( QEvent * event );
@@ -200,7 +220,11 @@ private Q_SLOTS:
     void forwardMouseClick( qreal lon, qreal lat, GeoDataCoordinates::Unit );
 
 private:
+#if QT_VERSION < 0x050000
     static void addLayer( QDeclarativeListProperty<DeclarativeDataPlugin> *list, DeclarativeDataPlugin *layer );
+#else
+    static void addLayer( QQmlListProperty<DeclarativeDataPlugin> *list, DeclarativeDataPlugin *layer );
+#endif
 
     /** Wrapped MarbleWidget */
     Marble::MarbleWidget *const m_marbleWidget;

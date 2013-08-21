@@ -4,7 +4,9 @@ include_directories(
  ${CMAKE_CURRENT_BINARY_DIR}
  ${QT_INCLUDE_DIR}
 )
-include( ${QT_USE_FILE} )
+if( QT4_FOUND )
+  include( ${QT_USE_FILE} )
+endif()
 
 set( tilecreator_SRCS
             ../lib/DownloadPolicy.cpp
@@ -29,7 +31,13 @@ marble_qt4_automoc( ${tilecreator_SRCS} )
 
 add_definitions( -DMAKE_MARBLE_LIB -DTILECREATOR )
 add_executable( tilecreator ${tilecreator_SRCS} )
-target_link_libraries( tilecreator ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTMAIN_LIBRARY} )
+
+if( QT4_FOUND )
+  target_link_libraries( tilecreator ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTMAIN_LIBRARY} )
+else()
+  target_link_libraries( tilecreator ${Qt5Core_LIBRARIES} ${Qt5Gui_LIBRARIES} )
+endif()
+
 if (APPLE)
   target_link_libraries (tilecreator ${APP_SERVICES_LIBRARY})
 endif (APPLE)

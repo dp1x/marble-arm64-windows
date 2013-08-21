@@ -27,6 +27,30 @@ macro( marble_qt4_automoc )
   endif()
 endmacro()
 
+macro(qt_add_resources)
+  if( QT4_FOUND )
+    qt4_add_resources(${ARGN})
+  else()
+    qt5_add_resources(${ARGN})
+  endif()
+endmacro()
+
+macro(qt_wrap_ui)
+  if( QT4_FOUND )
+    qt4_wrap_ui(${ARGN})
+  else()
+    qt5_wrap_ui(${ARGN})
+  endif()
+endmacro()
+
+macro(qt_add_resources)
+  if( QT4_FOUND )
+    qt4_add_resources(${ARGN})
+  else()
+    qt5_add_resources(${ARGN})
+  endif()
+endmacro()
+
 # the place to put in common cmake macros
 # this is needed to minimize the amount of errors to do
 macro( marble_add_plugin _target_name )

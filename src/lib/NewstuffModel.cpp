@@ -107,6 +107,10 @@ public:
 
     QList<Action> m_actionQueue;
 
+#if QT_VERSION >= 0x050000
+    QHash<int, QByteArray> m_roleNames;
+#endif
+
     NewstuffModelPrivate( NewstuffModel* parent );
 
     QIcon preview( int index );
@@ -254,7 +258,7 @@ void NewstuffModelPrivate::handleProviderData(QNetworkReply *reply)
 
         QVariant const size = reply->header( QNetworkRequest::ContentLengthHeader );
         if ( size.isValid() ) {
-            qint64 length = qVariantValue<qint64>( size );
+            qint64 length = size.value<qint64>();
             for ( int i=0; i<m_items.size(); ++i ) {
                 NewstuffItem &item = m_items[i];
                 if ( item.m_payloadUrl == reply->url() ) {
@@ -371,7 +375,8 @@ void NewstuffModelPrivate::updateModel()
         }
     }
 
-    m_parent->reset();
+    m_parent->beginResetModel();
+    m_parent->endResetModel();
 }
 
 void NewstuffModelPrivate::saveRegistry()
@@ -451,7 +456,7 @@ NewstuffModel::NewstuffModel( QObject *parent ) :
     connect( &d->m_networkAccessManager, SIGNAL(finished(QNetworkReply*)),
              this, SLOT(handleProviderData(QNetworkReply*)) );
 
-    QHash<int,QByteArray> roles = roleNames();
+    QHash<int,QByteArray> roles;;
     roles[Name] = "name";
     roles[Author] = "author";
     roles[License] = "license";
@@ -469,7 +474,11 @@ NewstuffModel::NewstuffModel( QObject *parent ) :
     roles[IsTransitioning] = "transitioning";
     roles[PayloadSize] = "size";
     roles[DownloadedSize] = "downloaded";
+#if QT_VERSION < 0x050000
     setRoleNames( roles );
+#else
+    d->m_roleNames = roles;
+#endif
 }
 
 NewstuffModel::~NewstuffModel()
@@ -523,6 +532,14 @@ QVariant NewstuffModel::data ( const QModelIndex &index, int role ) const
 
     return QVariant();
 }
+
+#if QT_VERSION >= 0x050000
+QHash<int, QByteArray> NewstuffModel::roleNames() const
+{
+    return d->m_roleNames;
+}
+#endif
+
 
 int NewstuffModel::count()
 {

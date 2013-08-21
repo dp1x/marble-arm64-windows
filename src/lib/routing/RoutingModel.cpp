@@ -56,6 +56,9 @@ public:
     PositionTracking* m_positionTracking;
     RouteRequest* const m_request;
     GeoDataCoordinates m_position;
+#if QT_VERSION >= 0x050000
+    QHash<int, QByteArray> m_roleNames;
+#endif
 
     void importPlacemark( RouteSegment &outline, QVector<RouteSegment> &segments, const GeoDataPlacemark *placemark );
 
@@ -101,7 +104,7 @@ void RoutingModelPrivate::importPlacemark( RouteSegment &outline, QVector<RouteS
                 // The enum value is converted to/from an int in the QVariant
                 // because only a limited set of data types can be serialized with QVariant's
                 // toString() method (which is used to serialize <ExtendedData>/<Data> values)
-                maneuver.setDirection( Maneuver::Direction( qVariantValue<int>( turnType ) ) );
+                maneuver.setDirection( Maneuver::Direction( turnType.toInt() ) );
             }
 
             if ( placemark->extendedData().contains( "roadName" ) ) {
@@ -135,11 +138,15 @@ RoutingModel::RoutingModel( RouteRequest* request, MarbleModel *model, QObject *
                  this, SLOT(updatePosition(GeoDataCoordinates,qreal)) );
     }
 
-   QHash<int, QByteArray> roles = roleNames();
+   QHash<int, QByteArray> roles;
    roles.insert( RoutingModel::TurnTypeIconRole, "turnTypeIcon" );
    roles.insert( RoutingModel::LongitudeRole, "longitude" );
    roles.insert( RoutingModel::LatitudeRole, "latitude" );
+#if QT_VERSION < 0x050000
    setRoleNames( roles );
+#else
+   d->m_roleNames = roles;
+#endif
 }
 
 RoutingModel::~RoutingModel()
@@ -213,6 +220,13 @@ QVariant RoutingModel::data ( const QModelIndex & index, int role ) const
     return QVariant();
 }
 
+#if QT_VERSION >= 0x050000
+QHash<int, QByteArray> RoutingModel::roleNames() const
+{
+    return d->m_roleNames;
+}
+#endif
+
 bool RoutingModel::setCurrentRoute( GeoDataDocument* document )
 {
     d->m_route = Route();
@@ -268,7 +282,8 @@ bool RoutingModel::setCurrentRoute( GeoDataDocument* document )
 
     d->m_deviation = RoutingModelPrivate::Unknown;
 
-    reset();
+    beginResetModel();
+    endResetModel();
     emit currentRouteChanged();
     return true;
 }
@@ -309,7 +324,8 @@ void RoutingModel::exportGpx( QIODevice *device ) const
 void RoutingModel::clear()
 {
     d->m_route = Route();
-    reset();
+    beginResetModel();
+    endResetModel();
     emit currentRouteChanged();
 }
 

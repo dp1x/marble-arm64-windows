@@ -95,7 +95,6 @@ private Q_SLOTS:
     QDialog * m_configDialog;
     Ui::CompassConfigWidget * m_uiConfigWidget;
 };
-
 }
 
 #endif

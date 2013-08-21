@@ -5,6 +5,8 @@ project(marble)
 SET(CMAKE_COLOR_MAKEFILE ON)
 # SET(CMAKE_SKIP_RPATH ON)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC") 
+
 ####################################################
 # Generate the tiles with the tilecreator at compile time
 # if this option is set, srtm.jpg will not be installed but the generated tiles instead
@@ -251,28 +253,46 @@ endif(APPLE)
 ####################################################
 # Specific options for if building with Qt or kde4 libs
 
-find_package(Qt4 REQUIRED)
-set( QT_USE_QTXML         ON )
-set( QT_USE_QTNETWORK     ON )
-set( QT_USE_QTTEST        ON )
-set( QT_USE_QTSCRIPT      ON )
-set( QT_USE_QTWEBKIT      ON )
-set( QT_USE_QTSVG         ON )
-set( QT_USE_QTDECLARATIVE ON )
-set( QT_USE_QTSQL         ON )
-include( ${QT_USE_FILE} )
-marble_set_package_properties( Qt4 PROPERTIES DESCRIPTION "cross-platform application framework" )
-marble_set_package_properties( Qt4 PROPERTIES URL "http://qt.digia.com/" )
-marble_set_package_properties( Qt4 PROPERTIES TYPE REQUIRED PURPOSE "core framework" )
-IF ( NOT QT_QTDECLARATIVE_LIBRARY )
-  # older cmake versions have a FindQt4.cmake without support for declarative,
-  # but the library may still be available
-  FIND_LIBRARY(QT_QTDECLARATIVE_LIBRARY NAMES QtDeclarative HINTS ${QT_LIBRARY_DIR})
-ENDIF()
+if(QT5BUILD)
+  find_package(Qt5Core REQUIRED)
+  find_package(Qt5Xml REQUIRED)
+  find_package(Qt5Network REQUIRED)
+  find_package(Qt5Test REQUIRED)
+  find_package(Qt5Script REQUIRED)
+  find_package(Qt5Widgets REQUIRED)
+  find_package(Qt5WebKitWidgets REQUIRED)
+  find_package(Qt5Svg REQUIRED)
+  find_package(Qt5Sql REQUIRED)
+  find_package(Qt5Concurrent REQUIRED)
+  find_package(Qt5PrintSupport REQUIRED)
 
-if( NOT ${CMAKE_VERSION} STRLESS "2.8" AND NOT QT4_FOUND)
+  include_directories( ${Qt5Svg_INCLUDE_DIRS} )
+  include_directories( ${Qt5PrintSupport_INCLUDE_DIRS} )
+  include_directories( ${Qt5Network_INCLUDE_DIRS} )
+  include_directories( ${Qt5Script_INCLUDE_DIRS} )
+
   SET(CMAKE_AUTOMOC TRUE)
   SET(CMAKE_AUTOMOC_RELAXED_MODE TRUE)
+
+else(QT5BUILD)
+  find_package(Qt4 REQUIRED)
+  set( QT_USE_QTXML         ON )
+  set( QT_USE_QTNETWORK     ON )
+  set( QT_USE_QTTEST        ON )
+  set( QT_USE_QTSCRIPT      ON )
+  set( QT_USE_QTWEBKIT      ON )
+  set( QT_USE_QTSVG         ON )
+  set( QT_USE_QTDECLARATIVE ON )
+  set( QT_USE_QTSQL         ON )
+  include( ${QT_USE_FILE} )
+  marble_set_package_properties( Qt4 PROPERTIES DESCRIPTION "cross-platform application framework" )
+  marble_set_package_properties( Qt4 PROPERTIES URL "http://qt.digia.com/" )
+  marble_set_package_properties( Qt4 PROPERTIES TYPE REQUIRED PURPOSE "core framework" )
+  IF ( NOT QT_QTDECLARATIVE_LIBRARY )
+    # older cmake versions have a FindQt4.cmake without support for declarative,
+    # but the library may still be available
+    FIND_LIBRARY(QT_QTDECLARATIVE_LIBRARY NAMES QtDeclarative HINTS ${QT_LIBRARY_DIR})
+  ENDIF()
 endif()
 
 if(QTONLY)
@@ -345,7 +365,9 @@ add_subdirectory(data)
 
 include(DistTarget)
 
+if( QT4_FOUND ) # FIXME port tests to qt5
 add_subdirectory(tests)
+endif()
 
 ####################################################
 # Install extra files

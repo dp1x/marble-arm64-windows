@@ -22,6 +22,7 @@
 #include <QMetaObject>
 #include <QMetaProperty>
 #include <QScriptValue>
+#include <QScriptValueIterator>
 
 using namespace Marble;
 
@@ -40,7 +41,11 @@ public:
     bool m_isInitialized;
     QList<AbstractDataPluginItem *> m_items;
     QList<DeclarativeDataPluginModel*> m_modelInstances;
+#if QT_VERSION < 0x050000
     QDeclarativeComponent* m_delegate;
+#else
+    QQmlComponent* m_delegate;
+#endif
     QVariant m_model;
     static int m_global_counter;
     int m_counter;
@@ -73,7 +78,7 @@ void DeclarativeDataPluginPrivate::parseChunk( DeclarativeDataPluginItem *item, 
     } else if( key == "alt" || key == "altitude" ) {
         coordinates.setAltitude( value.toDouble() );
     } else {
-        item->setProperty( key.toAscii(), value );
+        item->setProperty( key.toLatin1(), value );
     }
 }
 
@@ -121,7 +126,11 @@ void DeclarativeDataPluginPrivate::parseObject( QObject *object )
     }
 
     for( int i = 0; i < meta->methodCount(); ++i ) {
+#if QT_VERSION < 0x050000
         if( qstrcmp( meta->method(i).signature(), "get(int)" ) == 0 ) {
+#else
+        if( meta->method(i).methodSignature() == "get(int)" ) {
+#endif
             for( int j=0; j < count; ++j ) {
                 QScriptValue value;
                 meta->method(i).invoke( object, Qt::AutoConnection, Q_RETURN_ARG( QScriptValue , value), Q_ARG( int, j ) );
@@ -323,12 +332,20 @@ void DeclarativeDataPlugin::setAboutDataText( const QString & aboutDataText )
     }
 }
 
+#if QT_VERSION < 0x050000
 QDeclarativeComponent *DeclarativeDataPlugin::delegate()
+#else
+QQmlComponent *DeclarativeDataPlugin::delegate()
+#endif
 {
     return d->m_delegate;
 }
 
+#if QT_VERSION < 0x050000
 void DeclarativeDataPlugin::setDelegate( QDeclarativeComponent *delegate )
+#else
+void DeclarativeDataPlugin::setDelegate( QQmlComponent *delegate )
+#endif
 {
     if ( delegate != d->m_delegate ) {
         d->m_delegate = delegate;
@@ -354,7 +371,7 @@ void DeclarativeDataPlugin::setDeclarativeModel( const QVariant &model )
     d->m_model = model;
     d->m_items.clear();
 
-    QObject* object = qVariantValue<QObject*>( model );
+    QObject* object = model.value<QObject*>();
     if( qobject_cast< QAbstractListModel* >( object ) ) {
         d->parseListModel( qobject_cast< QAbstractListModel *>( object ) );
     } else {

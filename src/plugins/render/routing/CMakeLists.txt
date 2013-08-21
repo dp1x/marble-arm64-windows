@@ -11,7 +11,9 @@ INCLUDE_DIRECTORIES(
  ${QT_INCLUDE_DIR}
  ${PHONON_INCLUDES}
 )
-INCLUDE(${QT_USE_FILE})
+if( QT4_FOUND )
+  INCLUDE(${QT_USE_FILE})
+endif()
 
 IF( PHONON_FOUND )
   set( routing_SRCS RoutingPlugin.cpp AudioOutput.cpp )
@@ -19,8 +21,8 @@ ELSE()
   set( routing_SRCS RoutingPlugin.cpp NullAudioOutput.cpp )
 ENDIF()
 set( routing_UI RoutingPlugin.ui RoutingConfigDialog.ui )
-qt4_wrap_ui( routing_SRCS ${routing_UI} )
-qt4_add_resources(routing_SRCS routing.qrc)
+qt_wrap_ui( routing_SRCS ${routing_UI} )
+qt_add_resources(routing_SRCS routing.qrc)
 
 marble_add_plugin( RoutingPlugin ${routing_SRCS} )
 target_link_libraries(RoutingPlugin ${PHONON_LIBS})
