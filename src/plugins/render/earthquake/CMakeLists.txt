@@ -6,7 +6,6 @@ INCLUDE_DIRECTORIES(
  ${QT_INCLUDE_DIR}
  ${Qt5Script_INCLUDE_DIRS}
 )
-message("................................. ${Qt5Script_INCLUDE_DIRS}")
 if( QT4_FOUND )
   INCLUDE(${QT_USE_FILE})
 endif()
