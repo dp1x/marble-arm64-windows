@@ -28,6 +28,7 @@
 class MarbleDeclarativePlugin : public QQmlExtensionPlugin
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA( IID "org.kde.edu.marble.MarbleDeclarativePlugin" )
 public:
     /** Overriding QQmlExtensionPlugin to register types */
     virtual void registerTypes( const char *uri );

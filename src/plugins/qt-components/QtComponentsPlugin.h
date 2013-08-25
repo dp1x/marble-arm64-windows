@@ -19,6 +19,7 @@
 class QtComponentsPlugin : public QDeclarativeExtensionPlugin
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA( IID "org.kde.edu.marble.QtComponentsPlugin" )
 public:
     /** Overriding QDeclarativeExtensionPlugin to register types */
     virtual void registerTypes( const char *uri );

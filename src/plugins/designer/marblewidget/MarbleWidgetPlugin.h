@@ -23,6 +23,7 @@
 class MarbleWidgetPlugin : public QObject, public QDesignerCustomWidgetInterface
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA( IID "org.kde.edu.marble.MarbleWidgetPlugin" )
     Q_INTERFACES(QDesignerCustomWidgetInterface)
 
 public:
