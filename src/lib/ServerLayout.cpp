@@ -33,16 +33,6 @@ ServerLayout::~ServerLayout()
 {
 }
 
-qint64 ServerLayout::numTilesX( const Marble::TileId& tileId ) const
-{
-    return ( 1 << tileId.zoomLevel() ) * m_textureLayer->levelZeroColumns();
-}
-
-qint64 ServerLayout::numTilesY( const Marble::TileId& tileId ) const
-{
-    return ( 1 << tileId.zoomLevel() ) * m_textureLayer->levelZeroRows();
-}
-
 MarbleServerLayout::MarbleServerLayout( GeoSceneTiled *textureLayer )
     : ServerLayout( textureLayer )
 {
@@ -116,11 +106,7 @@ WmsServerLayout::WmsServerLayout( GeoSceneTiled *texture )
 
 QUrl WmsServerLayout::downloadUrl( const QUrl &prototypeUrl, const Marble::TileId &tileId ) const
 {
-    const qreal radius = numTilesX( tileId ) / 2.0;
-    const qint64 x = tileId.x();
-
-    const qreal lonLeft   = ( x - radius ) / radius * 180.0;
-    const qreal lonRight  = ( x - radius + 1 ) / radius * 180.0;
+    GeoDataLatLonBox box = tileId.toLatLonBox( m_textureLayer );
 
 #if QT_VERSION < 0x050000
     QUrl url = prototypeUrl;
@@ -145,11 +131,10 @@ QUrl WmsServerLayout::downloadUrl( const QUrl &prototypeUrl, const Marble::TileI
         url.addQueryItem( "layers", m_textureLayer->name() );
     url.addQueryItem( "width", QString::number( m_textureLayer->tileSize().width() ) );
     url.addQueryItem( "height", QString::number( m_textureLayer->tileSize().height() ) );
-    url.addQueryItem( "bbox", QString( "%1,%2,%3,%4" ).arg( QString::number( lonLeft, 'f', 12 ) )
-                                                      .arg( QString::number( latBottom( tileId ), 'f', 12 ) )
-                                                      .arg( QString::number( lonRight, 'f', 12 ) )
-                                                      .arg( QString::number( latTop( tileId ), 'f', 12 ) ) );
-
+    url.addQueryItem( "bbox", QString( "%1,%2,%3,%4" ).arg( QString::number( box.west( GeoDataCoordinates::Degree ), 'f', 12 ) )
+                                                      .arg( QString::number( box.south( GeoDataCoordinates::Degree ), 'f', 12 ) )
+                                                      .arg( QString::number( box.east( GeoDataCoordinates::Degree ), 'f', 12 ) )
+                                                      .arg( QString::number( box.north( GeoDataCoordinates::Degree ), 'f', 12 ) ) );
 #if QT_VERSION < 0x050000
     return url;
 #else
@@ -162,38 +147,6 @@ QUrl WmsServerLayout::downloadUrl( const QUrl &prototypeUrl, const Marble::TileI
 QString WmsServerLayout::name() const
 {
     return "WebMapService";
-}
-
-qreal WmsServerLayout::latBottom( const Marble::TileId &tileId ) const
-{
-    const qreal radius = numTilesY( tileId ) / 2.0;
-
-    switch( m_textureLayer->projection() )
-    {
-    case GeoSceneTiled::Equirectangular:
-        return ( radius - tileId.y() - 1 ) / radius *  90.0;
-    case GeoSceneTiled::Mercator:
-        return atan( sinh( ( radius - tileId.y() - 1 ) / radius * M_PI ) ) * 180.0 / M_PI;
-    }
-
-    Q_ASSERT( false ); // not reached
-    return 0.0;
-}
-
-qreal WmsServerLayout::latTop( const Marble::TileId &tileId ) const
-{
-    const qreal radius = numTilesY( tileId ) / 2.0;
-
-    switch( m_textureLayer->projection() )
-    {
-    case GeoSceneTiled::Equirectangular:
-        return ( radius - tileId.y() ) / radius *  90.0;
-    case GeoSceneTiled::Mercator:
-        return atan( sinh( ( radius - tileId.y() ) / radius * M_PI ) ) * 180.0 / M_PI;
-    }
-
-    Q_ASSERT( false ); // not reached
-    return 0.0;
 }
 
 QString WmsServerLayout::epsgCode() const

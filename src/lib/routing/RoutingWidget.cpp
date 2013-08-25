@@ -24,6 +24,9 @@
 #include "RoutingProfileSettingsDialog.h"
 #include "GeoDataDocument.h"
 #include "AlternativeRoutesModel.h"
+#include "RouteSyncManager.h"
+#include "CloudRoutesDialog.h"
+#include "CloudSyncManager.h"
 
 #include <QTime>
 #include <QTimer>
@@ -62,6 +65,8 @@ public:
 
     RouteRequest *const m_routeRequest;
 
+    RouteSyncManager *m_routeSyncManager;
+
     bool m_zoomRouteAfterDownload;
 
     QTimer m_progressTimer;
@@ -78,6 +83,9 @@ public:
 
     QToolButton *m_openRouteButton;
     QToolButton *m_saveRouteButton;
+    QAction *m_cloudSyncSeparator;
+    QAction *m_uploadToCloudAction;
+    QAction *m_openCloudRoutesAction;
     QToolButton *m_addViaButton;
     QToolButton *m_reverseRouteButton;
     QToolButton *m_clearRouteButton;
@@ -117,6 +125,8 @@ RoutingWidgetPrivate::RoutingWidgetPrivate( RoutingWidget *parent, MarbleWidget 
         m_inputRequest( 0 ),
         m_routingModel( m_routingManager->routingModel() ),
         m_routeRequest( marbleWidget->model()->routingManager()->routeRequest() ),
+        m_routeSyncManager( new RouteSyncManager( marbleWidget->model()->cloudSyncManager(),
+                                                  marbleWidget->model()->routingManager() ) ),
         m_zoomRouteAfterDownload( false ),
         m_currentFrame( 0 ),
         m_iconSize( 16 ),
@@ -185,8 +195,16 @@ void RoutingWidgetPrivate::setupToolBar()
     m_saveRouteButton->setIcon( QIcon(":/icons/16x16/document-save.png") );
     m_toolBar->addWidget(m_saveRouteButton);
 
-    m_toolBar->addSeparator();
+    m_cloudSyncSeparator = m_toolBar->addSeparator();
+    m_uploadToCloudAction = m_toolBar->addAction( QObject::tr("Upload to Cloud") );
+    m_uploadToCloudAction->setToolTip( QObject::tr("Upload to Cloud") );
+    m_uploadToCloudAction->setIcon( QIcon(":/icons/cloud-upload.png") );
 
+    m_openCloudRoutesAction = m_toolBar->addAction( QObject::tr("Manage Cloud Routes") );
+    m_openCloudRoutesAction->setToolTip( QObject::tr("Manage Cloud Routes") );
+    m_openCloudRoutesAction->setIcon( QIcon(":/icons/cloud-download.png") );
+
+    m_toolBar->addSeparator();
     m_addViaButton = new QToolButton;
     m_addViaButton->setToolTip( QObject::tr("Add Via") );
     m_addViaButton->setIcon( QIcon(":/marble/list-add.png") );
@@ -213,6 +231,10 @@ void RoutingWidgetPrivate::setupToolBar()
                       m_parent, SLOT(openRoute()) );
     QObject::connect( m_saveRouteButton, SIGNAL(clicked()),
                       m_parent, SLOT(saveRoute()) );
+    QObject::connect( m_uploadToCloudAction, SIGNAL(triggered()),
+                      m_parent, SLOT(uploadToCloud()) );
+    QObject::connect( m_openCloudRoutesAction, SIGNAL(triggered()),
+                      m_parent, SLOT(openCloudRoutesDialog()));
     QObject::connect( m_addViaButton, SIGNAL(clicked()),
                       m_parent, SLOT(addInputWidget()) );
     QObject::connect( m_reverseRouteButton, SIGNAL(clicked()),
@@ -291,6 +313,10 @@ RoutingWidget::RoutingWidget( MarbleWidget *marbleWidget, QWidget *parent ) :
              this, SLOT(retrieveRoute()) );
     connect( d->m_routingManager->alternativeRoutesModel(), SIGNAL(rowsInserted(QModelIndex,int,int)),
              this, SLOT(updateAlternativeRoutes()) );
+    connect( d->m_widget->model()->cloudSyncManager(), SIGNAL(syncEnabledChanged(bool)),
+             this, SLOT(updateCloudSyncButtons()) );
+    connect( d->m_widget->model()->cloudSyncManager(), SIGNAL(routeSyncEnabledChanged(bool)),
+             this, SLOT(updateCloudSyncButtons()) );
 
     d->m_ui.directionsListView->setModel( d->m_routingModel );
 
@@ -317,6 +343,7 @@ RoutingWidget::RoutingWidget( MarbleWidget *marbleWidget, QWidget *parent ) :
     d->m_ui.resultLabel->setVisible( false );
     setShowDirectionsButtonVisible( false );
     updateActiveRoutingProfile();
+    updateCloudSyncButtons();
 
     if ( MarbleGlobal::getInstance()->profiles() & MarbleGlobal::SmallScreen ) {
         d->m_ui.directionsListView->setVisible( false );
@@ -661,6 +688,25 @@ void RoutingWidget::saveRoute()
     }
 }
 
+void RoutingWidget::uploadToCloud()
+{
+    d->m_routeSyncManager->uploadRoute();
+}
+
+void RoutingWidget::openCloudRoutesDialog()
+{
+    d->m_routeSyncManager->prepareRouteList();
+
+    CloudRoutesDialog *dialog = new CloudRoutesDialog( d->m_routeSyncManager->model(), d->m_widget );
+    connect( d->m_routeSyncManager, SIGNAL(routeListDownloadProgress(qint64,qint64)), dialog, SLOT(updateListDownloadProgressbar(qint64,qint64)) );
+    connect( dialog, SIGNAL(downloadButtonClicked(QString)), d->m_routeSyncManager, SLOT(downloadRoute(QString)) );
+    connect( dialog, SIGNAL(openButtonClicked(QString)), d->m_routeSyncManager, SLOT(openRoute(QString)) );
+    connect( dialog, SIGNAL(deleteButtonClicked(QString)), d->m_routeSyncManager, SLOT(deleteRoute(QString)) );
+    connect( dialog, SIGNAL(removeFromCacheButtonClicked(QString)), d->m_routeSyncManager, SLOT(removeRouteFromCache(QString)) );
+    connect( dialog, SIGNAL(uploadToCloudButtonClicked(QString)), d->m_routeSyncManager, SLOT(uploadRoute(QString)) );
+    dialog->exec();
+}
+
 void RoutingWidget::indicateRoutingFailure( GeoDataDocument* route )
 {
     if ( !route ) {
@@ -677,6 +723,15 @@ void RoutingWidget::updateActiveRoutingProfile()
     RoutingProfile const profile = d->m_routingManager->routeRequest()->routingProfile();
     QList<RoutingProfile> const profiles = d->m_routingManager->profilesModel()->profiles();
     d->m_ui.routingProfileComboBox->setCurrentIndex( profiles.indexOf( profile ) );
+}
+
+void RoutingWidget::updateCloudSyncButtons()
+{
+    CloudSyncManager const * const manager = d->m_widget->model()->cloudSyncManager();
+    bool const show = manager->isSyncEnabled() && manager->isRouteSyncEnabled();
+    d->m_cloudSyncSeparator->setVisible( show );
+    d->m_uploadToCloudAction->setVisible( show );
+    d->m_openCloudRoutesAction->setVisible( show );
 }
 
 bool RoutingWidget::eventFilter( QObject *o, QEvent *event )

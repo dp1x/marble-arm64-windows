@@ -49,7 +49,6 @@ class AbstractDataPluginItem;
 class GeoDataPlacemark;
 class GeoPainter;
 class MeasureTool;
-class MapThemeManager;
 class PositionTracking;
 class HttpDownloadManager;
 class MarbleModelPrivate;
@@ -66,6 +65,7 @@ class RoutingManager;
 class BookmarkManager;
 class FileManager;
 class ElevationModel;
+class CloudSyncManager;
 
 /**
  * @short The data model (not based on QAbstractModel) for a MarbleWidget.
@@ -117,6 +117,9 @@ class MARBLE_EXPORT MarbleModel : public QObject
      */
     GeoDataTreeModel *treeModel();
     const GeoDataTreeModel *treeModel() const;
+
+    QAbstractItemModel *groundOverlayModel();
+    const QAbstractItemModel *groundOverlayModel() const;
 
     QAbstractItemModel *placemarkModel();
     const QAbstractItemModel *placemarkModel() const;
@@ -176,8 +179,6 @@ class MARBLE_EXPORT MarbleModel : public QObject
      * @param  zoom       the default zoom level for the new home point.
      */
     void setHome( const GeoDataCoordinates& homePoint, int zoom = 1050 );
-
-    MapThemeManager *mapThemeManager();
 
     /**
      * @brief Return the downloadmanager to load missing tiles
@@ -272,6 +273,9 @@ class MARBLE_EXPORT MarbleModel : public QObject
 
     ElevationModel* elevationModel();
     const ElevationModel* elevationModel() const;
+
+    CloudSyncManager *cloudSyncManager();
+    const CloudSyncManager* cloudSyncManager() const;
 
     /**
      * Returns the placemark being tracked by this model or 0 if no

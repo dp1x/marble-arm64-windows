@@ -10,7 +10,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 ####################################################
 # Generate the tiles with the tilecreator at compile time
 # if this option is set, srtm.jpg will not be installed but the generated tiles instead
-option(TILES_AT_COMPILETIME "Create the data for the Atlas map at compiletime" ON)
 option(QTONLY "Create Marble version without KDE dependencies" OFF)
 option(MOBILE "Create a Marble version optimized for handheld devices")
 
@@ -284,6 +283,7 @@ else(QT5BUILD)
   set( QT_USE_QTSVG         ON )
   set( QT_USE_QTDECLARATIVE ON )
   set( QT_USE_QTSQL         ON )
+  set( QT_USE_QTDBUS        ON )
   include( ${QT_USE_FILE} )
   marble_set_package_properties( Qt4 PROPERTIES DESCRIPTION "cross-platform application framework" )
   marble_set_package_properties( Qt4 PROPERTIES URL "http://qt.digia.com/" )
@@ -291,7 +291,8 @@ else(QT5BUILD)
   IF ( NOT QT_QTDECLARATIVE_LIBRARY )
     # older cmake versions have a FindQt4.cmake without support for declarative,
     # but the library may still be available
-    FIND_LIBRARY(QT_QTDECLARATIVE_LIBRARY NAMES QtDeclarative HINTS ${QT_LIBRARY_DIR})
+    FIND_PACKAGE(QtDeclarative)
+    include_directories(${QT_QTDECLARATIVE_INCLUDE_DIR})
   ENDIF()
 endif()
 
@@ -343,7 +344,7 @@ endif(WIN32)
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/src/lib
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/Projections
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/projections
   ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/geodata
   ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/geodata/data
   ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/geodata/graphicsitem

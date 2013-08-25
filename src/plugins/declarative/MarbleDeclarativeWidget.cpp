@@ -303,7 +303,7 @@ void MarbleWidget::addLayer( QQmlListProperty<DeclarativeDataPlugin> *list, Decl
 
 QStandardItemModel *MarbleWidget::mapThemeModel()
 {
-    return m_marbleWidget->model()->mapThemeManager()->mapThemeModel();
+    return m_mapThemeManager.mapThemeModel();
 }
 
 void MarbleWidget::setGeoSceneProperty(const QString &key, bool value)

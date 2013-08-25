@@ -12,9 +12,11 @@
 // Own
 #include "QtMarbleConfigDialog.h"
 
+#include "ui_MarbleCacheSettingsWidget.h"
 #include "ui_MarbleViewSettingsWidget.h"
 #include "ui_MarbleNavigationSettingsWidget.h"
 #include "ui_MarbleTimeSettingsWidget.h"
+#include "ui_MarbleCloudSyncSettingsWidget.h"
 
 // Qt
 #include <QList>
@@ -34,7 +36,6 @@
 #include "DialogConfigurationInterface.h"
 #include "MarbleDebug.h"
 #include "MarbleDirs.h"
-#include "MarbleCacheSettingsWidget.h"
 #include "MarblePluginSettingsWidget.h"
 #include "MarbleLocale.h"
 #include "MarbleWidget.h"
@@ -54,6 +55,7 @@ class QtMarbleConfigDialogPrivate
         : ui_viewSettings(),
           ui_navigationSettings(),
           ui_timeSettings(),
+          ui_cacheSettings(),
           m_marbleWidget( marbleWidget ),
           m_pluginModel()
     {
@@ -62,7 +64,8 @@ class QtMarbleConfigDialogPrivate
     Ui::MarbleViewSettingsWidget       ui_viewSettings;
     Ui::MarbleNavigationSettingsWidget ui_navigationSettings;
     Ui::MarbleTimeSettingsWidget       ui_timeSettings;
-    MarbleCacheSettingsWidget          *w_cacheSettings;
+    Ui::MarbleCacheSettingsWidget      ui_cacheSettings;
+    Ui::MarbleCloudSyncSettingsWidget  ui_cloudSyncSettings;
     MarblePluginSettingsWidget         *w_pluginSettings;
 
     QSettings m_settings;
@@ -127,13 +130,13 @@ QtMarbleConfigDialog::QtMarbleConfigDialog( MarbleWidget *marbleWidget, QWidget 
     tabWidget->addTab( w_navigationSettings, tr( "Navigation" ) );
 
     // cache page
-    d->w_cacheSettings = new MarbleCacheSettingsWidget( this );
-    tabWidget->addTab( d->w_cacheSettings, tr( "Cache and Proxy" ) );
+    QWidget *w_cacheSettings = new QWidget( this );
+
+    d->ui_cacheSettings.setupUi( w_cacheSettings );
+    tabWidget->addTab( w_cacheSettings, tr( "Cache and Proxy" ) );
     // Forwarding clear button signals
-    connect( d->w_cacheSettings, SIGNAL(clearVolatileCache()),
-             this,               SIGNAL(clearVolatileCacheClicked()) );
-    connect( d->w_cacheSettings, SIGNAL(clearPersistentCache()),
-             this,               SIGNAL(clearPersistentCacheClicked()) );
+    connect( d->ui_cacheSettings.button_clearVolatileCache, SIGNAL(clicked()), SIGNAL(clearVolatileCacheClicked()) );
+    connect( d->ui_cacheSettings.button_clearPersistentCache, SIGNAL(clicked()), SIGNAL(clearPersistentCacheClicked()) );
 
     // time page
     QWidget *w_timeSettings = new QWidget( this );
@@ -157,6 +160,10 @@ QtMarbleConfigDialog::QtMarbleConfigDialog( MarbleWidget *marbleWidget, QWidget 
 
     connect( this, SIGNAL(rejected()), &d->m_pluginModel, SLOT(retrievePluginState()) );
     connect( this, SIGNAL(accepted()), &d->m_pluginModel, SLOT(applyPluginState()) );
+    
+    QWidget *w_cloudSyncSettings = new QWidget( this );
+    d->ui_cloudSyncSettings.setupUi( w_cloudSyncSettings );
+    tabWidget->addTab( w_cloudSyncSettings, tr( "Synchronization" ) );
 
     // Layout
     QVBoxLayout *layout = new QVBoxLayout( this );
@@ -222,23 +229,15 @@ void QtMarbleConfigDialog::readSettings()
     d->ui_viewSettings.kcfg_angleUnit->setCurrentIndex( angleUnit() );
     d->ui_viewSettings.kcfg_stillQuality->setCurrentIndex( stillQuality() );
     d->ui_viewSettings.kcfg_animationQuality->setCurrentIndex( animationQuality() );
-    d->ui_viewSettings.kcfg_labelLocalization->setCurrentIndex( labelLocalization() );
+    d->ui_viewSettings.kcfg_labelLocalization->setCurrentIndex( Marble::Native );
     d->ui_viewSettings.kcfg_mapFont->setCurrentFont( mapFont() );
     d->ui_viewSettings.kcfg_graphicsSystem->setCurrentIndex( graphicsSystem() );
     
     // Navigation
-    d->ui_navigationSettings.kcfg_dragLocation->setCurrentIndex( dragLocation() );
+    d->ui_navigationSettings.kcfg_dragLocation->setCurrentIndex( Marble::KeepAxisVertically );
     d->ui_navigationSettings.kcfg_onStartup->setCurrentIndex( onStartup() );
-    if( inertialEarthRotation() ) {
-        d->ui_navigationSettings.kcfg_inertialEarthRotation->setCheckState( Qt::Checked );
-    } else {
-        d->ui_navigationSettings.kcfg_inertialEarthRotation->setCheckState( Qt::Unchecked );
-    }
-    if( animateTargetVoyage() ) {
-        d->ui_navigationSettings.kcfg_animateTargetVoyage->setCheckState( Qt::Checked );
-    } else {
-        d->ui_navigationSettings.kcfg_animateTargetVoyage->setCheckState( Qt::Unchecked );
-    }
+    d->ui_navigationSettings.kcfg_inertialEarthRotation->setChecked( inertialEarthRotation() );
+    d->ui_navigationSettings.kcfg_animateTargetVoyage->setChecked( animateTargetVoyage() );
     int editorIndex = 0;
     if ( externalMapEditor() == "potlatch") {
         editorIndex = 1;
@@ -250,18 +249,14 @@ void QtMarbleConfigDialog::readSettings()
     d->ui_navigationSettings.kcfg_externalMapEditor->setCurrentIndex( editorIndex );
 
     // Cache
-    d->w_cacheSettings->kcfg_volatileTileCacheLimit->setValue( volatileTileCacheLimit() );
-    d->w_cacheSettings->kcfg_persistentTileCacheLimit->setValue( persistentTileCacheLimit() );
-    d->w_cacheSettings->kcfg_proxyUrl->setText( proxyUrl() );
-    d->w_cacheSettings->kcfg_proxyPort->setValue( proxyPort() );
-    d->w_cacheSettings->kcfg_proxyUser->setText( proxyUser() );
-    d->w_cacheSettings->kcfg_proxyPass->setText( proxyPass() );
-    d->w_cacheSettings->kcfg_proxyType->setCurrentIndex( proxyType() );
-    if ( proxyAuth() ) {
-        d->w_cacheSettings->kcfg_proxyAuth->setCheckState( Qt::Checked );
-    } else {
-        d->w_cacheSettings->kcfg_proxyAuth->setCheckState( Qt::Unchecked );
-    }
+    d->ui_cacheSettings.kcfg_volatileTileCacheLimit->setValue( volatileTileCacheLimit() );
+    d->ui_cacheSettings.kcfg_persistentTileCacheLimit->setValue( persistentTileCacheLimit() );
+    d->ui_cacheSettings.kcfg_proxyUrl->setText( proxyUrl() );
+    d->ui_cacheSettings.kcfg_proxyPort->setValue( proxyPort() );
+    d->ui_cacheSettings.kcfg_proxyUser->setText( proxyUser() );
+    d->ui_cacheSettings.kcfg_proxyPass->setText( proxyPass() );
+    d->ui_cacheSettings.kcfg_proxyType->setCurrentIndex( proxyType() );
+    d->ui_cacheSettings.kcfg_proxyAuth->setChecked( proxyAuth() );
  
     // Time
     d->ui_timeSettings.kcfg_systemTimezone->setChecked( systemTimezone() );
@@ -287,6 +282,14 @@ void QtMarbleConfigDialog::readSettings()
 
     // Routing
 
+    // ownCloud
+    d->ui_cloudSyncSettings.kcfg_enableSync->setChecked( syncEnabled() );
+    d->ui_cloudSyncSettings.kcfg_syncBookmarks->setChecked( syncBookmarks() );
+    d->ui_cloudSyncSettings.kcfg_syncRoutes->setChecked( syncRoutes() );
+    d->ui_cloudSyncSettings.kcfg_owncloudServer->setText( owncloudServer() );
+    d->ui_cloudSyncSettings.kcfg_owncloudUsername->setText( owncloudUsername() );
+    d->ui_cloudSyncSettings.kcfg_owncloudPassword->setText( owncloudPassword() );
+    
     // Read the settings of the plugins
     d->m_marbleWidget->readPluginSettings( d->m_settings );
 
@@ -319,24 +322,14 @@ void QtMarbleConfigDialog::writeSettings()
     d->m_settings.setValue( "angleUnit", d->ui_viewSettings.kcfg_angleUnit->currentIndex() );
     d->m_settings.setValue( "stillQuality", d->ui_viewSettings.kcfg_stillQuality->currentIndex() );
     d->m_settings.setValue( "animationQuality", d->ui_viewSettings.kcfg_animationQuality->currentIndex() );
-    d->m_settings.setValue( "labelLocalization", d->ui_viewSettings.kcfg_labelLocalization->currentIndex() );
     d->m_settings.setValue( "mapFont", d->ui_viewSettings.kcfg_mapFont->currentFont() );
     d->m_settings.setValue( "graphicsSystem", graphicsSystemString );
     d->m_settings.endGroup();
     
     d->m_settings.beginGroup( "Navigation" );
-    d->m_settings.setValue( "dragLocation", d->ui_navigationSettings.kcfg_dragLocation->currentIndex() );
     d->m_settings.setValue( "onStartup", d->ui_navigationSettings.kcfg_onStartup->currentIndex() );
-    if( d->ui_navigationSettings.kcfg_inertialEarthRotation->checkState() == Qt::Checked ) {
-        d->m_settings.setValue( "inertialEarthRotation", true );
-    } else {
-        d->m_settings.setValue( "inertialEarthRotation", false );
-    }
-    if( d->ui_navigationSettings.kcfg_animateTargetVoyage->checkState() == Qt::Checked ) {
-        d->m_settings.setValue( "animateTargetVoyage", true );
-    } else {
-        d->m_settings.setValue( "animateTargetVoyage", false );
-    }
+    d->m_settings.setValue( "inertialEarthRotation", d->ui_navigationSettings.kcfg_inertialEarthRotation->isChecked() );
+    d->m_settings.setValue( "animateTargetVoyage", d->ui_navigationSettings.kcfg_animateTargetVoyage->isChecked() );
     if( d->ui_navigationSettings.kcfg_externalMapEditor->currentIndex() == 0 ) {
         d->m_settings.setValue( "externalMapEditor", "" );
     } else if( d->ui_navigationSettings.kcfg_externalMapEditor->currentIndex() == 1 ) {
@@ -351,15 +344,15 @@ void QtMarbleConfigDialog::writeSettings()
     d->m_settings.endGroup();
     
     d->m_settings.beginGroup( "Cache" );
-    d->m_settings.setValue( "volatileTileCacheLimit", d->w_cacheSettings->kcfg_volatileTileCacheLimit->value() );
-    d->m_settings.setValue( "persistentTileCacheLimit", d->w_cacheSettings->kcfg_persistentTileCacheLimit->value() );
-    d->m_settings.setValue( "proxyUrl", d->w_cacheSettings->kcfg_proxyUrl->text() );
-    d->m_settings.setValue( "proxyPort", d->w_cacheSettings->kcfg_proxyPort->value() );
-    d->m_settings.setValue( "proxyType", d->w_cacheSettings->kcfg_proxyType->currentIndex() );
-    if ( d->w_cacheSettings->kcfg_proxyAuth->isChecked() ) {
+    d->m_settings.setValue( "volatileTileCacheLimit", d->ui_cacheSettings.kcfg_volatileTileCacheLimit->value() );
+    d->m_settings.setValue( "persistentTileCacheLimit", d->ui_cacheSettings.kcfg_persistentTileCacheLimit->value() );
+    d->m_settings.setValue( "proxyUrl", d->ui_cacheSettings.kcfg_proxyUrl->text() );
+    d->m_settings.setValue( "proxyPort", d->ui_cacheSettings.kcfg_proxyPort->value() );
+    d->m_settings.setValue( "proxyType", d->ui_cacheSettings.kcfg_proxyType->currentIndex() );
+    if ( d->ui_cacheSettings.kcfg_proxyAuth->isChecked() ) {
         d->m_settings.setValue( "proxyAuth", true );
-        d->m_settings.setValue( "proxyUser", d->w_cacheSettings->kcfg_proxyUser->text() );
-        d->m_settings.setValue( "proxyPass", d->w_cacheSettings->kcfg_proxyPass->text() );
+        d->m_settings.setValue( "proxyUser", d->ui_cacheSettings.kcfg_proxyUser->text() );
+        d->m_settings.setValue( "proxyPass", d->ui_cacheSettings.kcfg_proxyPass->text() );
     } else {
         d->m_settings.setValue( "proxyAuth", false );
     }
@@ -372,6 +365,16 @@ void QtMarbleConfigDialog::writeSettings()
     d->m_settings.setValue( "systemTime", d->ui_timeSettings.kcfg_systemTime->isChecked() );
     d->m_settings.setValue( "lastSessionTime", d->ui_timeSettings.kcfg_lastSessionTime->isChecked() );
     d->m_settings.setValue( "chosenTimezone", d->ui_timeSettings.kcfg_chosenTimezone->currentIndex() );
+    d->m_settings.endGroup();
+    
+    d->m_settings.beginGroup( "CloudSync" );
+    d->m_settings.setValue( "enableSync", d->ui_cloudSyncSettings.kcfg_enableSync->isChecked() );
+    d->m_settings.setValue( "syncBackend", "owncloud" );
+    d->m_settings.setValue( "syncBookmarks", d->ui_cloudSyncSettings.kcfg_syncBookmarks->isChecked() );
+    d->m_settings.setValue( "syncRoutes", d->ui_cloudSyncSettings.kcfg_syncRoutes->isChecked() );
+    d->m_settings.setValue( "owncloudServer", d->ui_cloudSyncSettings.kcfg_owncloudServer->text() );
+    d->m_settings.setValue( "owncloudUsername", d->ui_cloudSyncSettings.kcfg_owncloudUsername->text() );
+    d->m_settings.setValue( "owncloudPassword", d->ui_cloudSyncSettings.kcfg_owncloudPassword->text() );
     d->m_settings.endGroup();
 
     // Plugins
@@ -417,11 +420,6 @@ Marble::MapQuality QtMarbleConfigDialog::animationQuality() const
                                 Marble::LowQuality ).toInt();
 }
 
-int QtMarbleConfigDialog::labelLocalization() const
-{
-    return d->m_settings.value( "View/labelLocalization" , Marble::Native ).toInt();
-}
-
 QFont QtMarbleConfigDialog::mapFont() const
 {
     return d->m_settings.value( "View/mapFont", QApplication::font() ).value<QFont>();
@@ -436,11 +434,6 @@ Marble::GraphicsSystem QtMarbleConfigDialog::graphicsSystem() const
 
     // default case:  graphicsSystemString == "raster"
     return Marble::NativeGraphics;
-}
-
-int QtMarbleConfigDialog::dragLocation() const
-{
-    return d->m_settings.value( "Navigation/dragLocation", Marble::KeepAxisVertically ).toInt();
 }
 
 int QtMarbleConfigDialog::onStartup() const
@@ -575,6 +568,40 @@ void QtMarbleConfigDialog::initializeCustomTimezone()
     }
 }
 
+bool QtMarbleConfigDialog::syncEnabled() const
+{
+    return d->m_settings.value( "CloudSync/enableSync", false ).toBool();
+}
+
+QString QtMarbleConfigDialog::syncBackend() const
+{
+    return d->m_settings.value( "CloudSync/syncBackend", "" ).toString();
+}
+
+bool QtMarbleConfigDialog::syncBookmarks() const
+{
+    return d->m_settings.value( "CloudSync/syncBookmarks", true ).toBool();
+}
+
+bool QtMarbleConfigDialog::syncRoutes() const
+{
+    return d->m_settings.value( "CloudSync/syncRoutes", true ).toBool();
+}
+
+QString QtMarbleConfigDialog::owncloudServer() const
+{
+    return d->m_settings.value( "CloudSync/owncloudServer", "" ).toString();
+}
+
+QString QtMarbleConfigDialog::owncloudUsername() const
+{
+    return d->m_settings.value( "CloudSync/owncloudUsername", "" ).toString();
+}
+
+QString QtMarbleConfigDialog::owncloudPassword() const
+{
+    return d->m_settings.value( "CloudSync/owncloudPassword", "" ).toString();
+}
 
 }
 

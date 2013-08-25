@@ -34,10 +34,8 @@
 #include "GeoLineStringGraphicsItem.h"
 #include "GeoPolygonGraphicsItem.h"
 #include "GeoTrackGraphicsItem.h"
-#include "GeoDataGroundOverlay.h"
 #include "GeoDataPhotoOverlay.h"
 #include "GeoDataScreenOverlay.h"
-#include "GeoImageGraphicsItem.h"
 #include "GeoPhotoGraphicsItem.h"
 #include "ScreenOverlayGraphicsItem.h"
 #include "TileId.h"
@@ -261,7 +259,7 @@ bool GeometryLayer::render( GeoPainter *painter, ViewportParams *viewport,
     }
 
     painter->restore();
-    d->m_runtimeTrace = QString( "Items: %1 Drawn: %2 Zoom: %3")
+    d->m_runtimeTrace = QString( "Geometries: %1 Drawn: %2 Zoom: %3")
                 .arg( items.size() )
                 .arg( painted )
                 .arg( maxZoomLevel );
@@ -346,13 +344,7 @@ void GeometryLayerPrivate::createGraphicsItemFromGeometry( const GeoDataGeometry
 void GeometryLayerPrivate::createGraphicsItemFromOverlay( const GeoDataOverlay *overlay )
 {
     GeoGraphicsItem* item = 0;
-    if ( overlay->nodeType() == GeoDataTypes::GeoDataGroundOverlayType ) {
-        GeoDataGroundOverlay const * groundOverlay = static_cast<GeoDataGroundOverlay const *>( overlay );
-        GeoImageGraphicsItem *imageItem = new GeoImageGraphicsItem( overlay );
-        imageItem->setImageFile( groundOverlay->absoluteIconFile() );
-        imageItem->setLatLonBox( groundOverlay->latLonBox() );
-        item = imageItem;
-    } else if ( overlay->nodeType() == GeoDataTypes::GeoDataPhotoOverlayType ) {
+    if ( overlay->nodeType() == GeoDataTypes::GeoDataPhotoOverlayType ) {
         GeoDataPhotoOverlay const * photoOverlay = static_cast<GeoDataPhotoOverlay const *>( overlay );
         GeoPhotoGraphicsItem *photoItem = new GeoPhotoGraphicsItem( overlay );
         photoItem->setPhotoFile( photoOverlay->absoluteIconFile() );

@@ -38,7 +38,6 @@ class MARBLE_EXPORT QtMarbleConfigDialog : public QDialog
     Marble::AngleUnit angleUnit() const;
     Marble::MapQuality stillQuality() const;
     Marble::MapQuality animationQuality() const;
-    int labelLocalization() const;
     QFont mapFont() const;
 
     // View
@@ -46,7 +45,6 @@ class MARBLE_EXPORT QtMarbleConfigDialog : public QDialog
 
 
     // Navigation Settings
-    int dragLocation() const;
     int onStartup() const;
     bool animateTargetVoyage() const;
     QString externalMapEditor() const;
@@ -95,6 +93,15 @@ class MARBLE_EXPORT QtMarbleConfigDialog : public QDialog
     int chosenTimezone() const;
     
     void initializeCustomTimezone();
+    
+    // CloudSync settings
+    bool syncEnabled() const;
+    QString syncBackend() const;
+    bool syncBookmarks() const;
+    bool syncRoutes() const;
+    QString owncloudServer() const;
+    QString owncloudUsername() const;
+    QString owncloudPassword() const;
 
     Q_SIGNALS:
     /**

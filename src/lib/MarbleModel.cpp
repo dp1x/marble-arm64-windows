@@ -68,6 +68,7 @@
 #include "routing/RoutingManager.h"
 #include "BookmarkManager.h"
 #include "ElevationModel.h"
+#include "cloudsync/CloudSyncManager.h"
 
 namespace Marble
 {
@@ -80,7 +81,6 @@ class MarbleModelPrivate
           m_planet( new Planet( "earth" ) ),
           m_sunLocator( &m_clock, m_planet ),
           m_pluginManager(),
-          m_mapThemeManager(),
           m_homePoint( -9.4, 54.8, 0.0, GeoDataCoordinates::Degree ),  // Some point that tackat defined. :-)
           m_homeZoom( 1050 ),
           m_mapTheme( 0 ),
@@ -97,13 +97,18 @@ class MarbleModelPrivate
           m_bookmarkManager( &m_treeModel ),
           m_routingManager( 0 ),
           m_legend( 0 ),
-          m_workOffline( false )
+          m_workOffline( false ),
+          m_cloudSyncManager()
     {
         m_descendantProxy.setSourceModel( &m_treeModel );
 
         m_placemarkProxyModel.setFilterFixedString( GeoDataTypes::GeoDataPlacemarkType );
         m_placemarkProxyModel.setFilterKeyColumn( 1 );
         m_placemarkProxyModel.setSourceModel( &m_descendantProxy );
+
+        m_groundOverlayProxyModel.setFilterFixedString( GeoDataTypes::GeoDataGroundOverlayType );
+        m_groundOverlayProxyModel.setFilterKeyColumn( 1 );
+        m_groundOverlayProxyModel.setSourceModel( &m_descendantProxy );
     }
 
     ~MarbleModelPrivate()
@@ -116,7 +121,6 @@ class MarbleModelPrivate
     SunLocator               m_sunLocator;
 
     PluginManager            m_pluginManager;
-    MapThemeManager          m_mapThemeManager;
 
     // The home position
     GeoDataCoordinates       m_homePoint;
@@ -137,6 +141,7 @@ class MarbleModelPrivate
     GeoDataTreeModel         m_treeModel;
     KDescendantsProxyModel   m_descendantProxy;
     QSortFilterProxyModel    m_placemarkProxyModel;
+    QSortFilterProxyModel    m_groundOverlayProxyModel;
 
     // Selection handling
     QItemSelectionModel      m_placemarkSelectionModel;
@@ -153,6 +158,9 @@ class MarbleModelPrivate
     bool                     m_workOffline;
 
     ElevationModel           *m_elevationModel;
+
+    // Cloud synchronization
+    CloudSyncManager        m_cloudSyncManager;
 };
 
 MarbleModel::MarbleModel( QObject *parent )
@@ -188,7 +196,6 @@ MarbleModel::MarbleModel( QObject *parent )
             &d->m_sunLocator, SLOT(update()) );
 
     d->m_elevationModel = new ElevationModel( this );
-
 }
 
 MarbleModel::~MarbleModel()
@@ -240,7 +247,7 @@ void MarbleModel::setMapThemeId( const QString &mapThemeId )
     if ( !mapThemeId.isEmpty() && mapThemeId == this->mapThemeId() )
         return;
 
-    GeoSceneDocument *mapTheme = d->m_mapThemeManager.loadMapTheme( mapThemeId );
+    GeoSceneDocument *mapTheme = MapThemeManager::loadMapTheme( mapThemeId );
     if ( !mapTheme ) {
         // Check whether the previous theme works
         if ( d->m_mapTheme ){
@@ -251,7 +258,7 @@ void MarbleModel::setMapThemeId( const QString &mapThemeId )
         // Fall back to default theme
         QString defaultTheme = "earth/srtm/srtm.dgml";
         qWarning() << "Falling back to default theme:" << defaultTheme;
-        mapTheme = d->m_mapThemeManager.loadMapTheme( defaultTheme );
+        mapTheme = MapThemeManager::loadMapTheme( defaultTheme );
     }
 
     // If this last resort doesn't work either shed a tear and exit
@@ -391,11 +398,6 @@ void MarbleModel::setHome( const GeoDataCoordinates& homePoint, int zoom )
     emit homeChanged( d->m_homePoint );
 }
 
-MapThemeManager *MarbleModel::mapThemeManager()
-{
-    return &d->m_mapThemeManager;
-}
-
 HttpDownloadManager *MarbleModel::downloadManager()
 {
     return &d->m_downloadManager;
@@ -425,6 +427,16 @@ QAbstractItemModel *MarbleModel::placemarkModel()
 const QAbstractItemModel *MarbleModel::placemarkModel() const
 {
     return &d->m_placemarkProxyModel;
+}
+
+QAbstractItemModel *MarbleModel::groundOverlayModel()
+{
+    return &d->m_groundOverlayProxyModel;
+}
+
+const QAbstractItemModel *MarbleModel::groundOverlayModel() const
+{
+    return &d->m_groundOverlayProxyModel;
 }
 
 QItemSelectionModel *MarbleModel::placemarkSelectionModel()
@@ -683,6 +695,8 @@ void MarbleModel::setWorkOffline( bool workOffline )
 {
     if ( d->m_workOffline != workOffline ) {
         downloadManager()->setDownloadEnabled( !workOffline );
+        cloudSyncManager()->setWorkOffline( workOffline );
+
         d->m_workOffline = workOffline;
         emit workOfflineChanged();
     }
@@ -696,6 +710,16 @@ ElevationModel* MarbleModel::elevationModel()
 const ElevationModel* MarbleModel::elevationModel() const
 {
     return d->m_elevationModel;
+}
+
+CloudSyncManager *MarbleModel::cloudSyncManager()
+{
+    return &d->m_cloudSyncManager;
+}
+
+const CloudSyncManager* MarbleModel::cloudSyncManager() const
+{
+    return &d->m_cloudSyncManager;
 }
 
 }

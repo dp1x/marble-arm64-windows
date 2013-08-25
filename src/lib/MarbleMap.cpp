@@ -103,6 +103,8 @@ public:
 
     virtual qreal zValue() const { return 1.0e6; }
 
+    virtual QString runtimeTrace() const { return "CustomPaint"; }
+
 private:
     MarbleMap *const m_map;
 };
@@ -161,7 +163,7 @@ MarbleMapPrivate::MarbleMapPrivate( MarbleMap *parent, MarbleModel *model ) :
     m_geometryLayer( model->treeModel() ),
     m_vectorMapBaseLayer( &m_veccomposer ),
     m_vectorMapLayer( &m_veccomposer ),
-    m_textureLayer( model->downloadManager(), model->sunLocator(), &m_veccomposer, model->pluginManager() ),
+    m_textureLayer( model->downloadManager(), model->sunLocator(), &m_veccomposer, model->pluginManager(), model->groundOverlayModel() ),
     m_placemarkLayer( model->placemarkModel(), model->placemarkSelectionModel(), model->clock() ),
     m_vectorTileLayer( model->downloadManager(), model->pluginManager(), model->treeModel() ),
     m_isLockedToSubSolarPoint( false ),

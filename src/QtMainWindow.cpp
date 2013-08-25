@@ -79,6 +79,7 @@
 #include "GoToDialog.h"
 #include "MarbleWidgetInputHandler.h"
 #include "Planet.h"
+#include "cloudsync/CloudSyncManager.h"
 
 // For zoom buttons on Maemo
 #ifdef Q_WS_MAEMO_5
@@ -140,11 +141,6 @@ MainWindow::MainWindow(const QString& marbleDataPath, const QVariantMap& cmdLine
     // Load bookmark file. If it does not exist, a default one will be used.
     m_controlView->marbleModel()->bookmarkManager()->loadFile( "bookmarks/bookmarks.kml" );
 
-    const bool smallscreen = MarbleGlobal::getInstance()->profiles() & MarbleGlobal::SmallScreen;
-
-    if ( !smallscreen ) {
-        createToolBar();
-    }
     createActions();
     QList<QAction*> const panelActions = m_controlView->setupDockWidgets( this );
     createMenus( panelActions );
@@ -167,11 +163,28 @@ MainWindow::MainWindow(const QString& marbleDataPath, const QVariantMap& cmdLine
                               Q_ARG(QVariantMap, cmdLineSettings));
 }
 
+void MainWindow::addGeoDataFile( const QString &fileName )
+{
+    QFileInfo file( fileName );
+
+    if ( !file.exists() )
+        return;
+
+    // delay file loading to initObject(), such that restoring view from previous session in readSettings()
+    // doesn't interfere with focusing on these files
+    m_commandlineFilePaths << file.absoluteFilePath();
+}
+
 void MainWindow::initObject(const QVariantMap& cmdLineSettings)
 {
     QCoreApplication::processEvents ();
     setupStatusBar();
     readSettings(cmdLineSettings);
+
+    foreach ( const QString &path, m_commandlineFilePaths ) {
+        m_controlView->marbleModel()->addGeoDataFile( path );
+    }
+    m_commandlineFilePaths.clear();
 }
 
 void MainWindow::createActions()
@@ -1000,13 +1013,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
     event->accept();
 }
 
-void MainWindow::createToolBar()
-{
-//    QToolBar* toolBar = addToolBar( tr( "Main ToolBar" ) );
-//    toolBar->setObjectName( "mainToolBar" );
-//    toolBar->addWidget( ... );
-}
-
 QString MainWindow::readMarbleDataPath()
 {
      QSettings settings;
@@ -1222,6 +1228,15 @@ void MainWindow::readSettings(const QVariantMap& overrideSettings)
      settings.beginGroup( "Navigation" );
      m_controlView->setExternalMapEditor( settings.value( "externalMapEditor", "" ).toString() );
      settings.endGroup();
+
+     settings.beginGroup( "CloudSync" );
+     CloudSyncManager* cloudSyncManager = m_controlView->marbleWidget()->model()->cloudSyncManager();
+     cloudSyncManager->setSyncEnabled( settings.value( "enableSync", false ).toBool() );
+     cloudSyncManager->setRouteSyncEnabled( settings.value( "syncRoutes", true ).toBool() );
+     cloudSyncManager->setOwncloudServer( settings.value( "owncloudServer", "" ).toString() );
+     cloudSyncManager->setOwncloudUsername( settings.value( "owncloudUsername", "" ).toString() );
+     cloudSyncManager->setOwncloudPassword( settings.value( "owncloudPassword", "" ).toString() );
+     settings.endGroup();
 }
 
 void MainWindow::writeSettings()
@@ -1403,6 +1418,13 @@ void MainWindow::updateSettings()
     m_controlView->marbleWidget()->setProxy( m_configDialog->proxyUrl(), m_configDialog->proxyPort(), m_configDialog->user(), m_configDialog->password() );
     */
 
+    CloudSyncManager* cloudSyncManager = m_controlView->marbleWidget()->model()->cloudSyncManager();
+    cloudSyncManager->setSyncEnabled( m_configDialog->syncEnabled() );
+    cloudSyncManager->setRouteSyncEnabled( m_configDialog->syncRoutes() );
+    cloudSyncManager->setOwncloudServer( m_configDialog->owncloudServer() );
+    cloudSyncManager->setOwncloudUsername( m_configDialog->owncloudUsername() );
+    cloudSyncManager->setOwncloudPassword( m_configDialog->owncloudPassword() );
+
     m_controlView->marbleWidget()->update();
 }
 
@@ -1479,7 +1501,7 @@ void MainWindow::showMapViewDialog()
         m_mapViewWindow->setLayout( layout );
 
         MapViewWidget *mapViewWidget = new MapViewWidget( m_mapViewWindow );
-        mapViewWidget->setMarbleWidget( m_controlView->marbleWidget() );
+        mapViewWidget->setMarbleWidget( m_controlView->marbleWidget(), m_controlView->mapThemeManager() );
         layout->addWidget( mapViewWidget );
     }
 

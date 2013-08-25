@@ -8,7 +8,7 @@ endif (QTONLY)
 INCLUDE_DIRECTORIES(
  ${CMAKE_CURRENT_SOURCE_DIR}
  ${CMAKE_CURRENT_BINARY_DIR}
- ${CMAKE_CURRENT_SOURCE_DIR}/Projections
+ ${CMAKE_CURRENT_SOURCE_DIR}/projections
  ${CMAKE_CURRENT_SOURCE_DIR}/routing
  ${CMAKE_CURRENT_SOURCE_DIR}/geodata
  ${CMAKE_CURRENT_SOURCE_DIR}/geodata/data
@@ -20,6 +20,7 @@ INCLUDE_DIRECTORIES(
  ${CMAKE_CURRENT_SOURCE_DIR}/geodata/parser
  ${CMAKE_CURRENT_SOURCE_DIR}/graphicsview
  ${CMAKE_CURRENT_SOURCE_DIR}/layers
+ ${CMAKE_CURRENT_SOURCE_DIR}/cloudsync
  ${QT_INCLUDE_DIR}
 
 if( NOT QT4_FOUND )
@@ -108,7 +109,6 @@ set(marblewidget_SRCS
     HttpJob.cpp
     LayerManager.cpp
     PluginManager.cpp
-    MarbleCacheSettingsWidget.cpp
     TimeControlWidget.cpp
     AbstractFloatItem.cpp
     PopupItem.cpp
@@ -121,11 +121,11 @@ set(marblewidget_SRCS
     MapThemeManager.cpp
     ViewportParams.cpp
     ViewParams.cpp
-    Projections/AbstractProjection.cpp
-	Projections/CylindricalProjection.cpp
-    Projections/SphericalProjection.cpp
-    Projections/EquirectProjection.cpp
-    Projections/MercatorProjection.cpp
+    projections/AbstractProjection.cpp
+    projections/CylindricalProjection.cpp
+    projections/SphericalProjection.cpp
+    projections/EquirectProjection.cpp
+    projections/MercatorProjection.cpp
     VisiblePlacemark.cpp
     PlacemarkLayout.cpp
     Planet.cpp
@@ -157,13 +157,12 @@ set(marblewidget_SRCS
     FileManager.cpp
     PositionTracking.cpp
     DataMigration.cpp
+    ImageF.cpp
 
     AbstractDataPlugin.cpp
     AbstractDataPluginModel.cpp
     AbstractDataPluginItem.cpp
     AbstractWorkerThread.cpp
-
-    WikipediaService.cpp
 
     PluginInterface.cpp
     DialogConfigurationInterface.cpp
@@ -244,6 +243,15 @@ set(marblewidget_SRCS
     SearchWidget.cpp
     kineticmodel.cpp
     NewstuffModel.cpp
+    
+    cloudsync/CloudSyncManager.cpp
+    cloudsync/RouteSyncManager.cpp
+    cloudsync/AbstractSyncBackend.cpp
+    cloudsync/OwncloudSyncBackend.cpp
+    cloudsync/CloudRouteModel.cpp
+    cloudsync/CloudRoutesDialog.cpp
+    cloudsync/RouteItem.cpp
+    cloudsync/RouteItemDelegate.cpp
 )
 
 set (marblewidget_UI
@@ -254,9 +262,9 @@ set (marblewidget_UI
     CurrentLocationWidget.ui
     FileViewWidget.ui
     MarbleNavigator.ui
+    MarbleCacheSettingsWidget.ui
     MarbleViewSettingsWidget.ui
     MarbleNavigationSettingsWidget.ui
-    MarbleCacheSettingsWidget.ui
     TimeControlWidget.ui
     MarbleTimeSettingsWidget.ui
     MarblePluginSettingsWidget.ui
@@ -278,6 +286,8 @@ set (marblewidget_UI
     MapWizard.ui
     MapThemeDownloadDialog.ui
     WebPopupWidget.ui
+    cloudsync/CloudRoutesDialog.ui
+    MarbleCloudSyncSettingsWidget.ui
 )
 
 # FIXME: cleaner approach of src/lib/MarbleControlBox.* vs. marble.qrc
@@ -391,11 +401,7 @@ else (APPLE AND QTONLY)
     GeoPainter.h
     TileCreatorDialog.h
     ViewportParams.h
-    Projections/AbstractProjection.h
-	Projections/CylindricalProjection.h
-    Projections/SphericalProjection.h
-    Projections/EquirectProjection.h
-    Projections/MercatorProjection.h
+    projections/AbstractProjection.h
     PositionTracking.h
     Quaternion.h
     SunLocator.h
@@ -470,8 +476,6 @@ else (APPLE AND QTONLY)
     AbstractDataPluginModel.h
     AbstractDataPluginItem.h
     AbstractWorkerThread.h
-
-    WikipediaService.h
 
     LatLonEdit.h
     MapWizard.h
