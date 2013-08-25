@@ -41,11 +41,7 @@ public:
     bool m_isInitialized;
     QList<AbstractDataPluginItem *> m_items;
     QList<DeclarativeDataPluginModel*> m_modelInstances;
-#if QT_VERSION < 0x050000
-    QDeclarativeComponent* m_delegate;
-#else
     QQmlComponent* m_delegate;
-#endif
     QVariant m_model;
     static int m_global_counter;
     int m_counter;
@@ -332,20 +328,12 @@ void DeclarativeDataPlugin::setAboutDataText( const QString & aboutDataText )
     }
 }
 
-#if QT_VERSION < 0x050000
-QDeclarativeComponent *DeclarativeDataPlugin::delegate()
-#else
 QQmlComponent *DeclarativeDataPlugin::delegate()
-#endif
 {
     return d->m_delegate;
 }
 
-#if QT_VERSION < 0x050000
-void DeclarativeDataPlugin::setDelegate( QDeclarativeComponent *delegate )
-#else
 void DeclarativeDataPlugin::setDelegate( QQmlComponent *delegate )
-#endif
 {
     if ( delegate != d->m_delegate ) {
         d->m_delegate = delegate;

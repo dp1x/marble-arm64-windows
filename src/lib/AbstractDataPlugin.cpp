@@ -29,6 +29,9 @@
   #include <QDeclarativeComponent>
   #include <QDeclarativeContext>
   #include <QDeclarativeItem>
+  typedef QDeclarativeComponent QQmlComponent;
+  typedef QDeclarativeContext QQmlContext;
+  typedef QDeclarativeItem QQuickItem;
 #else
   #include <QQmlComponent>
   #include <QQmlContext>
@@ -57,15 +60,9 @@ class AbstractDataPluginPrivate
     
     AbstractDataPluginModel *m_model;
     quint32 m_numberOfItems;
-#if QT_VERSION < 0x050000
-    QDeclarativeComponent* m_delegate;
-    QGraphicsItem* m_delegateParent;
-    QMap<AbstractDataPluginItem*,QDeclarativeItem*> m_delegateInstances;
-#else
     QQmlComponent* m_delegate;
     QGraphicsItem* m_delegateParent;
     QMap<AbstractDataPluginItem*,QQuickItem*> m_delegateInstances;
-#endif
     QTimer m_updateTimer;
 };
 
@@ -175,11 +172,7 @@ RenderPlugin::RenderType AbstractDataPlugin::renderType() const
     return OnlineRenderType;
 }
 
-#if QT_VERSION < 0x050000
-void AbstractDataPlugin::setDelegate( QDeclarativeComponent *delegate, QGraphicsItem* parent )
-#else
 void AbstractDataPlugin::setDelegate( QQmlComponent *delegate, QGraphicsItem* parent )
-#endif
 {
     qDeleteAll( d->m_delegateInstances.values() );
     d->m_delegateInstances.clear();
@@ -223,11 +216,7 @@ void AbstractDataPlugin::handleViewportChange( const ViewportParams *viewport )
             // Create a new QML object instance using the delegate as the factory. The original
             // data plugin item is set as the context object, i.e. all its properties are available
             // to QML directly with their names
-#if QT_VERSION < 0x050000
-            QDeclarativeContext *context = new QDeclarativeContext( qmlContext( d->m_delegate ) );
-#else
             QQmlContext *context = new QQmlContext( qmlContext( d->m_delegate ) );
-#endif
             context->setContextObject( item );
             QList<QByteArray> const dynamicProperties = item->dynamicPropertyNames();
             foreach( const QByteArray &property, dynamicProperties ) {
@@ -235,11 +224,7 @@ void AbstractDataPlugin::handleViewportChange( const ViewportParams *viewport )
             }
 
             QObject* component = d->m_delegate->create( context );
-#if QT_VERSION < 0x050000
-            QDeclarativeItem* newItem = qobject_cast<QDeclarativeItem*>( component );
-#else
             QQuickItem* newItem = qobject_cast<QQuickItem*>( component );
-#endif
             QGraphicsItem* graphicsItem = qobject_cast<QGraphicsItem*>( component );
             if ( graphicsItem && newItem ) {
                 graphicsItem->setParentItem( d->m_delegateParent );
@@ -258,11 +243,7 @@ void AbstractDataPlugin::handleViewportChange( const ViewportParams *viewport )
         }
 
         Q_ASSERT( visible );
-#if QT_VERSION < 0x050000
-        QDeclarativeItem* declarativeItem = d->m_delegateInstances[item];
-#else
         QQuickItem* declarativeItem = d->m_delegateInstances[item];
-#endif
         Q_ASSERT( declarativeItem );
 
         // Make sure we have a valid bounding rect for collision detection
@@ -271,42 +252,6 @@ void AbstractDataPlugin::handleViewportChange( const ViewportParams *viewport )
 
         int shiftX( 0 ), shiftY( 0 );
         switch( declarativeItem->transformOrigin() ) {
-#if QT_VERSION < 0x050000
-        case QDeclarativeItem::TopLeft:
-        case QDeclarativeItem::Top:
-        case QDeclarativeItem::TopRight:
-            break;
-        case QDeclarativeItem::Left:
-        case QDeclarativeItem::Center:
-        case QDeclarativeItem::Right:
-            shiftY = declarativeItem->height() / 2;
-            break;
-        case QDeclarativeItem::BottomLeft:
-        case QDeclarativeItem::Bottom:
-        case QDeclarativeItem::BottomRight:
-            shiftY = declarativeItem->height();
-            break;
-        }
-
-        switch( declarativeItem->transformOrigin() ) {
-        case QDeclarativeItem::TopLeft:
-        case QDeclarativeItem::Left:
-        case QDeclarativeItem::BottomLeft:
-            break;
-        case QDeclarativeItem::Top:
-        case QDeclarativeItem::Center:
-        case QDeclarativeItem::Bottom:
-            shiftX = declarativeItem->width() / 2;
-            break;
-        case QDeclarativeItem::TopRight:
-        case QDeclarativeItem::Right:
-        case QDeclarativeItem::BottomRight:
-            shiftX = declarativeItem->width();
-            break;
-        }
-
-        declarativeItem->setPos( x - shiftX, y - shiftY );
-#else
         case QQuickItem::TopLeft:
         case QQuickItem::Top:
         case QQuickItem::TopRight:
@@ -342,7 +287,6 @@ void AbstractDataPlugin::handleViewportChange( const ViewportParams *viewport )
 
         declarativeItem->setX( x - shiftX );
         declarativeItem->setY( y - shiftY );
-#endif
         orphane.removeOne( item );
     }
 
