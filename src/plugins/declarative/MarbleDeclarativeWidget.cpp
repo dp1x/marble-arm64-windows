@@ -36,6 +36,10 @@
 #include <QSettings>
 #include <QApplication>
 
+#if QT_VERSION < 0x050000
+  typedef QDeclarativeComponent QQmlComponent;
+#endif
+
 MarbleWidget::MarbleWidget( QGraphicsItem *parent , Qt::WindowFlags flags ) :
     QGraphicsProxyWidget( parent, flags ),
     m_marbleWidget( new Marble::MarbleWidget ),

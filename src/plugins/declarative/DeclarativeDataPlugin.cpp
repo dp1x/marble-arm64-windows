@@ -24,6 +24,10 @@
 #include <QScriptValue>
 #include <QScriptValueIterator>
 
+#if QT_VERSION < 0x050000
+  typedef QDeclarativeComponent QQmlComponent;
+#endif
+
 using namespace Marble;
 
 class DeclarativeDataPluginPrivate {

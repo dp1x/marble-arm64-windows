@@ -35,7 +35,8 @@
 #if QT_VERSION < 0x050000
   #include <qdeclarative.h>
   #include <QDeclarativeEngine>
-  typedef QQmlEngine QDeclarativeEngine;
+  typedef QDeclarativeEngine QQmlEngine;
+  typedef QDeclarativeComponent QQmlComponent;
 #else
   #include <QtQml/qqml.h>
   #include <QQmlEngine>

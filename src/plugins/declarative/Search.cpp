@@ -17,6 +17,9 @@
 
 #if QT_VERSION < 0x050000
   #include <QDeclarativeContext>
+  typedef QDeclarativeItem QQuickItem;
+  typedef QDeclarativeContext QQmlContext;
+  typedef QDeclarativeComponent QQmlComponent;
 #else
   #include <QQmlContext>
 #endif

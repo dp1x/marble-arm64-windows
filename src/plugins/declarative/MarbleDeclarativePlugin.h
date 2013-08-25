@@ -15,8 +15,6 @@
 
 #if QT_VERSION < 0x050000
   #include <QDeclarativeExtensionPlugin>
-  typedef QDeclarativeExtensionPlugin QQmlExtensionPlugin;
-  typedef QDeclarativeEngine QQmlEngine;
 #else
   #include <QQmlExtensionPlugin>
 #endif
@@ -25,16 +23,25 @@
   * Registers MarbleWidget, MarbleRunnerManager and MarbleThemeManager
   * as QQml extensions for use in QML.
   */
+#if QT_VERSION < 0x050000
+class MarbleDeclarativePlugin : public QDeclarativeExtensionPlugin
+{
+#else
 class MarbleDeclarativePlugin : public QQmlExtensionPlugin
 {
-    Q_OBJECT
     Q_PLUGIN_METADATA( IID "org.kde.edu.marble.MarbleDeclarativePlugin" )
+#endif
+    Q_OBJECT
 public:
     /** Overriding QQmlExtensionPlugin to register types */
     virtual void registerTypes( const char *uri );
 
     /** Overriding QQmlExtensionPlugin to register image provider */
+#if QT_VERSION < 0x050000
+    void initializeEngine( QDeclarativeEngine *engine, const char *);
+#else
     void initializeEngine( QQmlEngine *engine, const char *);
+#endif
 };
 
 #endif

@@ -22,7 +22,6 @@
 #include <QStandardItemModel>
 #if QT_VERSION < 0x050000
   #include <QtDeclarative/qdeclarative.h>
-  typedef QDeclarativeComponent QQmlComponent;
 #else
   #include <QtQml/qqml.h>
 #endif
@@ -207,7 +206,11 @@ public Q_SLOTS:
 
     void downloadArea( int topTileLevel, int bottomTileLevel );
 
+#if QT_VERSION < 0x050000
+    void setDataPluginDelegate( const QString &plugin, QDeclarativeComponent* delegate );
+#else
     void setDataPluginDelegate( const QString &plugin, QQmlComponent* delegate );
+#endif
 
 protected:
     virtual bool event ( QEvent * event );
