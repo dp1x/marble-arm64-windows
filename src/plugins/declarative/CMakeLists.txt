@@ -7,6 +7,7 @@ INCLUDE_DIRECTORIES(
 
  if( NOT QT4_FOUND )
   ${Qt5Qml_INCLUDE_DIRS}
+  ${Qt5Quick_INCLUDE_DIRS}
  endif()
 )
 if( QT4_FOUND)

@@ -40,7 +40,7 @@ ENDIF()
 add_subdirectory( tilecreator )
 add_subdirectory( routing-instructions )
 add_subdirectory( lib )
-#add_subdirectory( plugins )
+add_subdirectory( plugins )
 add_subdirectory( bindings )
 
 if( QT_QTDECLARATIVE_FOUND )

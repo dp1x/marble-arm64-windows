@@ -16,10 +16,11 @@
 #include "GeoDataPlacemark.h"
 
 #include <QObject>
+#include <QAbstractListModel>
 #if QT_VERSION < 0x050000
-  #include <QtDeclarative>
+  #include <QDeclarativeComponent>
 #else
-  #include <QtQml>
+  #include <QQmlComponent>
 #endif
 
 /**

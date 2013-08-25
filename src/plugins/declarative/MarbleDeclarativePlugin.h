@@ -11,21 +11,29 @@
 #ifndef MARBLE_DECLARATIVE_PLUGIN_H
 #define MARBLE_DECLARATIVE_PLUGIN_H
 
-#include <QDeclarativeExtensionPlugin>
+#include "qglobal.h"
+
+#if QT_VERSION < 0x050000
+  #include <QDeclarativeExtensionPlugin>
+  typedef QDeclarativeExtensionPlugin QQmlExtensionPlugin;
+  typedef QDeclarativeEngine QQmlEngine;
+#else
+  #include <QQmlExtensionPlugin>
+#endif
 
 /**
   * Registers MarbleWidget, MarbleRunnerManager and MarbleThemeManager
-  * as QDeclarative extensions for use in QML.
+  * as QQml extensions for use in QML.
   */
-class MarbleDeclarativePlugin : public QDeclarativeExtensionPlugin
+class MarbleDeclarativePlugin : public QQmlExtensionPlugin
 {
     Q_OBJECT
 public:
-    /** Overriding QDeclarativeExtensionPlugin to register types */
+    /** Overriding QQmlExtensionPlugin to register types */
     virtual void registerTypes( const char *uri );
 
-    /** Overriding QDeclarativeExtensionPlugin to register image provider */
-    void initializeEngine( QDeclarativeEngine *engine, const char *);
+    /** Overriding QQmlExtensionPlugin to register image provider */
+    void initializeEngine( QQmlEngine *engine, const char *);
 };
 
 #endif

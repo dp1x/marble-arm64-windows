@@ -17,7 +17,7 @@
 #if QT_VERSION < 0x050000
   #include <QtDeclarative>
 #else
-  #include <QtQml>
+  #include <QtQml/qqml.h>
 #endif
 
 /**

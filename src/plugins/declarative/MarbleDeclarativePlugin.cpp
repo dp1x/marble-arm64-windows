@@ -32,8 +32,15 @@
 #include "RenderPlugin.h"
 #include "DeclarativeDataPlugin.h"
 
-#include <qdeclarative.h>
-#include <QDeclarativeEngine>
+#if QT_VERSION < 0x050000
+  #include <qdeclarative.h>
+  #include <QDeclarativeEngine>
+  typedef QQmlEngine QDeclarativeEngine;
+#else
+  #include <QtQml/qqml.h>
+  #include <QQmlEngine>
+  #include <QQmlContext>
+#endif
 
 void MarbleDeclarativePlugin::registerTypes( const char * )
 {
@@ -65,7 +72,7 @@ void MarbleDeclarativePlugin::registerTypes( const char * )
     qmlRegisterUncreatableType<Marble::RenderPlugin>( uri, 0, 11, "RenderPlugin", "Do not create" );
 }
 
-void MarbleDeclarativePlugin::initializeEngine( QDeclarativeEngine *engine, const char *)
+void MarbleDeclarativePlugin::initializeEngine( QQmlEngine *engine, const char *)
 {
     engine->addImageProvider( "maptheme", new MapThemeImageProvider );
     // Register the global Marble object. Can be used in .qml files for requests like Marble.resolvePath("some/icon.png")

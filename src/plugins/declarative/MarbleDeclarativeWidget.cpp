@@ -33,6 +33,9 @@
 #include "DeclarativeDataPlugin.h"
 #include "PluginManager.h"
 
+#include <QSettings>
+#include <QApplication>
+
 MarbleWidget::MarbleWidget( QGraphicsItem *parent , Qt::WindowFlags flags ) :
     QGraphicsProxyWidget( parent, flags ),
     m_marbleWidget( new Marble::MarbleWidget ),
@@ -125,23 +128,28 @@ QStringList MarbleWidget::activeRenderPlugins() const
     return result;
 }
 
+#if QT_VERSION < 0x050000
 QDeclarativeListProperty<QObject> MarbleWidget::childList()
 {
-#if QT_VERSION < 0x050000
     return QDeclarativeListProperty<QObject>( this, m_children );
-#else
-    return QQmlListProperty<QObject>( this, m_children );
-#endif
 }
 
 QDeclarativeListProperty<DeclarativeDataPlugin> MarbleWidget::dataLayers()
 {
-#if QT_VERSION < 0x050000
-    return QDeclarativeListProperty<DeclarativeDataPlugin>( this, 0, &MarbleWidget::addLayer );
-#else
-    return QQmlListProperty<QObject>( this, m_children );
-#endif
+    return QDeclarativeListProperty<DeclarativeDataPlugin>( this, 0, &MarbleWidget::addLayer, NULL, NULL, NULL );
 }
+
+#else
+QQmlListProperty<QObject> MarbleWidget::childList()
+{
+    return QQmlListProperty<QObject>( this, m_children );
+}
+
+QQmlListProperty<DeclarativeDataPlugin> MarbleWidget::dataLayers()
+{
+    return QQmlListProperty<DeclarativeDataPlugin>( this, 0, &MarbleWidget::addLayer, NULL, NULL, NULL );
+}
+#endif
 
 void MarbleWidget::setActiveRenderPlugins( const QStringList &items )
 {
@@ -293,7 +301,7 @@ void MarbleWidget::addLayer( QQmlListProperty<DeclarativeDataPlugin> *list, Decl
     }
 }
 
-QObject *MarbleWidget::mapThemeModel()
+QStandardItemModel *MarbleWidget::mapThemeModel()
 {
     return m_marbleWidget->model()->mapThemeManager()->mapThemeModel();
 }
@@ -327,11 +335,7 @@ void MarbleWidget::downloadArea(int topTileLevel, int bottomTileLevel)
     }
 }
 
-#if QT_VERSION < 0x050000
-void MarbleWidget::setDataPluginDelegate( const QString &plugin, QDeclarativeComponent *delegate )
-#else
 void MarbleWidget::setDataPluginDelegate( const QString &plugin, QQmlComponent *delegate )
-#endif
 {
     QList<Marble::RenderPlugin*> renderPlugins = m_marbleWidget->renderPlugins();
     foreach( Marble::RenderPlugin* renderPlugin, renderPlugins ) {

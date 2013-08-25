@@ -12,8 +12,8 @@
 
 #include "DeclarativeDataPlugin.h"
 #include "DeclarativeDataPluginModel.h"
-#include "DeclarativeDataPluginItem.h"
 #include "MarbleDeclarativeWidget.h"
+#include "DeclarativeDataPluginItem.h"
 
 #include "MarbleDebug.h"
 #include "MarbleWidget.h"

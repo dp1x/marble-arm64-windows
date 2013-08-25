@@ -12,7 +12,17 @@
 #define MARBLE_DECLARATIVE_SEARCH_H
 
 #include <QObject>
-#include <QtDeclarative>
+#if QT_VERSION < 0x050000
+  #include <QtDeclarative/qdeclarative.h>
+  #include <QDeclarativeComponent>
+  #include <QDeclarativeItem>
+  typedef QDeclarativeItem QQuickItem;
+  typedef QDeclarativeComponent QQmlComponent;
+  typedef QDeclarativeContext QQmlContext;
+#else
+  #include <QtQml/qqml.h>
+  #include <QQuickItem>
+#endif
 
 #include "MarbleRunnerManager.h"
 
@@ -27,7 +37,7 @@ class Search : public QObject
     Q_OBJECT
 
     Q_PROPERTY( MarbleWidget* map READ map WRITE setMap NOTIFY mapChanged )
-    Q_PROPERTY( QDeclarativeComponent* placemarkDelegate READ placemarkDelegate WRITE setPlacemarkDelegate NOTIFY placemarkDelegateChanged )
+    Q_PROPERTY( QQmlComponent* placemarkDelegate READ placemarkDelegate WRITE setPlacemarkDelegate NOTIFY placemarkDelegateChanged )
 
 public:
     explicit Search( QObject* parent = 0 );
@@ -36,9 +46,9 @@ public:
 
     void setMap( MarbleWidget* widget );
 
-    QDeclarativeComponent* placemarkDelegate();
+    QQmlComponent* placemarkDelegate();
 
-    void setPlacemarkDelegate( QDeclarativeComponent* delegate );
+    void setPlacemarkDelegate( QQmlComponent* delegate );
 
 Q_SIGNALS:
     void mapChanged();
@@ -73,9 +83,9 @@ private:
     /** Search result */
     Marble::MarblePlacemarkModel *m_searchResult;
 
-    QDeclarativeComponent* m_placemarkDelegate;
+    QQmlComponent* m_placemarkDelegate;
 
-    QMap<int,QDeclarativeItem*> m_placemarks;
+    QMap<int,QQuickItem*> m_placemarks;
 };
 
 #endif
