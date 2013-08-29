@@ -193,6 +193,7 @@ macro( marble_add_test TEST_NAME )
                                             ${QT_QTCORE_LIBRARY} 
                                             ${QT_QTGUI_LIBRARY} 
                                             ${QT_QTTEST_LIBRARY} 
+                                            ${Qt5Test_LIBRARIES}
                                             marblewidget )
         set_target_properties( ${TEST_NAME} PROPERTIES 
                                COMPILE_FLAGS "-DDATA_PATH=\"\\\"${DATA_PATH}\\\"\" -DPLUGIN_PATH=\"\\\"${PLUGIN_PATH}\\\"\"" )

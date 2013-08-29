@@ -269,6 +269,7 @@ if(QT5BUILD)
   include_directories( ${Qt5PrintSupport_INCLUDE_DIRS} )
   include_directories( ${Qt5Network_INCLUDE_DIRS} )
   include_directories( ${Qt5Script_INCLUDE_DIRS} )
+  include_directories( ${Qt5Test_INCLUDE_DIRS} )
 
   SET(CMAKE_AUTOMOC TRUE)
   SET(CMAKE_AUTOMOC_RELAXED_MODE TRUE)
@@ -371,9 +372,7 @@ add_subdirectory(data)
 
 include(DistTarget)
 
-if( QT4_FOUND ) # FIXME port tests to qt5
 add_subdirectory(tests)
-endif()
 
 ####################################################
 # Install extra files
