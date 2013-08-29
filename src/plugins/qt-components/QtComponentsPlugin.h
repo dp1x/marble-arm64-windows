@@ -11,12 +11,23 @@
 #ifndef MARBLE_QTCOMPONENTS_PLUGIN_H
 #define MARBLE_QTCOMPONENTS_PLUGIN_H
 
-#include <QDeclarativeExtensionPlugin>
+#include <qglobal.h>
+#include <marble_export.h>
+
+#if QT_VERSION < 0x050000
+  #include <QDeclarativeExtensionPlugin>
+#else
+  #include <QQmlExtensionPlugin>
+#endif
 
 /**
  * Dummy class to export plugin.
  */
+#if QT_VERSION < 0x050000
 class QtComponentsPlugin : public QDeclarativeExtensionPlugin
+#else
+class QtComponentsPlugin : public QQmlExtensionPlugin
+#endif
 {
     Q_OBJECT
     Q_PLUGIN_METADATA( IID "org.kde.edu.marble.QtComponentsPlugin" )

@@ -6,19 +6,21 @@ INCLUDE_DIRECTORIES(
  ${CMAKE_CURRENT_SOURCE_DIR}
  ${CMAKE_CURRENT_BINARY_DIR}
  ${QT_INCLUDE_DIR}
+
+ ${Qt5Qml_INCLUDE_DIRS}
 )
 
 set( my_SRCS
 QtComponentsPlugin.cpp
 )
 
-QT4_ADD_RESOURCES(my_SRCS qtcomponents.qrc)
+QT_ADD_RESOURCES(my_SRCS qtcomponents.qrc)
 
 FILE (GLOB QML_FILES *.qml)
 marble_add_project_resources(${QML_FILES} qmldir)
 
 MARBLE_ADD_DECLARATIVE_PLUGIN( QtComponentsPlugin qtcomponents ${my_SRCS} )
-QT4_AUTOMOC(${my_SRCS})
+MARBLE_QT4_AUTOMOC(${my_SRCS})
 TARGET_LINK_LIBRARIES( QtComponentsPlugin ${QT_QTDECLARATIVE_LIBRARY} ${QT_QTWEBKIT_LIBRARY} )
 INSTALL( FILES qmldir DESTINATION ${MARBLE_QT_IMPORTS_DIR}/org/kde/edu/marble/qtcomponents )
 INSTALL( FILES SearchField.qml DESTINATION ${MARBLE_QT_IMPORTS_DIR}/org/kde/edu/marble/qtcomponents )
