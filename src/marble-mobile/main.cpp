@@ -17,12 +17,15 @@
 #include <QTranslator>
 #include <QProcessEnvironment>
 
-#include "QtMainWindow.h"
+#include "MobileMainWindow.h"
 
+#include "GeoDataCoordinates.h"
+#include "MarbleGlobal.h"
 #include "MarbleDirs.h"
 #include "MarbleDebug.h"
-#include "MarbleTest.h"
 #include "MarbleLocale.h"
+#include "MarbleWidget.h"
+#include "MarbleTest.h"
 
 #ifdef STATIC_BUILD
  #include <QtPlugin>
@@ -39,14 +42,12 @@ using namespace Marble;
  
 int main(int argc, char *argv[])
 {
-#if QT_VERSION < 0x050000
     // The GraphicsSystem needs to be set before the instantiation of the
     // QApplication. Therefore we need to parse the current setting 
     // in this unusual place :-/
     QSettings graphicsSettings("KDE", "Marble Virtual Globe"); // keep the parameters here
     QString const graphicsString = graphicsSettings.value("View/graphicsSystem", "raster").toString();
     QApplication::setGraphicsSystem( graphicsString );
-#endif
 
     QApplication app(argc, argv);
     app.setApplicationName( "Marble Virtual Globe" );
@@ -109,7 +110,7 @@ int main(int argc, char *argv[])
     QString mapThemeId;
     QString coordinatesString;
     QString distanceString;
-    MarbleGlobal::Profiles profiles = MarbleGlobal::detectProfiles();
+    const MarbleGlobal::Profiles profiles = MarbleGlobal::SmallScreen | MarbleGlobal::HighResolution;
 
     QStringList args = QApplication::arguments();
 
@@ -130,10 +131,6 @@ int main(int argc, char *argv[])
         qWarning() << "  --runtimeTrace.............. Show the time spent and other debug info of each layer";
         qWarning() << "  --tile-id................... Write the identifier of texture tiles on top of them";
         qWarning() << "  --timedemo ................. Measure the paint performance while moving the map and quit";
-        qWarning();
-        qWarning() << "profile options (note that marble should automatically detect which profile to use. Override that with the options below):";
-        qWarning() << "  --highresolution ........... Enforce the profile for devices with high resolution (e.g. desktop computers)";
-        qWarning() << "  --nohighresolution ......... Deactivate the profile for devices with high resolution (e.g. desktop computers)";
 
         return 0;
     }
@@ -153,12 +150,6 @@ int main(int argc, char *argv[])
             dataPathIndex = i + 1;
             marbleDataPath = args.value( dataPathIndex );
             ++i;
-        }
-        else if ( arg == QLatin1String( "--highresolution" ) ) {
-            profiles |= MarbleGlobal::HighResolution;
-        }
-        else if ( arg == QLatin1String( "--nohighresolution" ) ) {
-            profiles &= ~MarbleGlobal::HighResolution;
         }
         else if ( arg.startsWith( QLatin1String( "--latlon=" ), Qt::CaseInsensitive ) )
         {
@@ -235,17 +226,18 @@ int main(int argc, char *argv[])
             return 0;
         }
         else if( arg == "--fps" ) {
-            window->marbleControl()->marbleWidget()->setShowFrameRate( true );
+            window->marbleWidget()->setShowFrameRate( true );
         }
         else if ( arg == "--tile-id" )
         {
-	    window->marbleControl()->marbleWidget()->setShowTileId(true);
+            window->marbleWidget()->setShowTileId(true);
         }
         else if( arg == "--runtimeTrace" ) {
-            window->marbleControl()->marbleWidget()->setShowRuntimeTrace( true );
+            window->marbleWidget()->setShowRuntimeTrace( true );
         }
-        else if ( i != dataPathIndex && QFile::exists( arg ) )
-            window->addGeoDataFile( arg );
+        else if ( i != dataPathIndex && QFile::exists( arg ) ) {
+            window->addGeoDataFile( QFileInfo( arg ).absoluteFilePath() );
+        }
     }
 
     return app.exec();
