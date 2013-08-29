@@ -1,7 +1,7 @@
 add_subdirectory( designer )
 add_subdirectory( declarative )
 add_subdirectory( render )
-#add_subdirectory( runner )
+add_subdirectory( runner )
 #add_subdirectory( templates )
 #add_subdirectory( positionprovider )
 

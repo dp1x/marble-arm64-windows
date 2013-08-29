@@ -4,8 +4,14 @@ INCLUDE_DIRECTORIES(
  ${CMAKE_CURRENT_SOURCE_DIR}
  ${CMAKE_CURRENT_BINARY_DIR}
  ${QT_INCLUDE_DIR}
+
+ if( NOT QT4_fOUND )
+  ${Qt5Sql_INCLUDE_DIRS}
+ endif()
 )
-INCLUDE(${QT_USE_FILE})
+if( $QT4_FOUND )
+  INCLUDE(${QT_USE_FILE})
+endif()
 
 set( localOsmSearch_SRCS
 LocalOsmSearchRunner.cpp

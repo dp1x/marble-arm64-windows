@@ -51,6 +51,14 @@ macro(qt_add_resources)
   endif()
 endmacro()
 
+macro(qt_generate_moc)
+  if( QT4_FOUND )
+    qt4_generate_moc(${ARGN})
+  else()
+    qt5_generate_moc(${ARGN})
+  endif()
+endmacro()
+
 # the place to put in common cmake macros
 # this is needed to minimize the amount of errors to do
 macro( marble_add_plugin _target_name )
@@ -173,7 +181,7 @@ macro( marble_add_test TEST_NAME )
     if( BUILD_MARBLE_TESTS )
         set( ${TEST_NAME}_SRCS ${TEST_NAME}.cpp ${ARGN} )
         if( QTONLY )
-            qt4_generate_moc( ${TEST_NAME}.cpp ${CMAKE_CURRENT_BINARY_DIR}/${TEST_NAME}.moc )
+            qt_generate_moc( ${TEST_NAME}.cpp ${CMAKE_CURRENT_BINARY_DIR}/${TEST_NAME}.moc )
             include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
             set( ${TEST_NAME}_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${TEST_NAME}.moc ${${TEST_NAME}_SRCS} )
           
