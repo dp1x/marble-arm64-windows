@@ -36,7 +36,7 @@ MapThemeModel::MapThemeModel( QObject *parent ) : QSortFilterProxyModel( parent 
 #endif
 }
 
-int MapThemeModel::count()
+int MapThemeModel::count() const
 {
     return rowCount();
 }
@@ -48,7 +48,7 @@ QHash<int, QByteArray> MapThemeModel::roleNames() const
 }
 #endif
 
-QString MapThemeModel::name( const QString &id )
+QString MapThemeModel::name( const QString &id ) const
 {
     for ( int i=0; i<rowCount(); ++i ) {
         if ( data( index( i, 0, QModelIndex() ), Qt::UserRole + 1 ).toString() == id ) {
@@ -58,7 +58,7 @@ QString MapThemeModel::name( const QString &id )
     return QString();
 }
 
-int MapThemeModel::indexOf(const QString &id)
+int MapThemeModel::indexOf( const QString &id ) const
 {
     for ( int i=0; i<rowCount(); ++i ) {
         if ( data( index( i, 0, QModelIndex() ), Qt::UserRole + 1 ).toString() == id ) {

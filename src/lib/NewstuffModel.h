@@ -75,7 +75,7 @@ public:
     QHash<int, QByteArray> roleNames() const;
 #endif
 
-    /** @todo FIXME https://bugreports.qt.nokia.com/browse/QTCOMPONENTS-1206 */
+    /** @todo FIXME https://bugreports.qt-project.org/browse/QTCOMPONENTS-1206 */
     int count();
 
     /**
