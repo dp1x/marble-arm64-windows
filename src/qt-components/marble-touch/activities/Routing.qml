@@ -82,10 +82,24 @@ Page {
                     saveRouteDialog.open()
                 }
             }
+
+            MenuItem {
+                text: "Save Route to Cloud"
+                onClicked: marbleWidget.cloudSync.uploadRoute()
+                visible: settings.owncloudSync
+            }
+
             MenuItem {
                 text: "Open Route"
                 onClicked: openRouteDialog.open()
             }
+
+            MenuItem {
+                text: "Cloud Routes"
+                onClicked: manageRoutesSheet.open()
+                visible: settings.owncloudSync
+            }
+
             MenuItemSwitch {
                 text: "Elevation Profile"
                 checked: false
@@ -252,6 +266,128 @@ Page {
             mapContainer.embedMarbleWidget()
         }
     }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Sheet {
+        id: manageRoutesSheet
+
+        //acceptButtonText: "Save"
+        //rejectButtonText: "Cancel"
+
+        content: ListView {
+            id: routeView
+
+            anchors.fill: parent
+
+            //model: cloudSync.routeModel
+            model: marbleWidget.cloudSync.routeModel
+            delegate: routeViewDelegate
+
+            spacing: 5   // ?!
+        }
+    }
+
+    Component {
+        id: routeViewDelegate
+        
+        Rectangle {
+            /*
+            width: routeView.width
+            height: Math.max( previewImage.height, nameText.height+buttonRow.height )
+            */
+            anchors.fill: parent
+            
+            Image {
+                id: previewImage
+                source: previewUrl
+                width: 128; height: 128
+                anchors.left: parent.left
+            }
+            
+            Text {
+                id: nameText
+                text: name
+                anchors.left: previewImage.right
+                anchors.leftMargin: 5
+                anchors.right: parent.right
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+            }
+/*
+            Row {
+                id: buttonRow
+                anchors.top: nameText.bottom
+                anchors.left: nameText.left
+                anchors.leftMargin: 5
+                spacing: 5
+
+                Button {
+                    id: downloadArea
+                    visible: !isCached && isOnCloud
+
+                    label: "Download"
+                    color: "green"
+
+                    onClicked: {
+                        //cloudSync.downloadRoute( identifier )
+                        marbleWidget.cloudSync.downloadRoute( identifier )
+                    }
+                }
+
+                Button {
+                    id: deleteFromCloudArea
+                    visible: !isCached
+
+                    label: "Delete from cloud"
+                    color: "red"
+
+                    onClicked: {
+                        //cloudSync.deleteRouteFromCloud( identifier )
+                        marbleWidget.cloudSync.deleteRouteFromCloud( identifier )
+                    }
+                }
+
+                Button {
+                    id: openArea
+                    visible: isCached
+
+                    label: "Open"
+                    color: "blue"
+
+                    onClicked: {
+                        //cloudSync.openRoute( identifier )
+                        marbleWidget.cloudSync.openRoute( identifier )
+                    }
+                }
+
+                Button {
+                    id: removeFromCacheArea
+                    visible: isCached
+
+                    label: "Remove from device"
+                    color: "yellow"
+
+                    onClicked: {
+                        //cloudSync.removeRouteFromDevice( identifier )
+                        marbleWidget.cloudSync.removeRouteFromDevice( identifier )
+                    }
+                }
+
+                Button {
+                    id: uploadArea
+                    visible: isCached && !isOnCloud
+
+                    label: "Upload"
+                    color: "grey"
+
+                    onClicked: {
+                        //cloudSync.uploadRoute( identifier )
+                        marbleWidget.cloudSync.uploadRoute( identifier )
+                    }
+                }
+            }
+            */
+        }
+    }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     Sheet {
         id: downloadSheet
