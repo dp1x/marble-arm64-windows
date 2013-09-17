@@ -43,9 +43,9 @@ add_subdirectory( lib )
 add_subdirectory( plugins )
 add_subdirectory( bindings )
 
-if( QT_QTDECLARATIVE_FOUND )
+if( QT_QTDECLARATIVE_FOUND OR Qt5Quick_FOUND )
     add_subdirectory( qt-components )
-endif( QT_QTDECLARATIVE_FOUND )
+endif( QT_QTDECLARATIVE_FOUND OR Qt5Quick_FOUND )
 
 if( NOT QTONLY AND KDE4_PLASMA_LIBS )   # don't try to build this against kdelibs < 4.2
    add_subdirectory( plasmoid )
