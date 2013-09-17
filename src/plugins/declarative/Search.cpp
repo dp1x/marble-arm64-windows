@@ -13,6 +13,7 @@
 #include "MarbleDeclarativeWidget.h"
 #include "MarbleModel.h"
 #include "MarblePlacemarkModel.h"
+#include "SearchRunnerManager.h"
 #include "ViewportParams.h"
 
 #if QT_VERSION < 0x050000
@@ -60,8 +61,7 @@ void Search::setPlacemarkDelegate( QQmlComponent* delegate )
 void Search::find( const QString &searchTerm )
 {
     if ( !m_runnerManager && m_marbleWidget ) {
-        m_runnerManager = new Marble::MarbleRunnerManager( m_marbleWidget->model()->pluginManager(), this );
-        m_runnerManager->setModel( m_marbleWidget->model() );
+        m_runnerManager = new Marble::SearchRunnerManager( m_marbleWidget->model(), this );
         connect( m_runnerManager, SIGNAL(searchFinished(QString)),
                  this, SLOT(handleSearchResult()) );
         connect( m_runnerManager, SIGNAL(searchResultChanged(QAbstractItemModel*)),
