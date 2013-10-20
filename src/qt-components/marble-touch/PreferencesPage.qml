@@ -11,7 +11,6 @@ import QtQuick 1.0
 import QtMultimediaKit 1.1
 import com.nokia.meego 1.0
 import org.kde.edu.marble 0.11
-import org.kde.edu.marble.qtcomponents 0.12
 
 /*
  * General preferences
@@ -382,6 +381,20 @@ Page {
                     Component {
                         id: offlineDataPage
                         OfflineDataPage {  }
+                    }
+                }
+
+                Button {
+                    id: manageCloudSyncButton
+                    anchors.top: manageThemeButton.bottom
+                    anchors.topMargin: 5
+                    anchors.left: parent.left;
+                    anchors.right: parent.right;
+                    text: "Manage Cloud Sync"
+                    onClicked: pageStack.push(cloudSyncPage)
+                    Component {
+                        id: cloudSyncPage
+                        CloudSyncPage {  }
                     }
                 }
             }

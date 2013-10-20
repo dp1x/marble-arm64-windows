@@ -10,7 +10,6 @@
 import QtQuick 1.0
 import com.nokia.meego 1.0
 import org.kde.edu.marble 0.11
-import org.kde.edu.marble.qtcomponents 0.12
 
 PageStackWindow {
     width: screen.displayWidth
@@ -97,6 +96,10 @@ PageStackWindow {
             return "image://theme/icon-m-toolbar-favorite-mark"
         } else if ( name === "actions/go-home" ) {
             return "image://theme/icon-m-toolbar-home"
+        } else if ( name === "actions/download" ) {
+            return "image://theme/icon-s-transfer-download"
+        } else if ( name === "actions/upload" ) {
+            return "image://theme/icon-s-transfer-upload"
         }
 
         return name

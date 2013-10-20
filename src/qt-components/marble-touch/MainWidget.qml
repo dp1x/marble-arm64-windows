@@ -33,6 +33,7 @@ Item {
     property alias search: map.search
     property alias tracking: map.tracking
     property alias navigation: map.navigation
+    property alias cloudSync: map.cloudSync
 
     // The widget representing the map.
     MarbleWidget {
@@ -79,6 +80,14 @@ Item {
             speaker: settings.voiceNavigationSpeaker
             soundEnabled: settings.voiceNavigationSoundEnabled
         }
+
+        property CloudSync cloudSync: CloudSync {
+            id: cloudSync
+            map: map
+            owncloudServer: settings.owncloudServer
+            owncloudUsername: settings.owncloudUsername
+            owncloudPassword: settings.owncloudPassword
+        }
         
         Component.onCompleted: {
             mouseClickGeoPosition.connect( screen.mouseClickGeoPosition )
@@ -104,7 +113,7 @@ Item {
             placemarkDelegate:
                 Image {
                 id: searchDelegate
-                source: "qrc:/placemark.svg"
+                source: "qrc:/icons/placemark.svg"
                 transformOrigin: Item.Bottom
                 width: 32
                 fillMode: Image.PreserveAspectFit
@@ -207,7 +216,7 @@ Item {
             screen.placemarkSelected(placemark)
         }
     }
-    
+
     // Delivers the current (gps) position.
     PositionSource {
         id: positionProvider
@@ -235,7 +244,7 @@ Item {
         width: 60
         fillMode: Image.PreserveAspectFit
         smooth: true
-        source: positionProvider.hasPosition ? "qrc:/marker.svg" : "qrc:/marker-yellow.svg"
+        source: positionProvider.hasPosition ? "qrc:/icons/marker.svg" : "qrc:/icons/marker-yellow.svg"
         visible: false
 
         // Animation that grows/shrinks the marker.
