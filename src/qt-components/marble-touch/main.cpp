@@ -11,7 +11,7 @@
 #include <QApplication>
 #if QT_VERSION < 0x050000
   #include <QtDeclarative>
-  typedef QtDeclarativeView QQuickView;
+  typedef QDeclarativeView QQuickView;
 #else
   #include <QQuickView>
   #include <QtQml/qqml.h>
