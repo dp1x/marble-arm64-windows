@@ -140,7 +140,7 @@ QDeclarativeListProperty<QObject> MarbleWidget::childList()
 
 QDeclarativeListProperty<DeclarativeDataPlugin> MarbleWidget::dataLayers()
 {
-    return QDeclarativeListProperty<DeclarativeDataPlugin>( this, 0, &MarbleWidget::addLayer, NULL, NULL, NULL );
+    return QDeclarativeListProperty<DeclarativeDataPlugin>( this, 0, &MarbleWidget::addLayer, 0, 0, 0 );
 }
 
 #else
@@ -151,7 +151,7 @@ QQmlListProperty<QObject> MarbleWidget::childList()
 
 QQmlListProperty<DeclarativeDataPlugin> MarbleWidget::dataLayers()
 {
-    return QQmlListProperty<DeclarativeDataPlugin>( this, 0, &MarbleWidget::addLayer, NULL, NULL, NULL );
+    return QQmlListProperty<DeclarativeDataPlugin>( this, 0, &MarbleWidget::addLayer, 0, 0, 0 );
 }
 #endif
 
