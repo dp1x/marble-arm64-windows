@@ -8,21 +8,6 @@ SET(CMAKE_COLOR_MAKEFILE ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC") 
 
 ####################################################
-# Generate the tiles with the tilecreator at compile time
-# if this option is set, srtm.jpg will not be installed but the generated tiles instead
-option(QTONLY "Create Marble version without KDE dependencies" OFF)
-option(MOBILE "Create a Marble version optimized for handheld devices")
-
-####################################################
-# Build a D-Bus interface for marble
-# This is disabled by default for all win32, apple and Qt-Only builds  
-if( QTONLY OR WIN32 OR APPLE)
-    option(BUILD_WITH_DBUS "Build the D-Bus interface for the Marble widget" OFF)
-else( QTONLY OR WIN32 OR APPLE )
-    option(BUILD_WITH_DBUS "Build the D-Bus interface for the Marble widget" ON)
-endif( QTONLY OR WIN32 OR APPLE )
-
-####################################################
 # Where to look first for cmake modules,
 # before ${CMAKE_ROOT}/Modules/ is checked
 set ( CMAKE_MODULE_PATH
@@ -36,6 +21,94 @@ set ( CMAKE_MODULE_PATH
 
 # add cmake macros
 include( MarbleMacros )
+
+####################################################
+# Generate the tiles with the tilecreator at compile time
+# if this option is set, srtm.jpg will not be installed but the generated tiles instead
+option(QTONLY "Create Marble version without KDE dependencies" OFF)
+option(MOBILE "Create a Marble version optimized for handheld devices")
+
+####################################################
+# Specific options for if building with Qt or kde4 libs
+
+if(NOT QT5BUILD)
+  find_package(Qt4)
+endif()
+if(QT4_FOUND)
+  set( QT5BUILD FALSE )
+  set( QT_USE_QTXML         ON )
+  set( QT_USE_QTNETWORK     ON )
+  set( QT_USE_QTTEST        ON )
+  set( QT_USE_QTSCRIPT      ON )
+  set( QT_USE_QTWEBKIT      ON )
+  set( QT_USE_QTSVG         ON )
+  set( QT_USE_QTDECLARATIVE ON )
+  set( QT_USE_QTSQL         ON )
+  set( QT_USE_QTDBUS        ON )
+  include( ${QT_USE_FILE} )
+  marble_set_package_properties( Qt4 PROPERTIES DESCRIPTION "cross-platform application framework" )
+  marble_set_package_properties( Qt4 PROPERTIES URL "http://qt.digia.com/" )
+  marble_set_package_properties( Qt4 PROPERTIES TYPE REQUIRED PURPOSE "core framework" )
+  IF ( NOT QT_QTDECLARATIVE_LIBRARY )
+    # older cmake versions have a FindQt4.cmake without support for declarative,
+    # but the library may still be available
+    FIND_PACKAGE(QtDeclarative)
+    include_directories(${QT_QTDECLARATIVE_INCLUDE_DIR})
+  ENDIF()
+else()
+  set( QT5BUILD TRUE )
+  IF( NOT QTONLY )
+    # TODO: Port to KDE frameworks 5
+    set( QTONLY TRUE )
+    MESSAGE(WARNING "Qt 5 build detected. Disabling KDE support which has not been ported yet. Please compile Marble with Qt 4 if you want to build the Marble KDE desktop application.")
+  ENDIF()
+
+  find_package(Qt5Core REQUIRED)
+  find_package(Qt5Xml REQUIRED)
+  find_package(Qt5Network REQUIRED)
+  find_package(Qt5Test REQUIRED)
+  find_package(Qt5Script REQUIRED)
+  find_package(Qt5Widgets REQUIRED)
+  find_package(Qt5WebKitWidgets REQUIRED)
+  find_package(Qt5Svg REQUIRED)
+  find_package(Qt5Sql REQUIRED)
+  find_package(Qt5Concurrent REQUIRED)
+  find_package(Qt5PrintSupport REQUIRED)
+
+  include_directories( ${Qt5Svg_INCLUDE_DIRS} )
+  include_directories( ${Qt5PrintSupport_INCLUDE_DIRS} )
+  include_directories( ${Qt5Network_INCLUDE_DIRS} )
+  include_directories( ${Qt5Script_INCLUDE_DIRS} )
+  include_directories( ${Qt5Test_INCLUDE_DIRS} )
+
+  SET(CMAKE_AUTOMOC TRUE)
+  SET(CMAKE_AUTOMOC_RELAXED_MODE TRUE)
+endif()
+
+if( NOT ${CMAKE_VERSION} STRLESS "2.8" AND NOT QT4_FOUND)
+  SET(CMAKE_AUTOMOC TRUE)
+  SET(CMAKE_AUTOMOC_RELAXED_MODE TRUE)
+endif()
+
+if(QTONLY)
+  # add a flag to be able to distinguish between qt
+  # and kde mode in the sources
+  add_definitions(-DQTONLY)
+
+  # Use M_PI under Windows
+  if( WIN32 )
+    add_definitions( -D_USE_MATH_DEFINES )
+  endif( WIN32 )
+endif (QTONLY)
+
+####################################################
+# Build a D-Bus interface for marble
+# This is disabled by default for all win32, apple and Qt-Only builds  
+if( QTONLY OR WIN32 OR APPLE)
+    option(BUILD_WITH_DBUS "Build the D-Bus interface for the Marble widget" OFF)
+else( QTONLY OR WIN32 OR APPLE )
+    option(BUILD_WITH_DBUS "Build the D-Bus interface for the Marble widget" ON)
+endif( QTONLY OR WIN32 OR APPLE )
 
 ###################################################
 # Check if KDE4 is available
@@ -246,70 +319,6 @@ if(APPLE)
     )
   endif(NOT DEFINED ${QT_QTDESIGNER_INCLUDE_DIR})
 endif(APPLE)
-
-####################################################
-# Specific options for if building with Qt or kde4 libs
-
-if(QT5BUILD)
-  find_package(Qt5Core REQUIRED)
-  find_package(Qt5Xml REQUIRED)
-  find_package(Qt5Network REQUIRED)
-  find_package(Qt5Test REQUIRED)
-  find_package(Qt5Script REQUIRED)
-  find_package(Qt5Widgets REQUIRED)
-  find_package(Qt5WebKitWidgets REQUIRED)
-  find_package(Qt5Svg REQUIRED)
-  find_package(Qt5Sql REQUIRED)
-  find_package(Qt5Concurrent REQUIRED)
-  find_package(Qt5PrintSupport REQUIRED)
-
-  include_directories( ${Qt5Svg_INCLUDE_DIRS} )
-  include_directories( ${Qt5PrintSupport_INCLUDE_DIRS} )
-  include_directories( ${Qt5Network_INCLUDE_DIRS} )
-  include_directories( ${Qt5Script_INCLUDE_DIRS} )
-  include_directories( ${Qt5Test_INCLUDE_DIRS} )
-
-  SET(CMAKE_AUTOMOC TRUE)
-  SET(CMAKE_AUTOMOC_RELAXED_MODE TRUE)
-
-else(QT5BUILD)
-  find_package(Qt4 REQUIRED)
-  set( QT_USE_QTXML         ON )
-  set( QT_USE_QTNETWORK     ON )
-  set( QT_USE_QTTEST        ON )
-  set( QT_USE_QTSCRIPT      ON )
-  set( QT_USE_QTWEBKIT      ON )
-  set( QT_USE_QTSVG         ON )
-  set( QT_USE_QTDECLARATIVE ON )
-  set( QT_USE_QTSQL         ON )
-  set( QT_USE_QTDBUS        ON )
-  include( ${QT_USE_FILE} )
-  marble_set_package_properties( Qt4 PROPERTIES DESCRIPTION "cross-platform application framework" )
-  marble_set_package_properties( Qt4 PROPERTIES URL "http://qt.digia.com/" )
-  marble_set_package_properties( Qt4 PROPERTIES TYPE REQUIRED PURPOSE "core framework" )
-  IF ( NOT QT_QTDECLARATIVE_LIBRARY )
-    # older cmake versions have a FindQt4.cmake without support for declarative,
-    # but the library may still be available
-    FIND_PACKAGE(QtDeclarative)
-    include_directories(${QT_QTDECLARATIVE_INCLUDE_DIR})
-  ENDIF()
-endif()
-
-if( NOT ${CMAKE_VERSION} STRLESS "2.8" AND NOT QT4_FOUND)
-  SET(CMAKE_AUTOMOC TRUE)
-  SET(CMAKE_AUTOMOC_RELAXED_MODE TRUE)
-endif()
-
-if(QTONLY)
-  # add a flag to be able to distinguish between qt 
-  # and kde mode in the sources
-  add_definitions(-DQTONLY)
-
-  # Use M_PI under Windows
-  if( WIN32 )
-    add_definitions( -D_USE_MATH_DEFINES )
-  endif( WIN32 )
-endif (QTONLY)
 
 #############################################################
 if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_C_COMPILER MATCHES "icc")

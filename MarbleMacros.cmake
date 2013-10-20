@@ -213,8 +213,8 @@ endmacro()
 
 # This is just a helper macro to set a bunch of variables empty.
 # We don't know whether the package uses UPPERCASENAME or CamelCaseName, so we try both:
-if(QTONLY)
 
+if(NOT COMMAND _MOFP_SET_EMPTY_IF_DEFINED)
 macro(_MOFP_SET_EMPTY_IF_DEFINED _name _var)
    if(DEFINED ${_name}_${_var})
       set(${_name}_${_var} "")
@@ -225,8 +225,9 @@ macro(_MOFP_SET_EMPTY_IF_DEFINED _name _var)
       set(${_nameUpper}_${_var}  "")
    endif(DEFINED ${_nameUpper}_${_var})
 endmacro(_MOFP_SET_EMPTY_IF_DEFINED _package _var)
+endif()
 
-
+if(NOT COMMAND MACRO_OPTIONAL_FIND_PACKAGE)
 macro (MACRO_OPTIONAL_FIND_PACKAGE _name )
    option(WITH_${_name} "Search for ${_name} package" ON)
    if (WITH_${_name})
@@ -246,5 +247,4 @@ macro (MACRO_OPTIONAL_FIND_PACKAGE _name )
       _mofp_set_empty_if_defined(${_name} DEFINITIONS)
    endif (WITH_${_name})
 endmacro (MACRO_OPTIONAL_FIND_PACKAGE)
-
-endif(QTONLY)
+endif()
