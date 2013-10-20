@@ -11,6 +11,7 @@
 #define LATLONEDITPLUGIN_H
 
 #include <QDesignerCustomWidgetInterface>
+#include <marble_export.h>
 
 class QObject;
 class QString;
