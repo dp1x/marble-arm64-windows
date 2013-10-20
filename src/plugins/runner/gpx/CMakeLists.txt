@@ -56,10 +56,10 @@ if( BUILD_MARBLE_TESTS )
         qt_generate_moc( tests/TestTrack.cpp ${CMAKE_CURRENT_BINARY_DIR}/TestTrack.moc )
         include_directories(
             ${CMAKE_CURRENT_BINARY_DIR}/tests
-            if( NOT QT4_FOUND )
-                ${Qt5Test_INCLUDE_DIRS}
-            endif()
         )
+        if( NOT QT4_FOUND )
+          include_directories(${Qt5Test_INCLUDE_DIRS})
+        endif()
         set( TestTrack_SRCS TestTrack.moc ${TestTrack_SRCS} )
 
         add_executable( TestTrack ${TestTrack_SRCS} )
