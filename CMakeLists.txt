@@ -5,7 +5,7 @@ project(marble)
 SET(CMAKE_COLOR_MAKEFILE ON)
 # SET(CMAKE_SKIP_RPATH ON)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC") 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 ####################################################
 # Where to look first for cmake modules,
