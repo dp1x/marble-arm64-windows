@@ -56,6 +56,7 @@
 #include <KDE/KStandardDirs>
 #include <kdeprintdialog.h>
 #include <KDE/KToolBar>
+#include <kglobal.h>
 
 // Marble library classes
 #include "AbstractFloatItem.h"
@@ -435,7 +436,7 @@ void MarblePart::copyCoordinates()
 
 void MarblePart::readSettings()
 {
-    kDebug() << "Start: MarblePart::readSettings()";
+    qDebug() << "Start: MarblePart::readSettings()";
     // Set home position
     m_controlView->marbleModel()->setHome( MarbleSettings::homeLongitude(),
                                            MarbleSettings::homeLatitude(),
@@ -1099,8 +1100,8 @@ void MarblePart::migrateNewstuffConfigFiles() const
 
             QDomNodeList items = xml.elementsByTagName( "stuff" );
             for ( unsigned int i = 0; i < items.length(); ++i ) {
-                repairNode( items.item(i), "summary" );
-                repairNode( items.item(i), "author" );
+                repairNode( items.item(i), QString("summary") );
+                repairNode( items.item(i), QString("author") );
             }
 
             QFile output( target.absoluteFilePath() );
@@ -1464,7 +1465,7 @@ void MarblePart::applyPluginState()
 
 void MarblePart::updateSettings()
 {
-    kDebug() << "Updating Settings ...";
+    qDebug() << "Updating Settings ...";
 
     // FIXME: Font doesn't get updated instantly.
     m_controlView->marbleWidget()->setDefaultFont( MarbleSettings::mapFont() );
@@ -1507,7 +1508,7 @@ void MarblePart::updateSettings()
             proxy.setType( QNetworkProxy::HttpProxy );
         }
         else {
-            kDebug() << "Unknown proxy type! Using Http Proxy instead.";
+            qDebug() << "Unknown proxy type! Using Http Proxy instead.";
             proxy.setType( QNetworkProxy::HttpProxy );
         }
     }
@@ -1643,7 +1644,7 @@ void MarblePart::downloadJobAdded()
         m_downloadProgressBar->setMaximum( m_downloadProgressBar->maximum() + 1 );
     }
 
-//     kDebug() << "downloadProgressJobAdded: value/maximum: "
+//     qDebug() << "downloadProgressJobAdded: value/maximum: "
 //              << m_downloadProgressBar->value() << '/' << m_downloadProgressBar->maximum();
 
     m_downloadProgressBar->setUpdatesEnabled( true );
@@ -1658,7 +1659,7 @@ void MarblePart::downloadJobRemoved()
         m_downloadProgressBar->setVisible( false );
     }
 
-//     kDebug() << "downloadProgressJobCompleted: value/maximum: "
+//     qDebug() << "downloadProgressJobCompleted: value/maximum: "
 //              << m_downloadProgressBar->value() << '/' << m_downloadProgressBar->maximum();
 
     m_downloadProgressBar->setUpdatesEnabled( true );
