@@ -48,7 +48,7 @@
 #include <stdio.h>
 #define SGP4Version  "SGP4 Version 2008-11-03"
 
-#define pi 3.14159265358979323846
+#define marble_pi 3.14159265358979323846
 
 // -------------------------- structure declarations ----------------------------
 typedef enum

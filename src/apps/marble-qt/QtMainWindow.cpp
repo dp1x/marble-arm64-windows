@@ -1422,4 +1422,4 @@ void MainWindow::fallBackToDefaultTheme()
     m_controlView->marbleWidget()->setMapThemeId( m_controlView->defaultMapThemeId() );
 }
 
-#include "QtMainWindow.moc"
+//#include "QtMainWindow.moc"

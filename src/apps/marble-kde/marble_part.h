@@ -23,7 +23,7 @@
 #include "cloudsync/CloudSyncManager.h"
 #include <krecentfilesaction.h>
 
-class KAboutData;
+class K4AboutData;
 class KAction;
 class KToggleAction;
 class KConfigDialog;
@@ -59,7 +59,7 @@ class MarblePart: public KParts::ReadOnlyPart
 
     ControlView *controlView() const;
 
-    static KAboutData* createAboutData();
+    static K4AboutData* createAboutData();
     void createInfoBoxesMenu();
     void createOnlineServicesMenu();
     void createRenderPluginActions();
