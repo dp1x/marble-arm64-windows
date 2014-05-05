@@ -100,6 +100,7 @@ if(QTONLY)
     add_definitions( -D_USE_MATH_DEFINES )
   endif( WIN32 )
 endif (QTONLY)
+MESSAGE(WARNING "You are using the outdated and erroneus qt5 branch. Please switch to master (development) or KDE/4.13 (stable). Both branches have support for Qt 5.x")
 
 ####################################################
 # Build a D-Bus interface for marble
