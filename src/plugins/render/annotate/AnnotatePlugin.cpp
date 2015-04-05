@@ -22,12 +22,13 @@
 #include <QMessageBox>
 #include <QtAlgorithms>
 #include <QColor>
+#include <QApplication>
 
 // Marble
 #include "MarbleDebug.h"
 #include "AbstractProjection.h"
 #include "EditGroundOverlayDialog.h"
-#include "EditTextAnnotationDialog.h"
+#include "EditPlacemarkDialog.h"
 #include "EditPolygonDialog.h"
 #include "GeoDataDocument.h"
 #include "GeoDataGroundOverlay.h"
@@ -54,6 +55,7 @@
 #include "PolylineAnnotation.h"
 #include "EditPolylineDialog.h"
 #include "ParsingRunnerManager.h"
+#include "ViewportParams.h"
 
 
 namespace Marble
@@ -83,7 +85,7 @@ AnnotatePlugin::AnnotatePlugin( const MarbleModel *model )
     // Plugin is enabled by default
     setEnabled( true );
     // Plugin is not visible by default
-    setVisible( false );
+    setVisible( true );
     connect( this, SIGNAL(visibilityChanged(bool, QString)), SLOT(enableModel(bool)) );
 
     m_annotationDocument->setName( tr("Annotations") );
@@ -92,7 +94,9 @@ AnnotatePlugin::AnnotatePlugin( const MarbleModel *model )
     GeoDataStyle style;
     GeoDataPolyStyle polyStyle;
 
-    polyStyle.setColor( QColor( 0, 255, 255, 80 ) );
+    QColor highlightedColor = QApplication::palette().highlight().color();
+    highlightedColor.setAlpha(80);
+    polyStyle.setColor(highlightedColor);
     style.setId( "polygon" );
     style.setPolyStyle( polyStyle );
     m_annotationDocument->addStyle( style );
@@ -207,11 +211,6 @@ QString AnnotatePlugin::runtimeTrace() const
 const QList<QActionGroup*> *AnnotatePlugin::actionGroups() const
 {
     return &m_actions;
-}
-
-const QList<QActionGroup*> *AnnotatePlugin::toolbarActionGroups() const
-{
-    return &m_toolbarActions;
 }
 
 bool AnnotatePlugin::render( GeoPainter *painter, ViewportParams *viewport, const QString &renderPos, GeoSceneLayer *layer )
@@ -399,6 +398,11 @@ void AnnotatePlugin::loadAnnotationFile()
                 m_graphicsItems.append( polylineAnnotation );
             }
             m_marbleWidget->model()->treeModel()->addFeature( m_annotationDocument, newPlacemark );
+        } else if ( feature->nodeType() == GeoDataTypes::GeoDataGroundOverlayType ) {
+            GeoDataGroundOverlay *overlay = static_cast<GeoDataGroundOverlay*>( feature );
+            GeoDataGroundOverlay *newOverlay = new GeoDataGroundOverlay( *overlay );
+            m_marbleWidget->model()->treeModel()->addFeature( m_annotationDocument, newOverlay );
+            displayOverlayFrame( newOverlay );
         }
     }
     m_marbleWidget->centerOn( document->latLonAltBox() );
@@ -474,6 +478,13 @@ bool AnnotatePlugin::eventFilter( QObject *watched, QEvent *event )
             m_focusItem->setFocus( false );
             m_marbleWidget->model()->treeModel()->updateFeature( m_focusItem->placemark() );
             m_focusItem = 0;
+            return true;
+        }
+
+        // If we have an item which has the focus and the Delete key is pressed, delete the item
+        if ( m_focusItem && keyEvent->type() == QEvent::KeyPress && keyEvent->key() == Qt::Key_Delete &&
+             !m_editingDialogIsShown ) {
+            askToRemoveFocusItem();
             return true;
         }
 
@@ -592,6 +603,7 @@ bool AnnotatePlugin::handleDrawingPolygon( QMouseEvent *mouseEvent )
         GeoDataPolygon *poly = dynamic_cast<GeoDataPolygon*>( m_polygonPlacemark->geometry() );
         poly->outerBoundary().append( coords );
         m_marbleWidget->model()->treeModel()->addFeature( m_annotationDocument, m_polygonPlacemark );
+        emit nodeAdded( coords );
 
         return true;
     }
@@ -617,6 +629,7 @@ bool AnnotatePlugin::handleDrawingPolyline( QMouseEvent *mouseEvent )
         GeoDataLineString *line = dynamic_cast<GeoDataLineString*>( m_polylinePlacemark->geometry() );
         line->append( coords );
         m_marbleWidget->model()->treeModel()->addFeature( m_annotationDocument, m_polylinePlacemark );
+        emit nodeAdded( coords );
 
         return true;
     }
@@ -654,7 +667,7 @@ bool AnnotatePlugin::handleMovingSelectedItem( QMouseEvent *mouseEvent )
     // handler and updating their feature.
     if ( m_movedItem->sceneEvent( mouseEvent ) ) {
         m_marbleWidget->model()->treeModel()->updateFeature( m_movedItem->placemark() );
-
+        emit itemMoved( m_movedItem->placemark() );
         if ( m_movedItem->graphicType() == SceneGraphicsTypes::SceneGraphicTextAnnotation ) {
             emit placemarkMoved();
         }
@@ -673,7 +686,7 @@ void AnnotatePlugin::handleSuccessfulPressEvent( QMouseEvent *mouseEvent, SceneG
     m_marbleWidget->model()->treeModel()->updateFeature( item->placemark() );
 
     // Store a pointer to the item for possible following move events only if its state is
-    // either 'Editing' or 'AddingNodes' and the the mouse left button has been used.
+    // either 'Editing' or 'AddingNodes' and the mouse left button has been used.
     if ( ( item->state() == SceneGraphicsItem::Editing ||
            item->state() == SceneGraphicsItem::AddingNodes ) &&
          mouseEvent->button() == Qt::LeftButton ) {
@@ -734,6 +747,10 @@ void AnnotatePlugin::handleRequests( QMouseEvent *mouseEvent, SceneGraphicsItem 
                                       "contain all its inner boundary nodes." ) );
         } else if ( area->request() == SceneGraphicsItem::RemovePolygonRequest ) {
             removeFocusItem();
+        } else if ( area->request() == SceneGraphicsItem::ChangeCursorPolygonNodeHover ) {
+            m_marbleWidget->setCursor( Qt::PointingHandCursor );
+        } else if ( area->request() == SceneGraphicsItem::ChangeCursorPolygonBodyHover ) {
+            m_marbleWidget->setCursor( Qt::SizeAllCursor );
         }
     } else if ( item->graphicType() == SceneGraphicsTypes::SceneGraphicPolylineAnnotation ) {
         PolylineAnnotation * const polyline = static_cast<PolylineAnnotation*>( item );
@@ -754,12 +771,32 @@ void AnnotatePlugin::handleRequests( QMouseEvent *mouseEvent, SceneGraphicsItem 
             animation->startAnimation();
         } else if ( polyline->request() == SceneGraphicsItem::RemovePolylineRequest ) {
             removeFocusItem();
+        } else if ( polyline->request() == SceneGraphicsItem::ChangeCursorPolylineNodeHover ) {
+            m_marbleWidget->setCursor( Qt::PointingHandCursor );
+        } else if ( polyline->request() == SceneGraphicsItem::ChangeCursorPolylineLineHover ) {
+            m_marbleWidget->setCursor( Qt::SizeAllCursor );
         }
     } else if ( item->graphicType() == SceneGraphicsTypes::SceneGraphicTextAnnotation ) {
         PlacemarkTextAnnotation * const textAnnotation = static_cast<PlacemarkTextAnnotation*>( item );
 
         if ( textAnnotation->request() == SceneGraphicsItem::ShowPlacemarkRmbMenu ) {
             showTextAnnotationRmbMenu( mouseEvent->x(), mouseEvent->y() );
+        } else if ( textAnnotation->request() == SceneGraphicsItem::ChangeCursorPlacemarkHover ) {
+            m_marbleWidget->setCursor( Qt::SizeAllCursor );
+        }
+    } else if ( item->graphicType() == SceneGraphicsTypes::SceneGraphicGroundOverlay ){
+        GroundOverlayFrame * const groundOverlay = static_cast<GroundOverlayFrame*>( item );
+
+        if ( groundOverlay->request() == SceneGraphicsItem::ChangeCursorOverlayVerticalHover ) {
+            m_marbleWidget->setCursor( Qt::SizeVerCursor );
+        } else if ( groundOverlay->request() == SceneGraphicsItem::ChangeCursorOverlayHorizontalHover ) {
+            m_marbleWidget->setCursor( Qt::SizeHorCursor );
+        } else if ( groundOverlay->request() == SceneGraphicsItem::ChangeCursorOverlayBDiagHover ) {
+            m_marbleWidget->setCursor( Qt::SizeBDiagCursor );
+        } else if ( groundOverlay->request() == SceneGraphicsItem::ChangeCursorOverlayFDiagHover ) {
+            m_marbleWidget->setCursor( Qt::SizeFDiagCursor );
+        } else if ( groundOverlay->request() == SceneGraphicsItem::ChangeCursorOverlayBodyHover ) {
+            m_marbleWidget->setCursor( Qt::SizeAllCursor );
         }
     }
 }
@@ -800,7 +837,6 @@ void AnnotatePlugin::setupActions( MarbleWidget *widget )
 {
     qDeleteAll( m_actions );
     m_actions.clear();
-    m_toolbarActions.clear();
 
     if ( !widget ) {
         return;
@@ -810,7 +846,7 @@ void AnnotatePlugin::setupActions( MarbleWidget *widget )
     group->setExclusive( true );
 
 
-    QAction *selectItem = new QAction( QIcon(":/icons/hand.png"),
+    QAction *selectItem = new QAction( QIcon(":/icons/edit-select.png"),
                                        tr("Select Item"),
                                        this );
     selectItem->setCheckable( true );
@@ -877,6 +913,7 @@ void AnnotatePlugin::setupActions( MarbleWidget *widget )
     sep1->setSeparator( true );
     QAction *sep2 = new QAction( this );
     sep2->setSeparator( true );
+    sep2->setObjectName( "toolbarSeparator" );
     QAction *sep3 = new QAction( this );
     sep3->setSeparator( true );
     QAction *sep4 = new QAction( this );
@@ -900,7 +937,6 @@ void AnnotatePlugin::setupActions( MarbleWidget *widget )
     group->addAction( sep4 );
 
     m_actions.append( group );
-    m_toolbarActions.append( group );
 
     emit actionGroupsChanged();
 }
@@ -989,14 +1025,16 @@ void AnnotatePlugin::showTextAnnotationRmbMenu( qreal x, qreal y )
 
 void AnnotatePlugin::editTextAnnotation()
 {
-    QPointer<EditTextAnnotationDialog> dialog = new EditTextAnnotationDialog( m_focusItem->placemark(),
-                                                                              m_marbleWidget );
+    QPointer<EditPlacemarkDialog> dialog = new EditPlacemarkDialog( m_focusItem->placemark(),
+                                                                    m_marbleWidget );
     connect( dialog, SIGNAL(textAnnotationUpdated(GeoDataFeature*)),
              m_marbleWidget->model()->treeModel(), SLOT(updateFeature(GeoDataFeature*)) );
     connect( this, SIGNAL(placemarkMoved()),
              dialog, SLOT(updateDialogFields()) );
     connect( dialog, SIGNAL(finished(int)),
              this, SLOT(stopEditingTextAnnotation(int)) );
+
+    dialog->setLabelColor(dynamic_cast<PlacemarkTextAnnotation*>(m_focusItem)->labelColor());
 
     disableActions( m_actions.first() );
     dialog->show();
@@ -1015,14 +1053,15 @@ void AnnotatePlugin::addTextAnnotation()
 
     GeoDataPlacemark *placemark = new GeoDataPlacemark;
     placemark->setCoordinate( lon, lat );
+    placemark->setVisible( true );
+    placemark->setBalloonVisible( false );
     m_marbleWidget->model()->treeModel()->addFeature( m_annotationDocument, placemark );
 
     PlacemarkTextAnnotation *textAnnotation = new PlacemarkTextAnnotation( placemark );
     textAnnotation->setFocus( true );
     m_graphicsItems.append( textAnnotation );
 
-    QPointer<EditTextAnnotationDialog> dialog = new EditTextAnnotationDialog( placemark, m_marbleWidget );
-    dialog->setFirstTimeEditing( true );
+    QPointer<EditPlacemarkDialog> dialog = new EditPlacemarkDialog( placemark, m_marbleWidget );
 
     connect( dialog, SIGNAL(textAnnotationUpdated(GeoDataFeature*)),
              m_marbleWidget->model()->treeModel(), SLOT(updateFeature(GeoDataFeature*)) );
@@ -1086,14 +1125,31 @@ void AnnotatePlugin::setupOverlayRmbMenu()
 void AnnotatePlugin::addOverlay()
 {
     GeoDataGroundOverlay *overlay = new GeoDataGroundOverlay();
+    qreal centerLongitude = m_marbleWidget->viewport()->centerLongitude()*RAD2DEG;
+    qreal centerLatitude = m_marbleWidget->viewport()->centerLatitude()*RAD2DEG;
+    GeoDataLatLonAltBox box  = m_marbleWidget->viewport()->viewLatLonAltBox();
+    qreal maxDelta = 20;
+    qreal deltaLongitude = qMin(box.width(GeoDataCoordinates::Degree), maxDelta);
+    qreal deltaLatitude = qMin(box.height(GeoDataCoordinates::Degree), maxDelta);
+    qreal north = centerLatitude + deltaLatitude/4;
+    qreal south = centerLatitude - deltaLatitude/4;
+    qreal west = centerLongitude - deltaLongitude/4;
+    qreal east = centerLongitude + deltaLongitude/4;
+    overlay->latLonBox().setBoundaries( north, south, east, west, GeoDataCoordinates::Degree );
+    overlay->setName( tr( "Untitled Ground Overlay" ) );
     QPointer<EditGroundOverlayDialog> dialog = new EditGroundOverlayDialog(
                                                                  overlay,
                                                                  m_marbleWidget->textureLayer(),
                                                                  m_marbleWidget );
     dialog->exec();
+    if( dialog->result() ) {
+        m_marbleWidget->model()->treeModel()->addFeature( m_annotationDocument, overlay );
+        displayOverlayFrame( overlay );
+    }
+    else {
+        delete overlay;
+    }
     delete dialog;
-    m_marbleWidget->model()->treeModel()->addFeature( m_annotationDocument, overlay );
-    displayOverlayFrame( overlay );
 }
 
 void AnnotatePlugin::showOverlayRmbMenu( GeoDataGroundOverlay *overlay, qreal x, qreal y )
@@ -1192,7 +1248,6 @@ void AnnotatePlugin::setupPolygonRmbMenu()
     connect( cutPolygon, SIGNAL(triggered()), this, SLOT(cutItem()) );
 
     QAction *copyPolygon = new QAction( tr( "Copy"), m_polygonRmbMenu );
-    copyPolygon->setEnabled( false ); // FIXME
     m_polygonRmbMenu->addAction( copyPolygon );
     connect( copyPolygon, SIGNAL(triggered()), this, SLOT(copyItem()) );
 
@@ -1247,12 +1302,12 @@ void AnnotatePlugin::addPolygon()
     m_marbleWidget->update();
 
     QPointer<EditPolygonDialog> dialog = new EditPolygonDialog( m_polygonPlacemark, m_marbleWidget );
-    dialog->setFirstTimeEditing( true );
 
     connect( dialog, SIGNAL(polygonUpdated(GeoDataFeature*)),
              m_marbleWidget->model()->treeModel(), SLOT(updateFeature(GeoDataFeature*)) );
     connect( dialog, SIGNAL(finished(int)),
              this, SLOT(stopEditingPolygon(int)) );
+    connect( this, SIGNAL( nodeAdded( GeoDataCoordinates ) ), dialog, SLOT( handleAddingNode( GeoDataCoordinates ) ) );
 
     // If there is another graphic item marked as 'selected' when pressing 'Add Polygon', change the focus of
     // that item.
@@ -1338,6 +1393,7 @@ void AnnotatePlugin::editPolygon()
              m_marbleWidget->model()->treeModel(), SLOT(updateFeature(GeoDataFeature*)) );
     connect( dialog, SIGNAL(finished(int)),
              this, SLOT(stopEditingPolygon(int)) );
+    connect( this, SIGNAL( itemMoved( GeoDataPlacemark* ) ), dialog, SLOT( handleItemMoving( GeoDataPlacemark * ) ) );
 
     disableActions( m_actions.first() );
 
@@ -1429,7 +1485,6 @@ void AnnotatePlugin::setupPolylineRmbMenu()
     connect( cutItem, SIGNAL(triggered()), this, SLOT(cutItem()) );
 
     QAction *copyItem = new QAction( tr( "Copy"), m_polylineRmbMenu );
-    copyItem->setEnabled( false ); // FIXME
     m_polylineRmbMenu->addAction( copyItem );
     connect( copyItem, SIGNAL(triggered()), this, SLOT(copyItem()) );
 
@@ -1469,6 +1524,7 @@ void AnnotatePlugin::editPolyline()
              m_marbleWidget->model()->treeModel(), SLOT(updateFeature(GeoDataFeature*)) );
     connect( dialog, SIGNAL(finished(int)),
              this, SLOT(stopEditingPolyline(int)) );
+    connect( this, SIGNAL( itemMoved( GeoDataPlacemark* ) ), dialog, SLOT( handleItemMoving( GeoDataPlacemark * ) ) );
 
     disableActions( m_actions.first() );
     dialog->show();
@@ -1493,12 +1549,12 @@ void AnnotatePlugin::addPolyline()
     m_marbleWidget->update();
 
     QPointer<EditPolylineDialog> dialog = new EditPolylineDialog( m_polylinePlacemark, m_marbleWidget );
-    dialog->setFirstTimeEditing( true );
 
     connect( dialog, SIGNAL(polylineUpdated(GeoDataFeature*)),
              m_marbleWidget->model()->treeModel(), SLOT(updateFeature(GeoDataFeature*)) );
     connect( dialog, SIGNAL(finished(int)),
              this, SLOT(stopEditingPolyline(int)) );
+    connect( this, SIGNAL( nodeAdded( GeoDataCoordinates ) ), dialog, SLOT( handleAddingNode( GeoDataCoordinates ) ) );
 
     if ( m_focusItem ) {
         m_focusItem->setFocus( false );
@@ -1544,7 +1600,7 @@ void AnnotatePlugin::setupCursor( SceneGraphicsItem *item )
     if ( !item || item->state() == SceneGraphicsItem::AddingNodes ) {
         m_marbleWidget->setCursor( Qt::DragCopyCursor );
     } else {
-        m_marbleWidget->setCursor( Qt::PointingHandCursor );
+        // Nothing to do. The other cursor changes were moved to the handleRequests() section.
     }
 }
 

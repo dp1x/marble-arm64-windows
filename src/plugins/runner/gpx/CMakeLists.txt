@@ -56,7 +56,7 @@ if( BUILD_MARBLE_TESTS )
                                      ${QT_QTCORE_LIBRARY}
                                      ${QT_QTGUI_LIBRARY}
                                      ${QT_QTTEST_LIBRARY}
-                                     marblewidget )
+                                     ${MARBLEWIDGET} )
     if( QT5BUILD )
       target_link_libraries( TestTrack ${Qt5Test_LIBRARIES})
     endif()

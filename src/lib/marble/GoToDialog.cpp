@@ -135,7 +135,7 @@ QVector<GeoDataPlacemark> TargetModel::viaPoints() const
     RouteRequest* request = m_marbleModel->routingManager()->routeRequest();
     QVector<GeoDataPlacemark> result;
     for ( int i = 0; i < request->size(); ++i ) {
-        if ( request->at( i ).longitude() != 0.0 || request->at( i ).latitude() != 0.0 ) {
+        if ( request->at( i ).isValid() ) {
             GeoDataPlacemark placemark;
             placemark.setCoordinate( request->at( i ) );
             placemark.setName( request->name( i ) );
@@ -161,8 +161,8 @@ int TargetModel::rowCount ( const QModelIndex & parent ) const
 
 QVariant TargetModel::currentLocationData ( int role ) const
 {
-    PositionTracking* tracking = m_marbleModel->positionTracking();
-    if ( tracking && tracking->status() == PositionProviderStatusAvailable ) {
+    const PositionTracking* tracking = m_marbleModel->positionTracking();
+    if ( tracking->status() == PositionProviderStatusAvailable ) {
         GeoDataCoordinates currentLocation = tracking->currentLocation();
         switch( role ) {
         case Qt::DisplayRole: return tr( "Current Location: %1" ).arg( currentLocation.toString() ) ;

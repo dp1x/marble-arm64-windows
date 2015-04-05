@@ -1,14 +1,18 @@
 [Desktop Entry]
 Type=Service
 Name=ESRI Shapefile
+Name[bg]=Файл с форми ESRI
+Name[bs]=ESRI datoteka s likovima
 Name[ca]=Fitxers de formes ESRI
 Name[da]=ESRI-shapefil
 Name[de]=ESRI-Shapefile
 Name[en_GB]=ESRI Shapefile
+Name[eo]=ESRI Shapefile
 Name[es]=Archivo de formas ESRI
 Name[et]=ESRI Shapefile
 Name[fi]=ESRI Shapefile
 Name[fr]=Fichier de formes ESRI
+Name[hu]=ESRI alakzatfájl
 Name[it]=Shapefile ESRI
 Name[nds]=ESRI-Ümreetdatei
 Name[nl]=ESRI Shapefile

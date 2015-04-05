@@ -413,7 +413,7 @@ QVariant GeoDataTreeModel::data( const QModelIndex &index, int role ) const
                  ( placemark->parent()->nodeType() == GeoDataTypes::GeoDataFolderType ||
                    placemark->parent()->nodeType() == GeoDataTypes::GeoDataDocumentType ) ) {
                 GeoDataContainer *container = static_cast<GeoDataContainer *>( placemark->parent() );
-                return QVariant( QBrush( container->style()->listStyle().backgroundColor() ));
+                return container->customStyle() ? QVariant( QBrush( container->customStyle()->listStyle().backgroundColor() )) : QVariant();
             }
         }
     }
@@ -802,7 +802,7 @@ int GeoDataTreeModel::addFeature( GeoDataContainer *parent, GeoDataFeature *feat
                 row = parent->size();
             }
             beginInsertRows( modelindex , row , row );
-            parent->insert( feature, row );
+            parent->insert( row, feature );
             d->checkParenting( parent );
             endInsertRows();
             emit added(feature);
@@ -891,6 +891,61 @@ void GeoDataTreeModel::setRootDocument( GeoDataDocument* document )
 GeoDataDocument * GeoDataTreeModel::rootDocument()
 {
     return d->m_rootDocument;
+}
+
+int GeoDataTreeModel::addTourPrimitive( const QModelIndex &parent, GeoDataTourPrimitive *primitive, int row )
+{
+    GeoDataObject *parentObject = static_cast<GeoDataObject*>( parent.internalPointer() );
+    if( parent.isValid() && parentObject->nodeType() == GeoDataTypes::GeoDataPlaylistType ) {
+        GeoDataPlaylist *playlist = static_cast<GeoDataPlaylist*>( parentObject );
+        if( row == -1 ) {
+            row = playlist->size();
+        }
+        beginInsertRows( parent, row, row );
+        playlist->insertPrimitive( row, primitive );
+        endInsertRows();
+        return row;
+    }
+    return -1;
+}
+
+bool GeoDataTreeModel::removeTourPrimitive( const QModelIndex &parent , int index)
+{
+    GeoDataObject *parentObject = static_cast<GeoDataObject*>( parent.internalPointer() );
+    if( parent.isValid() && parentObject->nodeType() == GeoDataTypes::GeoDataPlaylistType ) {
+        GeoDataPlaylist *playlist = static_cast<GeoDataPlaylist*>( parentObject );
+        if( playlist->size() > index ) {
+            beginRemoveRows( parent, index, index );
+            playlist->removePrimitiveAt( index );
+            endRemoveRows();
+            return true;
+        }
+    }
+    return false;
+}
+
+bool GeoDataTreeModel::swapTourPrimitives( const QModelIndex &parent, int indexA, int indexB )
+{
+    GeoDataObject *parentObject = static_cast<GeoDataObject*>( parent.internalPointer() );
+    if( parent.isValid() && parentObject->nodeType() == GeoDataTypes::GeoDataPlaylistType ) {
+        GeoDataPlaylist *playlist = static_cast<GeoDataPlaylist*>( parentObject );
+        if( indexA > indexB ) {
+            qSwap(indexA, indexB);
+        }
+        if ( indexB - indexA == 1 ) {
+            beginMoveRows( parent, indexA, indexA, parent, indexB+1 );
+        } else {
+            beginMoveRows( parent, indexA, indexA, parent, indexB );
+            beginMoveRows( parent, indexB, indexB, parent, indexA );
+        }
+        playlist->swapPrimitives( indexA, indexB );
+        if( indexB - indexA != 1 ) {
+            endMoveRows();
+        }
+        endMoveRows();
+        return true;
+    }
+    return false;
 }
 
 #include "GeoDataTreeModel.moc"

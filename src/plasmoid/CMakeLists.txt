@@ -34,7 +34,7 @@ target_link_libraries(plasma_applet_worldclock
                       KF5::ConfigCore
                       KF5::Plasma
                       KF5::Service
-                      marblewidget )
+                      ${MARBLEWIDGET} )
 
 install(TARGETS plasma_applet_worldclock
         DESTINATION ${PLUGIN_INSTALL_DIR})

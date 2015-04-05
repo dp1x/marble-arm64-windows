@@ -74,6 +74,8 @@ class GEODATA_EXPORT GeoDataPlacemark: public GeoDataFeature
     */
     ~GeoDataPlacemark();
 
+    GeoDataPlacemark &operator=( const GeoDataPlacemark &other );
+
     /**
     * Equality operators.
     */
@@ -121,7 +123,7 @@ class GEODATA_EXPORT GeoDataPlacemark: public GeoDataFeature
     */
     void setCoordinate( const GeoDataCoordinates &coordinate );
 
-    MARBLE_DEPRECATED( void setCoordinate( const GeoDataPoint &point ) );
+    GEODATA_DEPRECATED( void setCoordinate( const GeoDataPoint &point ) );
 
     /**
      * Sets the current Geometry of this Placemark. @see geometry() and the class 

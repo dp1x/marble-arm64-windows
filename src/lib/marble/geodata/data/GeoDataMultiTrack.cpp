@@ -101,7 +101,7 @@ QVector<GeoDataTrack> GeoDataMultiTrack::vector() const
     QVector<GeoDataTrack*>::const_iterator end = p()->m_vector.constEnd();
 
     for (; it != end; ++it) {
-            GeoDataTrack f = **it;
+            const GeoDataTrack f(**it);
             results.append( f );
     }
 
@@ -180,6 +180,7 @@ QVector<GeoDataTrack*>::ConstIterator GeoDataMultiTrack::constEnd() const
  */
 GeoDataTrack* GeoDataMultiTrack::child( int i )
 {
+    detach();
     return p()->m_vector.at( i );
 }
 

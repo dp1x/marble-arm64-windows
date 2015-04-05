@@ -1,14 +1,18 @@
 [Desktop Entry]
 Type=Service
 Name=GPX Geographic Data
+Name[bg]=Географски данни – GPX
+Name[bs]=GPX geografski podaci
 Name[ca]=Dades geogràfiques GPX
 Name[da]=GPX geografiske data
 Name[de]=GPX-Geografiedaten
 Name[en_GB]=GPX Geographic Data
+Name[eo]=GPX Geografiaj datumoj
 Name[es]=Datos geográficos GPX
 Name[et]=GPX geograafilised andmed
 Name[fi]=GPX-paikkatieto
 Name[fr]=Données géographiques GPX
+Name[hu]=GPX földrajzi adat
 Name[it]=Dati geografici GPX
 Name[nds]=GPX-Geodaten
 Name[nl]=GPX Geographic Data

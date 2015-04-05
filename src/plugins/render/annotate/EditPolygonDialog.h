@@ -33,13 +33,15 @@ public:
     EditPolygonDialog( GeoDataPlacemark *placemark, QWidget *parent = 0 );
     ~EditPolygonDialog();
 
-    void setFirstTimeEditing( bool enabled );
+public slots:
+    void handleAddingNode( const GeoDataCoordinates &node );
+    void handleItemMoving( GeoDataPlacemark *item );
+    void updatePolygon();
 
 signals:
     void polygonUpdated( GeoDataFeature *feature );
 
 private slots:
-    void updatePolygon();
     void updateLinesDialog( const QColor &color );
     void updatePolyDialog( const QColor &color );
     void checkFields();

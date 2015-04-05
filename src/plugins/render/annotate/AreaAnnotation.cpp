@@ -16,6 +16,8 @@
 // Qt
 #include <qmath.h>
 #include <QPair>
+#include <QApplication>
+#include <QPalette>
 
 // Marble
 #include "GeoDataPlacemark.h"
@@ -35,9 +37,9 @@ const int AreaAnnotation::selectedDim = 15;
 const int AreaAnnotation::mergedDim = 20;
 const int AreaAnnotation::hoveredDim = 20;
 const QColor AreaAnnotation::regularColor = Oxygen::aluminumGray3;
-const QColor AreaAnnotation::selectedColor = Oxygen::aluminumGray6;
+const QColor AreaAnnotation::selectedColor = QApplication::palette().highlight().color();
 const QColor AreaAnnotation::mergedColor = Oxygen::emeraldGreen6;
-const QColor AreaAnnotation::hoveredColor = Oxygen::grapeViolet6;
+const QColor AreaAnnotation::hoveredColor = QApplication::palette().highlight().color();
 
 AreaAnnotation::AreaAnnotation( GeoDataPlacemark *placemark ) :
     SceneGraphicsItem( placemark ),
@@ -688,6 +690,9 @@ void AreaAnnotation::drawNodes( GeoPainter *painter )
     const GeoDataLinearRing &outerRing = polygon->outerBoundary();
     const QVector<GeoDataLinearRing> &innerRings = polygon->innerBoundaries();
 
+    QColor glowColor = QApplication::palette().highlightedText().color();
+    glowColor.setAlpha(120);
+
     for ( int i = 0; i < outerRing.size(); ++i ) {
         // The order here is important, because a merged node can be at the same time selected.
         if ( m_outerNodesList.at(i).isBeingMerged() ) {
@@ -702,9 +707,7 @@ void AreaAnnotation::drawNodes( GeoPainter *painter )
                 QPen defaultPen = painter->pen();
                 QPen newPen;
                 newPen.setWidth( defaultPen.width() + 3 );
-                newPen.setColor( m_outerNodesList.at(i).isEditingHighlighted() ?
-                                 QColor( 0, 255, 255, 120 ) :
-                                 QColor( 25, 255, 25, 180 ) );
+                newPen.setColor( glowColor );
 
                 painter->setBrush( Qt::NoBrush );
                 painter->setPen( newPen );
@@ -720,9 +723,7 @@ void AreaAnnotation::drawNodes( GeoPainter *painter )
                 QPen defaultPen = painter->pen();
                 QPen newPen;
                 newPen.setWidth( defaultPen.width() + 3 );
-                newPen.setColor( m_outerNodesList.at(i).isEditingHighlighted() ?
-                                 QColor( 0, 255, 255, 120 ) :
-                                 QColor( 25, 255, 25, 180 ) );
+                newPen.setColor( glowColor );
 
                 painter->setPen( newPen );
                 painter->setBrush( Qt::NoBrush );
@@ -746,9 +747,7 @@ void AreaAnnotation::drawNodes( GeoPainter *painter )
                     QPen defaultPen = painter->pen();
                     QPen newPen;
                     newPen.setWidth( defaultPen.width() + 3 );
-                    newPen.setColor( m_innerNodesList.at(i).at(j).isEditingHighlighted() ?
-                                     QColor( 0, 255, 255, 120 ) :
-                                     QColor( 25, 255, 25, 180 ) );
+                    newPen.setColor( glowColor );
 
                     painter->setBrush( Qt::NoBrush );
                     painter->setPen( newPen );
@@ -764,9 +763,7 @@ void AreaAnnotation::drawNodes( GeoPainter *painter )
                     QPen defaultPen = painter->pen();
                     QPen newPen;
                     newPen.setWidth( defaultPen.width() + 3 );
-                    newPen.setColor( m_innerNodesList.at(i).at(j).isEditingHighlighted() ?
-                                     QColor( 0, 255, 255, 120 ) :
-                                     QColor( 25, 255, 25, 180 ) );
+                    newPen.setColor( glowColor );
 
                     painter->setBrush( Qt::NoBrush );
                     painter->setPen( newPen );
@@ -1390,6 +1387,7 @@ bool AreaAnnotation::dealWithHovering( QMouseEvent *mouseEvent )
 
             m_hoveredNode = QPair<int, int>( outerIndex, -1 );
             m_outerNodesList[outerIndex].setFlag( flag );
+            setRequest( ChangeCursorPolygonNodeHover );
         }
 
         return true;
@@ -1418,6 +1416,7 @@ bool AreaAnnotation::dealWithHovering( QMouseEvent *mouseEvent )
 
             m_hoveredNode = innerIndex;
             m_innerNodesList[innerIndex.first][innerIndex.second].setFlag( flag );
+            setRequest( ChangeCursorPolygonNodeHover );
         }
 
         return true;
@@ -1429,6 +1428,7 @@ bool AreaAnnotation::dealWithHovering( QMouseEvent *mouseEvent )
     }
 
     // This means that the interior of the polygon has been covered so we catch this event too.
+    setRequest( ChangeCursorPolygonBodyHover );
     return true;
 }
 

@@ -60,6 +60,7 @@ if(Qt5Core_FOUND)
   cmake_minimum_required(VERSION 2.8.12)
   set(QT5BUILD TRUE)
   set(QT4BUILD FALSE)
+  set(MARBLEWIDGET marblewidget-qt5)
 
   include_directories( ${Qt5Svg_INCLUDE_DIRS} )
   include_directories( ${Qt5PrintSupport_INCLUDE_DIRS} )
@@ -77,6 +78,7 @@ else()
   set(QT5BUILD FALSE)
   set(WITH_KF5 FALSE)
   set(QT4BUILD TRUE)
+  set(MARBLEWIDGET marblewidget)
   find_package(Qt4 REQUIRED)
   set( QT_USE_QTXML         ON )
   set( QT_USE_QTNETWORK     ON )
@@ -139,8 +141,13 @@ set (ENABLE_TESTS FALSE CACHE BOOL "Build unit tests?")
 set (WITH_DESIGNER_PLUGIN TRUE CACHE BOOL "Build plugins for Qt Designer")
 add_feature_info("Qt Designer plugins" WITH_DESIGNER_PLUGIN "Marble widget support in Qt Designer. Toggle with WITH_DESIGNER_PLUGIN=YES/NO")
 
+# TODO: this could use GNUInstallDirs or ECM, so e.g. LIB_SUFFIX is automatically set
 set(LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)" )
 set(EXEC_INSTALL_PREFIX  ${CMAKE_INSTALL_PREFIX} CACHE PATH  "Base directory for executables and libraries" FORCE)
+if (QT5BUILD)
+   set(QT_PLUGINS_DIR ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/plugins)
+endif()
+
 ####################################################
 # Detect default for the user configurable MARBLE_DATA_PATH option
 
@@ -293,8 +300,14 @@ install(FILES marble.appdata.xml DESTINATION ${CMAKE_INSTALL_PREFIX}/share/appda
 
 ####################################################
 # Install CMake module
+
+CONFIGURE_FILE(
+    ${CMAKE_CURRENT_SOURCE_DIR}/FindMarble.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/FindMarble.cmake
+)
+
 if( CMAKE_MODULES_INSTALL_PATH AND NOT WIN32 )
-  install( FILES FindMarble.cmake
+  install( FILES ${CMAKE_CURRENT_BINARY_DIR}/FindMarble.cmake
            DESTINATION ${CMAKE_MODULES_INSTALL_PATH}  )
 endif()
 

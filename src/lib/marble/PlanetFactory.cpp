@@ -13,6 +13,7 @@
 #include "PlanetFactory.h"
 #include "Planet.h"
 #include "MarbleDebug.h"
+#include "MarbleGlobal.h"
 
 namespace Marble {
 
@@ -213,7 +214,7 @@ Planet PlanetFactory::construct( const QString &id )
         planet.setRadius( 10000000.0 );
         planet.setName( "Sky" );
         planet.setHasAtmosphere( false );
-    } else if ( id == "earth" ) {
+    } else {
         mDebug() << "WARNING: Creating Planet instance" << id << "with invalid orbital elements";
         planet.setRadius( 10000000.0 );
         planet.setName( "Unknown" );

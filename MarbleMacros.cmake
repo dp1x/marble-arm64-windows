@@ -65,7 +65,7 @@ target_link_libraries( ${_target_name} ${QT_QTCORE_LIBRARY}
                                        ${QT_QTNETWORK_LIBRARY}
                                        ${QT_QTMAIN_LIBRARY}
                                        ${${_target_name}_LIBS}
-                                       marblewidget )
+                                       ${MARBLEWIDGET} )
 install( TARGETS ${_target_name} DESTINATION ${MARBLE_PLUGIN_INSTALL_PATH} )
 
 set_target_properties( ${_target_name} PROPERTIES 
@@ -93,7 +93,7 @@ target_link_libraries( ${_target_name} ${QT_QTCORE_LIBRARY}
                                        ${QT_QTNETWORK_LIBRARY}
                                        ${QT_QTMAIN_LIBRARY}
                                        ${${_target_name}_LIBS}
-                                       marblewidget )
+                                       ${MARBLEWIDGET} )
 install( TARGETS ${_target_name} DESTINATION ${QT_PLUGINS_DIR}/designer )
 
 set_target_properties( ${_target_name} PROPERTIES 
@@ -116,7 +116,7 @@ target_link_libraries( ${_target_name} ${QT_QTCORE_LIBRARY}
                                            ${QT_QTNETWORK_LIBRARY}
                                            ${QT_QTMAIN_LIBRARY}
                                            ${${_target_name}_LIBS}
-                                           marblewidget )
+                                           ${MARBLEWIDGET} )
 install( TARGETS ${_target_name} DESTINATION ${MARBLE_QT_IMPORTS_DIR}/org/kde/edu/marble/${_install_path} )
 
 set_target_properties( ${_target_name} PROPERTIES
@@ -143,7 +143,7 @@ macro( marble_add_test TEST_NAME )
         set( ${TEST_NAME}_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${TEST_NAME}.moc ${${TEST_NAME}_SRCS} )
 
         add_executable( ${TEST_NAME} ${${TEST_NAME}_SRCS} )
-        target_link_libraries( ${TEST_NAME} marblewidget )
+        target_link_libraries( ${TEST_NAME} ${MARBLEWIDGET} )
         if( QT4BUILD )
           target_link_libraries( ${TEST_NAME} ${QT_QTMAIN_LIBRARY}
                                               ${QT_QTCORE_LIBRARY}

@@ -73,6 +73,12 @@ set(marblewidget_SRCS
     MapViewWidget.cpp
     FileViewWidget.cpp
     TourWidget.cpp
+    FlyToEditWidget.cpp
+    TourControlEditWidget.cpp
+    WaitEditWidget.cpp
+    SoundCueEditWidget.cpp
+    RemoveItemEditWidget.cpp
+    TourItemDelegate.cpp
     TourPlayback.cpp
     LegendWidget.cpp
     PlaybackItem.cpp
@@ -127,9 +133,15 @@ set(marblewidget_SRCS
     ViewParams.cpp
     projections/AbstractProjection.cpp
     projections/CylindricalProjection.cpp
+    projections/AzimuthalProjection.cpp
     projections/SphericalProjection.cpp
     projections/EquirectProjection.cpp
     projections/MercatorProjection.cpp
+    projections/GnomonicProjection.cpp
+    projections/StereographicProjection.cpp
+    projections/LambertAzimuthalProjection.cpp
+    projections/AzimuthalEquidistantProjection.cpp
+    projections/VerticalPerspectiveProjection.cpp
     VisiblePlacemark.cpp
     PlacemarkLayout.cpp
     Planet.cpp
@@ -142,6 +154,7 @@ set(marblewidget_SRCS
     EquirectScanlineTextureMapper.cpp
     MercatorScanlineTextureMapper.cpp
     TileScalingTextureMapper.cpp
+    GenericScanlineTextureMapper.cpp
     VectorTileModel.cpp
     DiscCache.cpp
     ServerLayout.cpp
@@ -164,6 +177,9 @@ set(marblewidget_SRCS
     MovieCapture.cpp
     MovieCaptureDialog.cpp
     TourCaptureDialog.cpp
+    EditPlacemarkDialog.cpp
+    AddLinkDialog.cpp
+    FormattedTextWidget.cpp
 
     AbstractDataPlugin.cpp
     AbstractDataPluginModel.cpp
@@ -178,6 +194,8 @@ set(marblewidget_SRCS
     RenderPluginInterface.cpp
     PositionProviderPlugin.cpp
     PositionProviderPluginInterface.cpp
+    PlacemarkPositionProviderPlugin.cpp
+    RouteSimulationPositionProviderPlugin.cpp
     MarblePluginSettingsWidget.cpp
     RenderPluginModel.cpp
     PluginAboutDialog.cpp
@@ -191,6 +209,7 @@ set(marblewidget_SRCS
     MathHelper.cpp
 
     LatLonEdit.cpp
+    PlacemarkEditHeader.cpp
 
     MapThemeSortFilterProxyModel.cpp
 
@@ -286,6 +305,7 @@ set (marblewidget_UI
     MarbleAboutDialog.ui
     SunControlWidget.ui
     LatLonEdit.ui
+    PlacemarkEditHeader.ui
     routing/RoutingWidget.ui
     DataMigrationWidget.ui
     EditBookmarkDialog.ui
@@ -303,6 +323,10 @@ set (marblewidget_UI
     MarbleCloudSyncSettingsWidget.ui
     MovieCaptureDialog.ui
     TourCaptureDialog.ui
+    EditPlacemarkDialog.ui
+    AddLinkDialog.ui
+    FormattedTextWidget.ui
+    ElevationWidget.ui
 )
 
 # FIXME: cleaner approach of src/lib/marblwidget/MarbleControlBox.* vs. marble.qrc
@@ -311,14 +335,14 @@ qt_add_resources(marblewidget_SRCS libmarble.qrc ../../apps/marble-ui/marble.qrc
 qt_wrap_ui(marblewidget_SRCS ${marblewidget_UI})
 marble_qt4_automoc(${marblewidget_SRCS})
 
-ADD_LIBRARY(marblewidget SHARED ${marblewidget_SRCS} ${SOURCES_UI_HDRS})
+ADD_LIBRARY(${MARBLEWIDGET} SHARED ${marblewidget_SRCS} ${SOURCES_UI_HDRS})
 
 # link with libastro
-TARGET_LINK_LIBRARIES (marblewidget astro)
+TARGET_LINK_LIBRARIES (${MARBLEWIDGET} astro)
 
 # link with release version of Qt libs
 if( QT4BUILD )
-  TARGET_LINK_LIBRARIES (marblewidget
+  TARGET_LINK_LIBRARIES (${MARBLEWIDGET}
     ${QT_QTCORE_LIBRARY}
     ${QT_QTDBUS_LIBRARY}
     ${QT_QTGUI_LIBRARY}
@@ -331,7 +355,7 @@ if( QT4BUILD )
     ${QT_QTDECLARATIVE_LIBRARY}
   )
 else()
-  TARGET_LINK_LIBRARIES (marblewidget
+  TARGET_LINK_LIBRARIES (${MARBLEWIDGET}
     ${Qt5Core_LIBRARIES}
     ${Qt5Xml_LIBRARIES}
     ${Qt5Widgets_LIBRARIES}
@@ -347,41 +371,42 @@ endif()
 
 if( PHONON_FOUND AND NOT QT5BUILD )
   INCLUDE_DIRECTORIES( ${PHONON_INCLUDES} )
-  TARGET_LINK_LIBRARIES(marblewidget ${PHONON_LIBS} )
+  TARGET_LINK_LIBRARIES(${MARBLEWIDGET} ${PHONON_LIBS} )
   set (HAVE_PHONON TRUE)
 endif( PHONON_FOUND AND NOT QT5BUILD )
 
 if (APPLE)
   #defined in top level makefile
-  TARGET_LINK_LIBRARIES(marblewidget ${MAC_EXTRA_LIBS} )
+  TARGET_LINK_LIBRARIES(${MARBLEWIDGET} ${MAC_EXTRA_LIBS} )
 endif (APPLE)
 
 if (CMAKE_SYSTEM_NAME MATCHES "SunOS")
-  TARGET_LINK_LIBRARIES(marblewidget m)
+  TARGET_LINK_LIBRARIES(${MARBLEWIDGET} m)
 endif (CMAKE_SYSTEM_NAME MATCHES "SunOS")
 
 if(WIN32)
-  TARGET_LINK_LIBRARIES(marblewidget ws2_32 imm32 winmm)
+  TARGET_LINK_LIBRARIES(${MARBLEWIDGET} ws2_32 imm32 winmm)
 endif(WIN32)
 
 
-set_target_properties(marblewidget  PROPERTIES
+set_target_properties(${MARBLEWIDGET}  PROPERTIES
                                     VERSION ${GENERIC_LIB_VERSION}
                                     SOVERSION ${GENERIC_LIB_SOVERSION}
                                     COMPILE_FLAGS "-DKML_LAZY_IMP")
 # needed for marble_export.h
-set_target_properties(marblewidget PROPERTIES
+set_target_properties(${MARBLEWIDGET} PROPERTIES
   DEFINE_SYMBOL MAKE_MARBLE_LIB
 )
 
 # choose the correct target install library path
 if(WIN32)
-  install(TARGETS marblewidget RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX})
+  install(TARGETS ${MARBLEWIDGET} RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX})
 elseif(APPLE)
-  install(TARGETS marblewidget LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/Marble.app/Contents/MacOS/lib)
+  install(TARGETS ${MARBLEWIDGET} LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/Marble.app/Contents/MacOS/lib)
 else()
-  install(TARGETS marblewidget LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX})
+  install(TARGETS ${MARBLEWIDGET} LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX})
 endif()
+
 
 ########### install files ###############
 
@@ -407,6 +432,12 @@ install( FILES
     LegendWidget.h
     FileViewWidget.h
     TourWidget.h
+    FlyToEditWidget.h
+    TourControlEditWidget.h
+    WaitEditWidget.h
+    SoundCueEditWidget.h
+    RemoveItemEditWidget.h
+    TourItemDelegate.h
     TourPlayback.h
     CurrentLocationWidget.h
     MarbleNavigator.h
@@ -509,6 +540,9 @@ install( FILES
     marble_export.h
     Planet.h
     PlanetFactory.h
+    EditPlacemarkDialog.h
+    AddLinkDialog.h
+    FormattedTextWidget.h
 
     AbstractDataPlugin.h
     AbstractDataPluginModel.h
@@ -516,6 +550,7 @@ install( FILES
     AbstractWorkerThread.h
 
     LatLonEdit.h
+    PlacemarkEditHeader.h
     MapWizard.h
     MapThemeDownloadDialog.h
     ElevationModel.h

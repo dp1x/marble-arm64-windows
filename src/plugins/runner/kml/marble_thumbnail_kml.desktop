@@ -1,14 +1,18 @@
 [Desktop Entry]
 Type=Service
 Name=KML Geographic Data
+Name[bg]=Географски данни – KML
+Name[bs]=KML Geografski podaci
 Name[ca]=Dades geogràfiques KML
 Name[da]=KML geografiske data
 Name[de]=KML-Geografiedaten
 Name[en_GB]=KML Geographic Data
+Name[eo]=KML Geografiaj datumoj
 Name[es]=Datos geográficos KML
 Name[et]=KML geograafilised andmed
 Name[fi]=KML-paikkatieto
 Name[fr]=Données géographiques KML
+Name[hu]=KML földrajzi adat
 Name[it]=Dati geografici KML
 Name[nds]=KML-Geodaten
 Name[nl]=KML Geographic Data

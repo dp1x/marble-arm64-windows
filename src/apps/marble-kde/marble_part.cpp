@@ -554,14 +554,14 @@ void MarblePart::readSettings()
         m_controlView->marbleModel()->routingManager()->routeRequest()->setRoutingProfile( profile );
     }
 
+    PositionTracking *const tracking = m_controlView->marbleModel()->positionTracking();
+    tracking->readSettings();
     QString positionProvider = MarbleSettings::activePositionTrackingPlugin();
     if ( !positionProvider.isEmpty() ) {
-        PositionTracking* tracking = m_controlView->marbleModel()->positionTracking();
         const PluginManager* pluginManager = m_controlView->marbleModel()->pluginManager();
         foreach( const PositionProviderPlugin* plugin, pluginManager->positionProviderPlugins() ) {
             if ( plugin->nameId() == positionProvider ) {
                 PositionProviderPlugin* instance = plugin->newInstance();
-                instance->setMarbleModel( m_controlView->marbleModel() );
                 tracking->setPositionProviderPlugin( instance );
                 break;
             }
@@ -737,7 +737,8 @@ void MarblePart::writeSettings()
 
     QString positionProvider;
     PositionTracking* tracking = m_controlView->marbleModel()->positionTracking();
-    if ( tracking && tracking->positionProviderPlugin() ) {
+    tracking->writeSettings();
+    if ( tracking->positionProviderPlugin() ) {
         positionProvider = tracking->positionProviderPlugin()->nameId();
     }
     MarbleSettings::setActivePositionTrackingPlugin( positionProvider );
@@ -1486,7 +1487,7 @@ void MarblePart::editSettings()
     #ifdef Q_WS_X11
     nativeString = i18n( "Native (X11)" );
     #endif
-    #ifdef Q_WS_MAC
+    #ifdef Q_OS_MAC
     nativeString = i18n( "Native (Mac OS X Core Graphics)" );
     #endif
 

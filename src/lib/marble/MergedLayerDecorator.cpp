@@ -225,6 +225,9 @@ void MergedLayerDecorator::Private::renderGroundOverlays( QImage *tileImage, con
     for ( int i =  0; i < m_groundOverlays.size(); ++i ) {
 
         const GeoDataGroundOverlay* overlay = m_groundOverlays.at( i );
+        if ( !overlay->isGloballyVisible() ) {
+            continue;
+        }
 
         const GeoDataLatLonBox overlayLatLonBox = overlay->latLonBox();
 
@@ -243,17 +246,32 @@ void MergedLayerDecorator::Private::renderGroundOverlays( QImage *tileImage, con
         const qreal latToPixel = overlay->icon().height() / overlayLatLonBox.height();
         const qreal lonToPixel = overlay->icon().width() / overlayLatLonBox.width();
 
+        const qreal  global_height = tileImage->height()
+                * TileLoaderHelper::levelToRow( m_levelZeroRows, tileId.zoomLevel() );
+        const qreal pixel2Rad = M_PI / global_height;
+        const qreal rad2Pixel = global_height / M_PI;
+
+        qreal latPixelPosition = rad2Pixel/2 * gdInv(tileLatLonBox.north());
+
+        qreal centerLon = overlayLatLonBox.center().longitude();
+        bool crossesDateLine = overlayLatLonBox.crossesDateLine();
+
         for ( int y = 0; y < tileImage->height(); ++y ) {
              QRgb *scanLine = ( QRgb* ) ( tileImage->scanLine( y ) );
 
-             qreal lat = tileLatLonBox.north() - y * pixelToLat;
+             qreal lat = 0;
+
+             if (m_textureLayers.at( 0 )->projection() ==  GeoSceneTiled::Mercator) {
+                  lat = gd(2 * (latPixelPosition - y) * pixel2Rad );
+             }
+             else {
+                  lat = tileLatLonBox.north() - y * pixelToLat;
+             }
 
              for ( int x = 0; x < tileImage->width(); ++x, ++scanLine ) {
                  qreal lon = GeoDataCoordinates::normalizeLon( tileLatLonBox.west() + x * pixelToLon );
 
-                 qreal centerLon = overlayLatLonBox.center().longitude();
-
-                 if ( overlayLatLonBox.crossesDateLine() ) {
+                 if ( crossesDateLine ) {
                      if ( lon < 0 && centerLon > 0 ) {
                          centerLon -= 2 * M_PI;
                      }
@@ -272,13 +290,28 @@ void MergedLayerDecorator::Private::renderGroundOverlays( QImage *tileImage, con
 
                  GeoDataCoordinates::normalizeLonLat( rotatedLon, rotatedLat );
 
-                 if ( overlay->latLonBox().contains( GeoDataCoordinates( rotatedLon, rotatedLat ) ) ) {
+                 if ( overlay->latLonBox().contains( rotatedLon, rotatedLat ) ) {
 
-                     qreal px = ( GeoDataLatLonBox( 0, 0, rotatedLon, overlayLatLonBox.west() ).width() * lonToPixel );
-                     qreal py = qreal( overlay->icon().height() ) - ( GeoDataLatLonBox( rotatedLat, overlayLatLonBox.south(), 0, 0 ).height() * latToPixel ) - 1;
+                     qreal px = GeoDataLatLonBox::width( rotatedLon, overlayLatLonBox.west() ) * lonToPixel;
+                     qreal py = (qreal)( overlay->icon().height() ) - ( GeoDataLatLonBox::height( rotatedLat, overlayLatLonBox.south() ) * latToPixel ) - 1;
 
                      if ( px >= 0 && px < overlay->icon().width() && py >= 0 && py < overlay->icon().height() ) {
-                         *scanLine = ImageF::pixelF( overlay->icon(), px, py );
+                         int alpha = qAlpha( overlay->icon().pixel( px, py ) );
+                         if ( alpha != 0 )
+                         {
+                            QRgb result = ImageF::pixelF( overlay->icon(), px, py );
+
+                            if (alpha == 255)
+                            {
+                                *scanLine = result;
+                            }
+                            else
+                            {
+                                *scanLine = qRgb( ( alpha * qRed(result) + (255 - alpha) * qRed(*scanLine) ) / 255,
+                                            ( alpha * qGreen(result) + (255 - alpha) * qGreen(*scanLine) ) / 255,
+                                            ( alpha * qBlue(result) + (255 - alpha) * qBlue(*scanLine) ) / 255 );
+                            }
+                         }
                      }
                  }
              }

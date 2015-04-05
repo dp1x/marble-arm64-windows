@@ -18,6 +18,7 @@
 #include "routing/instructions/InstructionTransformation.h"
 #include "GeoDataDocument.h"
 #include "GeoDataExtendedData.h"
+#include "GeoDataPlacemark.h"
 
 #include <QProcess>
 #include <QMap>
@@ -25,7 +26,6 @@
 #include <MarbleMap.h>
 #include <MarbleModel.h>
 #include <routing/RoutingManager.h>
-#include <routing/RoutingModel.h>
 #include <routing/RoutingProfilesModel.h>
 
 namespace Marble

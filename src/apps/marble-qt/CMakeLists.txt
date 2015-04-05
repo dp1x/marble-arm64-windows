@@ -15,6 +15,9 @@ marble_qt4_automoc(${marble_SRCS})
 
 if (WIN32)
     add_executable (marble-qt WIN32 ${marble_SRCS})
+    if (MSVC)
+	  set_target_properties(marble-qt PROPERTIES LINK_FLAGS "/ENTRY:\"mainCRTStartup\"")
+    endif()
 else (WIN32)
     if (APPLE)
         add_executable (marble-qt ${marble_SRCS})
@@ -37,7 +40,7 @@ if (QT4BUILD)
     ${QT_QTMAIN_LIBRARY}
     ${QT_QTDBUS_LIBRARY}
     marbleui
-    marblewidget
+    ${MARBLEWIDGET}
     astro)
 else()
   target_link_libraries (
@@ -50,7 +53,7 @@ else()
     ${Qt5WebKitWidgets_LIBRARIES}
     ${Qt5WebKit_LIBRARIES}
     marbleui
-    marblewidget
+    ${MARBLEWIDGET}
     astro)
 endif()
 

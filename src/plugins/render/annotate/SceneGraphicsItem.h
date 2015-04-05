@@ -66,14 +66,26 @@ public:
         ShowNodeRmbMenu,
         StartPolygonAnimation,
         RemovePolygonRequest,
+        ChangeCursorPolygonNodeHover,
+        ChangeCursorPolygonBodyHover,
 
         // Placemark specific
         ShowPlacemarkRmbMenu,
+        ChangeCursorPlacemarkHover,
 
         // Polyline specific
         RemovePolylineRequest,
         ShowPolylineRmbMenu,
-        StartPolylineAnimation
+        StartPolylineAnimation,
+        ChangeCursorPolylineNodeHover,
+        ChangeCursorPolylineLineHover,
+
+        // GroundOverlay specific
+        ChangeCursorOverlayVerticalHover,
+        ChangeCursorOverlayHorizontalHover,
+        ChangeCursorOverlayBDiagHover,
+        ChangeCursorOverlayFDiagHover,
+        ChangeCursorOverlayBodyHover
     };
 
     /**

@@ -15,10 +15,14 @@
 // Qt
 #include <QColorDialog>
 #include <QMessageBox>
+#include <QVBoxLayout>
 
 // Marble
 #include "GeoDataPlacemark.h"
 #include "GeoDataStyle.h"
+#include "GeoDataTypes.h"
+#include "NodeModel.h"
+#include "FormattedTextWidget.h"
 
 
 namespace Marble
@@ -30,10 +34,6 @@ public:
     Private( GeoDataPlacemark *placemark);
     ~Private();
 
-    // Used to tell whether the settings before showing the dialog should be restored on
-    // pressing the 'Cancel' button or not.
-    bool m_firstEditing;
-
     QColorDialog *m_linesDialog;
     GeoDataPlacemark *m_placemark;
 
@@ -41,13 +41,16 @@ public:
     QString m_initialName;
     QString m_initialDescription;
     GeoDataLineStyle m_initialLineStyle;
+    FormattedTextWidget *m_formattedTextWidget;
+
+    NodeModel *m_nodeModel;
 };
 
 EditPolylineDialog::Private::Private( GeoDataPlacemark *placemark ) :
     Ui::UiEditPolylineDialog(),
-    m_firstEditing( false ),
     m_linesDialog( 0 ),
-    m_placemark( placemark )
+    m_placemark( placemark ),
+    m_nodeModel( new NodeModel )
 {
     // nothing to do
 }
@@ -55,6 +58,7 @@ EditPolylineDialog::Private::Private( GeoDataPlacemark *placemark ) :
 EditPolylineDialog::Private::~Private()
 {
     delete m_linesDialog;
+    delete m_nodeModel;
 }
 
 EditPolylineDialog::EditPolylineDialog( GeoDataPlacemark *placemark, QWidget *parent ) :
@@ -62,6 +66,12 @@ EditPolylineDialog::EditPolylineDialog( GeoDataPlacemark *placemark, QWidget *pa
     d ( new Private( placemark ) )
 {
     d->setupUi( this );
+
+    d->m_formattedTextWidget = new FormattedTextWidget( d->m_descriptionTab );
+
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->addWidget( d->m_formattedTextWidget );
+    d->m_descriptionTab->setLayout( layout );
 
     // If the polygon has just been drawn, assign it a default name.
     if ( d->m_placemark->name().isNull() ) {
@@ -73,8 +83,8 @@ EditPolylineDialog::EditPolylineDialog( GeoDataPlacemark *placemark, QWidget *pa
     d->m_initialName = d->m_name->text();
     connect( d->m_name, SIGNAL(editingFinished()), this, SLOT(updatePolyline()) );
 
-    d->m_description->setText( placemark->description() );
-    d->m_initialDescription = d->m_description->toPlainText();
+    d->m_formattedTextWidget->setText( placemark->description() );
+    d->m_initialDescription = d->m_formattedTextWidget->text();
 
     d->m_linesWidth->setRange( 0.1, 5.0 );
 
@@ -100,6 +110,17 @@ EditPolylineDialog::EditPolylineDialog( GeoDataPlacemark *placemark, QWidget *pa
     connect( d->m_linesDialog, SIGNAL(colorSelected(QColor)), this, SLOT(updateLinesDialog(const QColor&)) );
     connect( d->m_linesDialog, SIGNAL(colorSelected(QColor)), this, SLOT(updatePolyline()) );
 
+    if( placemark->geometry()->nodeType() == GeoDataTypes::GeoDataLineStringType ) {
+        GeoDataLineString *lineString = static_cast<GeoDataLineString*>( placemark->geometry() );
+        for( int i = 0; i < lineString->size(); ++i ) {
+            d->m_nodeModel->addNode( lineString->at( i ) );
+        }
+    }
+    d->m_nodeView->setModel( d->m_nodeModel );
+
+    // Resize column to contents size for better UI.
+    d->m_nodeView->resizeColumnToContents( 0 );
+
     // Promote "Ok" button to default button.
     d->buttonBox->button( QDialogButtonBox::Ok )->setDefault( true );
 
@@ -117,14 +138,27 @@ EditPolylineDialog::~EditPolylineDialog()
     delete d;
 }
 
-void EditPolylineDialog::setFirstTimeEditing( bool enabled )
+void EditPolylineDialog::handleAddingNode( const GeoDataCoordinates &node )
 {
-    d->m_firstEditing = enabled;
+    d->m_nodeModel->addNode( node );
+}
+
+void EditPolylineDialog::handleItemMoving( GeoDataPlacemark *item )
+{
+    if( item == d->m_placemark ) {
+        d->m_nodeModel->clear();
+        if( d->m_placemark->geometry()->nodeType() == GeoDataTypes::GeoDataLineStringType ) {
+            GeoDataLineString *lineString = static_cast<GeoDataLineString*>( d->m_placemark->geometry() );
+            for( int i = 0; i < lineString->size(); ++i ) {
+                d->m_nodeModel->addNode( lineString->at( i ) );
+            }
+        }
+    }
 }
 
 void EditPolylineDialog::updatePolyline()
 {
-    d->m_placemark->setDescription( d->m_description->toPlainText() );
+    d->m_placemark->setDescription( d->m_formattedTextWidget->text() );
     d->m_placemark->setName( d->m_name->text() );
 
 
@@ -169,10 +203,25 @@ void EditPolylineDialog::restoreInitial( int result )
 
 void EditPolylineDialog::checkFields()
 {
+    bool ok = true;
     if ( d->m_name->text().isEmpty() ) {
         QMessageBox::warning( this,
                               tr( "No name specified" ),
                               tr( "Please specify a name for this polyline." ) );
+        ok = false;
+    } else {
+        if ( d->m_placemark->geometry()->nodeType() == GeoDataTypes::GeoDataLineStringType ) {
+            GeoDataLineString *lineString = static_cast<GeoDataLineString*>( d->m_placemark->geometry() );
+            if( lineString->size() < 2 ) {
+                QMessageBox::warning( this,
+                                      tr( "Not enough nodes specified." ),
+                                      tr( "Please specify at least 2 nodes for the path by clicking on the map." ) );
+                ok = false;
+            }
+        }
+    }
+    if( ok ) {
+        accept();
     }
 }
 

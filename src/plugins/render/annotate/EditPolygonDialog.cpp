@@ -15,10 +15,14 @@
 // Qt
 #include <QColorDialog>
 #include <QMessageBox>
+#include <QVBoxLayout>
 
 // Marble
 #include "GeoDataStyle.h"
-
+#include "GeoDataTypes.h"
+#include "NodeModel.h"
+#include "NodeItemDelegate.h"
+#include "FormattedTextWidget.h"
 
 namespace Marble {
 
@@ -29,7 +33,6 @@ public:
     ~Private();
 
     GeoDataPlacemark *m_placemark;
-    bool m_firstEditing;
 
     QColorDialog *m_linesDialog;
     QColorDialog *m_polyDialog;
@@ -37,14 +40,19 @@ public:
     QString m_initialDescription;
     QString m_initialName;
     GeoDataStyle m_initialStyle;
+    GeoDataLinearRing m_initialOuterBoundary;
+
+    NodeModel *m_nodeModel;
+    NodeItemDelegate *m_delegate;
+    FormattedTextWidget *m_formattedTextWidget;
 };
 
 EditPolygonDialog::Private::Private( GeoDataPlacemark *placemark ) :
     Ui::UiEditPolygonDialog(),
     m_placemark( placemark ),
-    m_firstEditing( false ),
     m_linesDialog( 0 ),
-    m_polyDialog( 0 )
+    m_polyDialog( 0 ),
+    m_nodeModel( new NodeModel )
 {
     // nothing to do
 }
@@ -53,6 +61,8 @@ EditPolygonDialog::Private::~Private()
 {
     delete m_linesDialog;
     delete m_polyDialog;
+    delete m_nodeModel;
+    delete m_delegate;
 }
 
 EditPolygonDialog::EditPolygonDialog( GeoDataPlacemark *placemark, QWidget *parent ) :
@@ -60,6 +70,12 @@ EditPolygonDialog::EditPolygonDialog( GeoDataPlacemark *placemark, QWidget *pare
     d( new Private( placemark ) )
 {
     d->setupUi( this );
+
+    d->m_formattedTextWidget = new FormattedTextWidget( d->m_descriptionTab );
+
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->addWidget(d->m_formattedTextWidget);
+    d->m_descriptionTab->setLayout(layout);
 
     d->m_initialStyle = *placemark->style();
 
@@ -71,7 +87,7 @@ EditPolygonDialog::EditPolygonDialog( GeoDataPlacemark *placemark, QWidget *pare
     d->m_initialName = placemark->name();
     connect( d->m_name, SIGNAL(editingFinished()), this, SLOT(updatePolygon()) );
 
-    d->m_description->setText( placemark->description() );
+    d->m_formattedTextWidget->setText( placemark->description() );
     d->m_initialDescription = placemark->description();
 
     // Get the current style properties.
@@ -116,6 +132,27 @@ EditPolygonDialog::EditPolygonDialog( GeoDataPlacemark *placemark, QWidget *pare
     connect( d->m_polyDialog, SIGNAL(colorSelected(QColor)), this, SLOT(updatePolyDialog(const QColor&)) );
     connect( d->m_polyDialog, SIGNAL(colorSelected(QColor)), this, SLOT(updatePolygon()) );
 
+    // Setting the NodeView's delegate: mainly used for the editing the polygon's nodes
+    d->m_delegate = new NodeItemDelegate( d->m_placemark, this, d->m_nodeView );
+
+    d->m_nodeView->setItemDelegate( d->m_delegate );
+    d->m_nodeView->setEditTriggers( QAbstractItemView::AllEditTriggers );
+
+    // Populating the model
+    if( placemark->geometry()->nodeType() == GeoDataTypes::GeoDataPolygonType ) {
+        GeoDataPolygon *polygon = static_cast<GeoDataPolygon*>( placemark->geometry() );
+        GeoDataLinearRing outerBoundary = polygon->outerBoundary();
+        for( int i = 0; i < outerBoundary.size(); ++i ) {
+            d->m_nodeModel->addNode( outerBoundary.at( i ) );
+        }
+        d->m_initialOuterBoundary = outerBoundary;
+    }
+
+    d->m_nodeView->setModel( d->m_nodeModel );
+
+    // Resize column to contents size for better UI.
+    d->m_nodeView->resizeColumnToContents( 0 );
+
     // Promote "Ok" button to default button.
     d->buttonBox->button( QDialogButtonBox::Ok )->setDefault( true );
 
@@ -133,9 +170,23 @@ EditPolygonDialog::~EditPolygonDialog()
     delete d;
 }
 
-void EditPolygonDialog::setFirstTimeEditing( bool enabled )
+void EditPolygonDialog::handleAddingNode( const GeoDataCoordinates &node )
 {
-    d->m_firstEditing = enabled;
+    d->m_nodeModel->addNode( node );
+}
+
+void EditPolygonDialog::handleItemMoving( GeoDataPlacemark *item )
+{
+    if( item == d->m_placemark ) {
+        d->m_nodeModel->clear();
+        if( d->m_placemark->geometry()->nodeType() == GeoDataTypes::GeoDataPolygonType ) {
+            GeoDataPolygon *polygon = static_cast<GeoDataPolygon*>( d->m_placemark->geometry() );
+            GeoDataLinearRing outerBoundary = polygon->outerBoundary();
+            for( int i = 0; i < outerBoundary.size(); ++i ) {
+                d->m_nodeModel->addNode( outerBoundary.at( i ) );
+            }
+        }
+    }
 }
 
 void EditPolygonDialog::updatePolygon()
@@ -143,7 +194,7 @@ void EditPolygonDialog::updatePolygon()
     GeoDataStyle *style = new GeoDataStyle( *d->m_placemark->style() );
 
     d->m_placemark->setName( d->m_name->text() );
-    d->m_placemark->setDescription( d->m_description->toPlainText() );
+    d->m_placemark->setDescription( d->m_formattedTextWidget->text() );
 
     style->lineStyle().setWidth( d->m_linesWidth->value() );
     // 0 corresponds to "Filled" and 1 corresponds to "Not Filled".
@@ -179,10 +230,25 @@ void EditPolygonDialog::updatePolyDialog( const QColor &color )
 
 void EditPolygonDialog::checkFields()
 {
+    bool ok = true;
     if ( d->m_name->text().isEmpty() ) {
         QMessageBox::warning( this,
                               tr( "No name specified" ),
                               tr( "Please specify a name for this polygon." ) );
+        ok = false;
+    } else {
+        if ( d->m_placemark->geometry()->nodeType() == GeoDataTypes::GeoDataPolygonType ) {
+            GeoDataPolygon *polygon = static_cast<GeoDataPolygon*>( d->m_placemark->geometry() );
+            if( polygon->outerBoundary().size() < 3 ) {
+                QMessageBox::warning( this,
+                                      tr( "Not enough nodes specified." ),
+                                      tr( "Please specify at least 3 nodes for the polygon by clicking on the map." ) );
+                ok = false;
+            }
+        }
+    }
+    if( ok ) {
+        accept();
     }
 }
 
@@ -190,6 +256,13 @@ void EditPolygonDialog::restoreInitial( int result )
 {
     if ( result ) {
         return;
+    }
+
+    GeoDataPolygon *polygon = static_cast<GeoDataPolygon*>( d->m_placemark->geometry() );
+    GeoDataLinearRing outerBoundary = polygon->outerBoundary();
+
+    if ( outerBoundary != d->m_initialOuterBoundary ) {
+        polygon->setOuterBoundary( d->m_initialOuterBoundary );
     }
 
     if ( d->m_placemark->name() != d->m_initialName ) {
@@ -203,10 +276,8 @@ void EditPolygonDialog::restoreInitial( int result )
     if ( *d->m_placemark->style() != d->m_initialStyle ) {
         d->m_placemark->setStyle( new GeoDataStyle( d->m_initialStyle ) );
     }
-
     emit polygonUpdated( d->m_placemark );
 }
 
 }
-
 #include "EditPolygonDialog.moc"

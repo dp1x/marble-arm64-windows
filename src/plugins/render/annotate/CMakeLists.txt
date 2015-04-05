@@ -13,7 +13,6 @@ endif()
 
 set( annotate_UI
   EditGroundOverlayDialog.ui
-  EditTextAnnotationDialog.ui
   EditPolygonDialog.ui
   EditPolylineDialog.ui
 )
@@ -22,8 +21,8 @@ set( annotate_SRCS
   AnnotatePlugin.cpp
   AreaAnnotation.cpp
   EditGroundOverlayDialog.cpp
-  EditTextAnnotationDialog.cpp
   EditPolygonDialog.cpp
+  NodeItemDelegate.cpp
   EditPolylineDialog.cpp
   GroundOverlayFrame.cpp
   MergingPolygonNodesAnimation.cpp
@@ -33,6 +32,7 @@ set( annotate_SRCS
   PolylineNode.cpp
   SceneGraphicsItem.cpp
   SceneGraphicsTypes.cpp
+  NodeModel.cpp
 )
 
 qt_wrap_ui(annotate_SRCS ${annotate_UI})

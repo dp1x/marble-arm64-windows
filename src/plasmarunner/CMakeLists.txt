@@ -19,7 +19,7 @@ set(plasmaRunner_SRCS
 
 add_library(plasma_runner_marble MODULE ${plasmaRunner_SRCS})
 target_link_libraries(plasma_runner_marble
-  marblewidget
+  ${MARBLEWIDGET}
   KF5::ConfigCore
   KF5::Runner
   KF5::Service

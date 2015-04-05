@@ -30,6 +30,7 @@ class QProgressBar;
 namespace Marble
 {
 
+class GeoDataContainer;
 class MarbleWidget;
 class SunControlWidget;
 class TimeControlWidget;
@@ -82,6 +83,8 @@ private Q_SLOTS:
     void  fallBackToDefaultTheme();
 
     void  changeRecordingState();
+
+    void  updateApplicationTitle(const QString&);
 
     // File Menu
     void  openFile();
