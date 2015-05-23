@@ -1,6 +1,7 @@
 ########### install files ###############
 #
 
+set(KDE_SKIP_UNINSTALL_TARGET TRUE)
 find_package(ECM QUIET)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH})
 if(ECM_FOUND)

@@ -23,6 +23,7 @@ else()
   install(FILES marble_shp.desktop DESTINATION ${APPS_INSTALL_DIR})
 endif()
 
+set(KDE_SKIP_UNINSTALL_TARGET TRUE)
 find_package(ECM QUIET)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH})
 if(ECM_FOUND)

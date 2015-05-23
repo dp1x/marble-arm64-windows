@@ -1,5 +1,6 @@
 project(MarblePlasmaRunner)
 
+set(KDE_SKIP_UNINSTALL_TARGET TRUE)
 find_package(ECM QUIET)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH})
 if(ECM_FOUND)
@@ -25,6 +26,12 @@ target_link_libraries(plasma_runner_marble
   KF5::Service
   KF5::I18n
 )
+
+if(UNIX)
+    # Extracted enabling from -std=c++0x KDECompilerSettings.cmake; it is used
+    # at least by kpluginloader which uses std::function
+    set_target_properties(plasma_runner_marble PROPERTIES COMPILE_FLAGS -std=c++0x)
+endif()
 
 install(TARGETS plasma_runner_marble DESTINATION ${PLUGIN_INSTALL_DIR})
 install(FILES plasma-runner-marble.desktop DESTINATION ${SERVICES_INSTALL_DIR})
