@@ -67,7 +67,8 @@ MeasureToolPlugin::MeasureToolPlugin( const MarbleModel *marbleModel )
       m_circularArea(0.0),
       m_radius(0.0),
       m_perimeter(0.0),
-      m_circumference(0.0)
+      m_circumference(0.0),
+      m_paintMode(Polygon)
 {
     m_pen.setWidthF( 2.0 );
 }
@@ -628,7 +629,8 @@ void MeasureToolPlugin::addContextItems()
     m_separator = new QAction( this );
     m_separator->setSeparator( true );
 
-    if ( ! MarbleGlobal::getInstance()->profiles() & MarbleGlobal::SmallScreen ) {
+    bool const smallScreen = MarbleGlobal::getInstance()->profiles() & MarbleGlobal::SmallScreen;
+    if ( !smallScreen ) {
         menu->addAction( Qt::RightButton, m_addMeasurePointAction );
         menu->addAction( Qt::RightButton, m_removeLastMeasurePointAction );
         menu->addAction( Qt::RightButton, m_removeMeasurePointsAction );

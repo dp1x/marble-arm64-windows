@@ -38,6 +38,37 @@
 #include "VisiblePlacemark.h"
 #include "MathHelper.h"
 
+namespace
+{
+    bool placemarkLayoutOrderCompare(const Marble::GeoDataPlacemark *left, const Marble::GeoDataPlacemark *right)
+    {
+        if (left->zoomLevel() != right->zoomLevel())
+            return (left->zoomLevel() < right->zoomLevel()); //lower zoom level comes first
+
+        if (left->popularity() != right->popularity())
+            return left->popularity() > right->popularity(); //higher popularity comes first
+
+        return left < right; //lower pointer value comes first
+    }
+}
+
+namespace
+{   //Helper function that checks for available room for the label
+    bool hasRoomFor(const QVector<Marble::VisiblePlacemark*> & placemarks, const QRectF &labelRect)
+    {
+        // Check if there is another label or symbol that overlaps.
+        QVector<Marble::VisiblePlacemark*>::const_iterator beforeItEnd = placemarks.constEnd();
+        for ( QVector<Marble::VisiblePlacemark*>::ConstIterator beforeIt = placemarks.constBegin();
+              beforeIt != beforeItEnd; ++beforeIt )
+        {
+            if ( labelRect.intersects( (*beforeIt)->labelRect() ) ) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
 namespace Marble
 {
 
@@ -253,7 +284,7 @@ int PlacemarkLayout::maxLabelHeight() const
         const GeoDataPlacemark *placemark = dynamic_cast<GeoDataPlacemark*>(qvariant_cast<GeoDataObject*>(index.data( MarblePlacemarkModel::ObjectPointerRole ) ));
         if ( placemark ) {
             const GeoDataStyle* style = placemark->style();
-            QFont labelFont = style->labelStyle().font();
+            QFont labelFont = style->labelStyle().scaledFont();
             int textHeight = QFontMetrics( labelFont ).height();
             if ( textHeight > maxLabelHeight )
                 maxLabelHeight = textHeight;
@@ -432,6 +463,7 @@ QVector<VisiblePlacemark *> PlacemarkLayout::generateLayout( const ViewportParam
     foreach ( const TileId &tileId, tileIdList ) {
         placemarkList += m_placemarkCache.value( tileId );
     }
+    qSort(placemarkList.begin(), placemarkList.end(), placemarkLayoutOrderCompare);
 
     foreach ( const GeoDataPlacemark *placemark, placemarkList ) {
         const GeoDataCoordinates coordinates = placemarkIconCoordinates( placemark );
@@ -601,7 +633,7 @@ QRectF PlacemarkLayout::roomForLabel( const GeoDataStyle * style,
                                       const qreal x, const qreal y,
                                       const QString &labelText ) const
 {
-    QFont labelFont = style->labelStyle().font();
+    QFont labelFont = style->labelStyle().scaledFont();
     int textHeight = QFontMetrics( labelFont ).height();
 
     int textWidth;
@@ -616,7 +648,7 @@ QRectF PlacemarkLayout::roomForLabel( const GeoDataStyle * style,
     const QVector<VisiblePlacemark*> currentsec = m_rowsection.at( y / m_maxLabelHeight );
 
     if ( style->labelStyle().alignment() == GeoDataLabelStyle::Corner ) {
-        const int symbolWidth = style->iconStyle().icon().width();
+        const int symbolWidth = style->iconStyle().scaledIcon().size().width();
 
         // Check the four possible positions by going through all of them
         for( int i=0; i<4; ++i ) {
@@ -626,43 +658,39 @@ QRectF PlacemarkLayout::roomForLabel( const GeoDataStyle * style,
                                               y - textHeight;
             const QRectF labelRect = QRectF( xPos, yPos, textWidth, textHeight );
 
-            // Check if there is another label or symbol that overlaps.
-            bool isRoom = true;
-            QVector<VisiblePlacemark*>::const_iterator beforeItEnd = currentsec.constEnd();
-            for ( QVector<VisiblePlacemark*>::ConstIterator beforeIt = currentsec.constBegin();
-                  beforeIt != beforeItEnd;
-                  ++beforeIt ) {
-                if ( labelRect.intersects( (*beforeIt)->labelRect()) ) {
-                    isRoom = false;
-                    break;
-                }
-            }
-
-            if ( isRoom ) {
+            if (hasRoomFor(currentsec, labelRect)) {
                 // claim the place immediately if it hasn't been used yet
                 return labelRect;
             }
         }
     }
     else if ( style->labelStyle().alignment() == GeoDataLabelStyle::Center ) {
-        bool isRoom = true;
         QRectF  labelRect( x - textWidth / 2, y - textHeight / 2,
                           textWidth, textHeight );
 
-        // Check if there is another label or symbol that overlaps.
-        QVector<VisiblePlacemark*>::const_iterator beforeItEnd = currentsec.constEnd();
-        for ( QVector<VisiblePlacemark*>::ConstIterator beforeIt = currentsec.constBegin();
-              beforeIt != beforeItEnd; ++beforeIt )
-        {
-            if ( labelRect.intersects( (*beforeIt)->labelRect() ) ) {
-                isRoom = false;
-                break;
-            }
-        }
-
-        if ( isRoom ) {
+        if (hasRoomFor(currentsec, labelRect)) {
             // claim the place immediately if it hasn't been used yet 
             return labelRect;
+        }
+    }
+    else if (style->labelStyle().alignment() == GeoDataLabelStyle::Right)
+    {
+        // Check up to seven vertical positions (center, +3, -3 from center)
+        for(int i=0; i<7; ++i)
+        {
+            const int symbolWidth = style->iconStyle().icon().width();
+            const qreal startY = y - textHeight/2;
+            const qreal increase = (i/2) * (textHeight + 1); //intentional integer arithmetics
+            const qreal direction = (i%2 == 0 ? 1 : -1);
+            const qreal xPos = x + symbolWidth / 2 + 1;
+            const qreal yPos = startY + increase*direction;
+
+            const QRectF labelRect = QRectF(xPos, yPos, textWidth, textHeight);
+
+            if (hasRoomFor(currentsec, labelRect))
+            {
+                return labelRect;
+            }
         }
     }
 

@@ -113,7 +113,7 @@ ControlView::~ControlView()
 
 QString ControlView::applicationVersion()
 {
-    return "1.9.20 (1.10 Alpha)";
+    return "1.11.20 (1.12 development version)";
 }
 
 MapThemeManager *ControlView::mapThemeManager()
@@ -804,8 +804,8 @@ void ControlView::updateAnnotationDock()
     QToolBar *firstToolbar = new QToolBar( widget );
     QToolBar *secondToolbar = new QToolBar( widget );
     QSpacerItem *spacer = new QSpacerItem( 0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
-    bool firstToolbarFilled = false;
     if( !tmp_actionGroups->isEmpty() ) {
+        bool firstToolbarFilled = false;
         foreach( QAction *action, tmp_actionGroups->first()->actions() ) {
             if( action->objectName() == "toolbarSeparator" ) {
                 firstToolbarFilled = true;

@@ -119,6 +119,8 @@ AnnotatePlugin::~AnnotatePlugin()
     // delete m_networkAccessManager;
 
     delete m_clipboardItem;
+
+    disconnect( this, SIGNAL(mouseMoveGeoPosition(QString)), m_marbleWidget, SIGNAL(mouseMoveGeoPosition(QString)) );
 }
 
 QStringList AnnotatePlugin::backendTypes() const
@@ -431,6 +433,8 @@ bool AnnotatePlugin::eventFilter( QObject *watched, QEvent *event )
             m_marbleWidget->model()->treeModel()->addDocument( m_annotationDocument );
             m_widgetInitialized = true;
 
+            connect( this, SIGNAL(mouseMoveGeoPosition(QString)), m_marbleWidget, SIGNAL(mouseMoveGeoPosition(QString)) );
+
             return true;
         }
         return false;
@@ -587,17 +591,16 @@ bool AnnotatePlugin::eventFilter( QObject *watched, QEvent *event )
 
 bool AnnotatePlugin::handleDrawingPolygon( QMouseEvent *mouseEvent )
 {
+    const GeoDataCoordinates coords = mouseGeoDataCoordinates( mouseEvent );
+
     if ( mouseEvent->type() == QEvent::MouseMove ) {
         setupCursor( 0 );
+
+        emit mouseMoveGeoPosition( coords.toString() );
+
         return true;
     } else if ( mouseEvent->button() == Qt::LeftButton &&
                 mouseEvent->type() == QEvent::MouseButtonPress ) {
-        qreal lon, lat;
-        m_marbleWidget->geoCoordinates( mouseEvent->pos().x(),
-                                        mouseEvent->pos().y(),
-                                        lon, lat,
-                                        GeoDataCoordinates::Radian );
-        const GeoDataCoordinates coords( lon, lat );
 
         m_marbleWidget->model()->treeModel()->removeFeature( m_polygonPlacemark );
         GeoDataPolygon *poly = dynamic_cast<GeoDataPolygon*>( m_polygonPlacemark->geometry() );
@@ -613,17 +616,16 @@ bool AnnotatePlugin::handleDrawingPolygon( QMouseEvent *mouseEvent )
 
 bool AnnotatePlugin::handleDrawingPolyline( QMouseEvent *mouseEvent )
 {
+    const GeoDataCoordinates coords = mouseGeoDataCoordinates( mouseEvent );
+
     if ( mouseEvent->type() == QEvent::MouseMove ) {
         setupCursor( 0 );
+
+        emit mouseMoveGeoPosition( coords.toString() );
+
         return true;
     } else if ( mouseEvent->button() == Qt::LeftButton &&
                 mouseEvent->type() == QEvent::MouseButtonPress ) {
-        qreal lon, lat;
-        m_marbleWidget->geoCoordinates( mouseEvent->pos().x(),
-                                        mouseEvent->pos().y(),
-                                        lon, lat,
-                                        GeoDataCoordinates::Radian );
-        const GeoDataCoordinates coords( lon, lat );
 
         m_marbleWidget->model()->treeModel()->removeFeature( m_polylinePlacemark );
         GeoDataLineString *line = dynamic_cast<GeoDataLineString*>( m_polylinePlacemark->geometry() );
@@ -639,12 +641,7 @@ bool AnnotatePlugin::handleDrawingPolyline( QMouseEvent *mouseEvent )
 
 void AnnotatePlugin::handleReleaseOverlay( QMouseEvent *mouseEvent )
 {
-    qreal lon, lat;
-    m_marbleWidget->geoCoordinates( mouseEvent->pos().x(),
-                                    mouseEvent->pos().y(),
-                                    lon, lat,
-                                    GeoDataCoordinates::Radian );
-    const GeoDataCoordinates coords( lon, lat );
+    const GeoDataCoordinates coords = mouseGeoDataCoordinates( mouseEvent );
 
     for ( int i = 0; i < m_groundOverlayModel.rowCount(); ++i ) {
         const QModelIndex index = m_groundOverlayModel.index( i, 0 );
@@ -671,6 +668,9 @@ bool AnnotatePlugin::handleMovingSelectedItem( QMouseEvent *mouseEvent )
         if ( m_movedItem->graphicType() == SceneGraphicsTypes::SceneGraphicTextAnnotation ) {
             emit placemarkMoved();
         }
+
+        const GeoDataCoordinates coords = mouseGeoDataCoordinates( mouseEvent );
+        emit mouseMoveGeoPosition( coords.toString() );
 
         return true;
     }
@@ -797,6 +797,8 @@ void AnnotatePlugin::handleRequests( QMouseEvent *mouseEvent, SceneGraphicsItem 
             m_marbleWidget->setCursor( Qt::SizeFDiagCursor );
         } else if ( groundOverlay->request() == SceneGraphicsItem::ChangeCursorOverlayBodyHover ) {
             m_marbleWidget->setCursor( Qt::SizeAllCursor );
+        } else if ( groundOverlay->request() == SceneGraphicsItem::ChangeCursorOverlayRotateHover ) {
+            m_marbleWidget->setCursor( Qt::CrossCursor );
         }
     }
 }
@@ -984,14 +986,15 @@ void AnnotatePlugin::addContextItems()
 {
     MarbleWidgetPopupMenu * const menu = m_marbleWidget->popupMenu();
 
-    m_pasteGraphicItem = new QAction( tr( "Paste Graphic Item" ), this );
-    m_pasteGraphicItem->setEnabled( false );
+    m_pasteGraphicItem = new QAction( tr( "Paste" ), this );
+    m_pasteGraphicItem->setVisible( false );
     connect( m_pasteGraphicItem, SIGNAL(triggered()), SLOT(pasteItem()) );
 
     QAction *separator = new QAction( this );
     separator->setSeparator( true );
 
-    if ( ! MarbleGlobal::getInstance()->profiles() & MarbleGlobal::SmallScreen ) {
+    bool const smallScreen = MarbleGlobal::getInstance()->profiles() & MarbleGlobal::SmallScreen;
+    if ( !smallScreen ) {
         menu->addAction( Qt::RightButton, m_pasteGraphicItem );
         menu->addAction( Qt::RightButton, separator );
     }
@@ -1617,7 +1620,7 @@ void AnnotatePlugin::cutItem()
     }
 
     m_clipboardItem = m_focusItem;
-    m_pasteGraphicItem->setEnabled( true );
+    m_pasteGraphicItem->setVisible( true );
 
     m_graphicsItems.removeAll( m_focusItem );
     m_marbleWidget->model()->treeModel()->removeFeature( m_focusItem->feature() );
@@ -1646,7 +1649,7 @@ void AnnotatePlugin::copyItem()
         m_clipboardItem = new PolylineAnnotation( placemark );
     }
 
-    m_pasteGraphicItem->setEnabled( true );
+    m_pasteGraphicItem->setVisible( true );
 }
 
 void AnnotatePlugin::pasteItem()
@@ -1666,7 +1669,17 @@ void AnnotatePlugin::pasteItem()
     m_focusItem = m_clipboardItem;
     m_clipboardItem = 0;
 
-    m_pasteGraphicItem->setEnabled( false );
+    m_pasteGraphicItem->setVisible( false );
+}
+
+const GeoDataCoordinates AnnotatePlugin::mouseGeoDataCoordinates( QMouseEvent *mouseEvent )
+{
+    qreal lon, lat;
+    m_marbleWidget->geoCoordinates( mouseEvent->pos().x(),
+                                    mouseEvent->pos().y(),
+                                    lon, lat,
+                                    GeoDataCoordinates::Radian );
+    return GeoDataCoordinates( lon, lat );
 }
 
 }

@@ -14,6 +14,7 @@
 #include <QToolButton>
 #include <QLabel>
 #include <QHBoxLayout>
+#include <QComboBox>
 
 #include "FlyToEditWidget.h"
 #include "MarbleWidget.h"
@@ -38,14 +39,45 @@ FlyToEditWidget::FlyToEditWidget( const QModelIndex &index, MarbleWidget* widget
     iconLabel->setPixmap( QPixmap( ":/marble/flag.png" ) );
     layout->addWidget( iconLabel );
 
-    QLabel *waitLabel = new QLabel;
-    waitLabel->setText(tr("Wait duration:"));
-    layout->addWidget(waitLabel);
+    QHBoxLayout *pairLayout = new QHBoxLayout;
+    pairLayout->setSpacing( 10 );
 
-    m_waitSpin = new QDoubleSpinBox;
-    layout->addWidget(m_waitSpin);
-    m_waitSpin->setValue(flyToElement()->duration());
-    m_waitSpin->setSuffix( tr(" s", "seconds") );
+    QHBoxLayout *durationLayout = new QHBoxLayout;
+    durationLayout->setSpacing( 5 );
+
+    QLabel *durationLabel = new QLabel;
+    durationLabel->setText( tr("Duration:") );
+    durationLayout->addWidget( durationLabel );
+
+    m_durationSpin = new QDoubleSpinBox;
+    durationLayout->addWidget( m_durationSpin );
+    m_durationSpin->setValue( flyToElement()->duration() );
+    m_durationSpin->setSuffix( tr(" s", "seconds") );
+
+    QHBoxLayout *modeLayout = new QHBoxLayout;
+    modeLayout->addSpacing( 5 );
+
+    QLabel *modeLabel = new QLabel;
+    modeLabel->setText( tr("Mode:") );
+    modeLayout->addWidget( modeLabel );
+
+    m_modeCombo = new QComboBox;
+    modeLayout->addWidget( m_modeCombo );
+    m_modeCombo->addItem( tr("Smooth") );
+    m_modeCombo->addItem( tr("Bounce") );
+
+    if( flyToElement()->flyToMode() == GeoDataFlyTo::Smooth ){
+        m_modeCombo->setCurrentIndex( 0 );
+    } else if( flyToElement()->flyToMode() == GeoDataFlyTo::Bounce ){
+        m_modeCombo->setCurrentIndex( 1 );
+    } else {
+        m_modeCombo->setCurrentIndex( -1 );
+    }
+
+    pairLayout->addLayout( durationLayout );
+    pairLayout->addLayout( modeLayout );
+
+    layout->addLayout( pairLayout );
 
     QToolButton* flyToPinCenter = new QToolButton;
     flyToPinCenter->setIcon(QIcon(":/marble/places.png"));
@@ -73,11 +105,11 @@ void FlyToEditWidget::setEditable( bool editable )
 void FlyToEditWidget::setFirstFlyTo(const QPersistentModelIndex &index)
 {
     if( m_index.internalPointer() == index.internalPointer() ) {
-        m_waitSpin->setEnabled( false );
+        m_durationSpin->setEnabled( false );
     } else {
-        if( !m_waitSpin->isEnabled() )
+        if( !m_durationSpin->isEnabled() )
         {
-            m_waitSpin->setEnabled( true );
+            m_durationSpin->setEnabled( true );
         }
     }
 }
@@ -105,7 +137,13 @@ void FlyToEditWidget::save()
         }
     }
 
-    flyToElement()->setDuration(m_waitSpin->value());
+    flyToElement()->setDuration(m_durationSpin->value());
+
+    if( m_modeCombo->currentText() == "Smooth" ){
+        flyToElement()->setFlyToMode( GeoDataFlyTo::Smooth );
+    } else if( m_modeCombo->currentText() == "Bounce" ){
+        flyToElement()->setFlyToMode( GeoDataFlyTo::Bounce );
+    }
 
     emit editingDone(m_index);
 }
