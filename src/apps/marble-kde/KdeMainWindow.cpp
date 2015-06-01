@@ -17,6 +17,8 @@
 #include <QToolBar>
 #include <QAction>
 #include <QActionGroup>
+#include <QCoreApplication>
+#include <QCloseEvent>
 
 // KDE
 #include <kactioncollection.h>
@@ -116,6 +118,18 @@ void MainWindow::changeViewSize( QAction* action )
     }
     mDebug()<<marbleControl()->size();
     mDebug()<<size();
+}
+
+void MainWindow::closeEvent( QCloseEvent *event )
+{
+    QCloseEvent newEvent;
+    QCoreApplication::sendEvent( this->marbleControl(), &newEvent );
+
+    if ( newEvent.isAccepted() ) {
+        event->accept();
+    } else {
+        event->ignore();
+    }
 }
 
 }

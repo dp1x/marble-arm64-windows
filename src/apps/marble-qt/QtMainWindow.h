@@ -59,7 +59,7 @@ public:
     void addGeoDataFile( const QString &fileName );
 
 protected:
-    void  closeEvent(QCloseEvent *event);
+    void  closeEvent( QCloseEvent *event );
 
 private:
     void  createActions();
@@ -123,6 +123,7 @@ private Q_SLOTS:
     void  enterWhatsThis();
     void  aboutMarble();
     void  handbook();
+    void  openForum();
 
     //Bookmark Menu
     void  openEditBookmarkDialog();
@@ -201,6 +202,7 @@ private:
     QAction *m_aboutQtAction;
     QAction *m_lockFloatItemsAction;
     QAction *m_handbookAction;
+    QAction *m_forumAction;
 
     // Status Bar
     QString     m_position;

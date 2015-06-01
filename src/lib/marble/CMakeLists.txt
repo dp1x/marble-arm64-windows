@@ -40,7 +40,7 @@ INCLUDE(geodata/CMakeLists.txt)
 INCLUDE(graphicsview/CMakeLists.txt)
 INCLUDE(layers/CMakeLists.txt)
 
-set(GENERIC_LIB_VERSION "0.21.20")
+set(GENERIC_LIB_VERSION "0.21.21")
 set(GENERIC_LIB_SOVERSION "22")
 
 # link_directories (${QT_LIBRARY_DIR})
@@ -365,7 +365,7 @@ else()
     ${Qt5Quick_LIBRARIES}
     ${Qt5OpenGL_LIBRARIES}
     ${Qt5PrintSupport_LIBRARIES}
-    Qt5::DBus
+    ${Qt5DBus_LIBRARIES}
     )
 endif()
 

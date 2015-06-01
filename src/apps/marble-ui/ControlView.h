@@ -131,6 +131,9 @@ signals:
     void showUploadDialog();
     void mapThemeDeleted();
 
+protected:
+    void closeEvent( QCloseEvent *event );
+
 private Q_SLOTS:
     void showSearch();
     // Bookmark sync slots

@@ -155,6 +155,7 @@ MainWindow::MainWindow(const QString& marbleDataPath, const QVariantMap& cmdLine
         m_aboutQtAction( 0 ),
         m_lockFloatItemsAction( 0 ),
         m_handbookAction( 0 ),
+        m_forumAction( 0 ),
 
         // Status Bar
         m_positionLabel( 0 ),
@@ -380,6 +381,10 @@ void MainWindow::createActions()
      m_whatsThisAction->setStatusTip(tr("Show a detailed explanation of the action."));
      connect(m_whatsThisAction, SIGNAL(triggered()), this, SLOT(enterWhatsThis()));
 
+     m_forumAction = new QAction( tr("&Community Forum"), this);
+     m_forumAction->setStatusTip(tr("Visit Marble's Community Forum"));
+     connect(m_forumAction, SIGNAL(triggered()), this, SLOT(openForum()));
+
      m_aboutMarbleAction = new QAction( QIcon(":/icons/marble.png"), tr("&About Marble Virtual Globe"), this);
      m_aboutMarbleAction->setStatusTip(tr("Show the application's About Box"));
      connect(m_aboutMarbleAction, SIGNAL(triggered()), this, SLOT(aboutMarble()));
@@ -475,6 +480,7 @@ void MainWindow::createMenus( const QList<QAction*> &panelActions )
 
         m_helpMenu = menuBar()->addMenu(tr("&Help"));
         m_helpMenu->addAction(m_handbookAction);
+        m_helpMenu->addAction(m_forumAction);
         m_helpMenu->addSeparator();
         m_helpMenu->addAction(m_whatsThisAction);
         m_helpMenu->addSeparator();
@@ -894,6 +900,14 @@ void MainWindow::handbook()
     qDebug() << "URL not opened";
 }
 
+void MainWindow::openForum()
+{
+    QUrl forumLocation("https://forum.kde.org/viewforum.php?f=217");
+    if( !QDesktopServices::openUrl( forumLocation ) ) {
+        mDebug() << "Failed to open URL " << forumLocation.toString();
+    }
+}
+
 void MainWindow::showPosition( const QString& position )
 {
     m_position = position;
@@ -982,8 +996,9 @@ void MainWindow::setupStatusBar()
 
     m_positionLabel = new QLabel( );
     m_positionLabel->setIndent( 5 );
+    // UTM syntax is used in the template string, as it is longer than the lon/lat one
     QString templatePositionString =
-        QString( "%1 000\xb0 00\' 00\"_, 000\xb0 00\' 00\"_" ).arg(POSITION_STRING);
+        QString( "%1 00Z 000000.00 m E, 00000000.00 m N_" ).arg(POSITION_STRING);
     int maxPositionWidth = fontMetrics().boundingRect(templatePositionString).width()
                             + 2 * m_positionLabel->margin() + 2 * m_positionLabel->indent();
     m_positionLabel->setFixedWidth( maxPositionWidth );
@@ -1064,10 +1079,18 @@ void MainWindow::removeProgressItem(){
     m_downloadProgressBar->setUpdatesEnabled( true );
 }
 
-void MainWindow::closeEvent(QCloseEvent *event)
+void MainWindow::closeEvent( QCloseEvent *event )
 {
     writeSettings();
-    event->accept();
+
+    QCloseEvent newEvent;
+    QCoreApplication::sendEvent( m_controlView, &newEvent );
+
+    if ( newEvent.isAccepted() ) {
+        event->accept();
+    } else {
+        event->ignore();
+    }
 }
 
 QString MainWindow::readMarbleDataPath()

@@ -12,6 +12,7 @@
 
 #include "ControlView.h"
 
+#include <QCloseEvent>
 #include <QLayout>
 #include <QSplitter>
 #include <QStringListModel>
@@ -113,7 +114,7 @@ ControlView::~ControlView()
 
 QString ControlView::applicationVersion()
 {
-    return "1.11.20 (1.12 development version)";
+    return "1.11.21 (1.12 development version)";
 }
 
 MapThemeManager *ControlView::mapThemeManager()
@@ -868,6 +869,18 @@ void ControlView::openTour( const QString &filename )
 {
     if ( m_tourWidget->openTour( filename ) ) {
         m_tourWidget->startPlaying();
+    }
+}
+
+void ControlView::closeEvent( QCloseEvent *event )
+{
+    QCloseEvent newEvent;
+    QCoreApplication::sendEvent( m_tourWidget, &newEvent );
+
+    if ( newEvent.isAccepted() ) {
+        event->accept();
+    } else {
+        event->ignore();
     }
 }
 

@@ -8,6 +8,7 @@
 // Copyright 2006-2007 Torsten Rahn <tackat@kde.org>
 // Copyright 2007-2008 Inge Wallin  <ingwa@kde.org>
 // Copyright 2008      Patrick Spendrin <ps_ml@gmx.de>
+// Copyright 2015      Alejandro Garcia Montoro <alejandro.garciamontoro@gmail.com>
 //
 
 
@@ -219,6 +220,35 @@ class GEODATA_EXPORT GeoDataCoordinates
     * @param altitude altitude
     */
     void setAltitude( const qreal altitude );
+
+    /**
+    * @brief retrieves the UTM zone of the GeoDataCoordinates object.
+    * If the point is located on one of the poles (latitude < 80S or
+    * latitude > 84N) there is no UTM zone associated; in this case,
+    * 0 is returned.
+    * @return UTM zone.
+    */
+    int utmZone() const;
+
+    /**
+    * @brief retrieves the UTM easting of the GeoDataCoordinates object,
+    * in meters.
+    * @return UTM easting
+    */
+    qreal utmEasting() const;
+
+    /**
+    * @brief retrieves the UTM latitude band of the GeoDataCoordinates object
+    * @return UTM latitude band
+    */
+    QString utmLatitudeBand() const;
+
+    /**
+    * @brief retrieves the UTM northing of the GeoDataCoordinates object,
+    * in meters
+    * @return UTM northing
+    */
+    qreal utmNorthing() const;
 
     /**
     * @brief return the detail flag
