@@ -2,7 +2,11 @@
 <qresource>
     <file>MainScreen.qml</file>
     <file>InteractionField.qml</file>
-    <file alias="marble/search.png">icons/action/drawable-hdpi/ic_search_black_36dp.png</file>
+    <file>SearchResults.qml</file>
+    <file>SearchField.qml</file>
+    <file>Search.qml</file>
+    <file>Theme.qml</file>
+    <file alias="search.png">../../../data/android/drawable-xxxhdpi/search.png</file>
 </qresource>
 </RCC>
 

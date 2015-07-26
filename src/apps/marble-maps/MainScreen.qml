@@ -2,7 +2,7 @@ import QtQuick 2.3
 import QtQuick.Controls 1.4
 import QtQuick.Window 2.2
 
-import MarbleItem 1.0
+import Marble 1.0
 
 ApplicationWindow {
     id: root
@@ -15,9 +15,10 @@ ApplicationWindow {
     menuBar: MenuBar {
         id: menuBar
         Menu {
-            title: "Marble Maps"
+            title: qsTr("Marble Maps")
             MenuItem{
                 text: qsTr("Search")
+                onTriggered: search.visible = !search.visible
             }
         }
     }
@@ -26,10 +27,14 @@ ApplicationWindow {
         id: toolBar
     }
 
+    Theme {
+        id: theme
+    }
+
     Rectangle {
         id: background
         anchors.fill: parent
-        color: "black"
+        color: theme.backgroundColor
     }
 
     PinchArea {
@@ -67,5 +72,11 @@ ApplicationWindow {
                 id: inputField
             }
         }
+    }
+
+    Search {
+        id: search
+        anchors.fill: parent
+        marbleQuickItem: marbleMaps
     }
 }
