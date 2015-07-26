@@ -9,6 +9,9 @@ ApplicationWindow {
     title: qsTr("Marble Maps")
     visible: true
 
+    width: 600
+    height: 800
+
     menuBar: MenuBar {
         id: menuBar
         Menu {
@@ -59,6 +62,10 @@ ApplicationWindow {
             showOtherPlaces: false
             showScaleBar: false
             showBackground: false
+
+            InteractionField {
+                id: inputField
+            }
         }
     }
 }

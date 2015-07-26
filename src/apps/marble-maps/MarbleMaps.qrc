@@ -1,6 +1,8 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
     <file>MainScreen.qml</file>
+    <file>InteractionField.qml</file>
+    <file alias="marble/search.png">icons/action/drawable-hdpi/ic_search_black_36dp.png</file>
 </qresource>
 </RCC>
 
