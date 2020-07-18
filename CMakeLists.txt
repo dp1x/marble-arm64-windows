@@ -186,6 +186,12 @@ if(WIN32)
     set(data_dir data)
     set(locale_dir "${data_dir}/locale")
     set(plugin_dir plugins)
+
+    # get all the redist dll needed for windows when compiling with vc
+	# and install them to bin/ folder
+    set(CMAKE_INSTALL_UCRT_LIBRARIES 1)
+    include(InstallRequiredSystemLibraries)
+
 elseif(APPLE)
     # needed for finding bundle path in e.g. katlasdir.h
     FIND_LIBRARY(APP_SERVICES_LIBRARY ApplicationServices )
