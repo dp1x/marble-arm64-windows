@@ -251,10 +251,15 @@ add_definitions(
     -DQT_NO_URL_CAST_FROM_STRING
     -DQT_NO_CAST_TO_ASCII
     -DQT_NO_CAST_FROM_BYTEARRAY
-    -DQT_STRICT_ITERATORS
     -DQT_DISABLE_DEPRECATED_BEFORE=0x050700
 )
 
+if (NOT WIN32)
+    # Strict iterators can't be used on Windows, they lead to a link error
+    # when application code iterates over a QVector<QPoint> for instance
+    # See example at https://bugreports.qt.io/browse/QTBUG-78112
+    add_definitions(-DQT_STRICT_ITERATORS)
+endif()
 ####################################################
 # Options for static build
 if(STATIC_BUILD)
