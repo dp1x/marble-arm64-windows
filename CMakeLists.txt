@@ -212,11 +212,11 @@ else() # Linux / bsd etc...
 endif()
 
 if(NOT ICON_INSTALL_DIR)
-	set(ICON_INSTALL_DIR ${CMAKE_INSTALL_FULL_DATAROOTDIR}/icons)
+	set(ICON_INSTALL_DIR share/icons)
 endif(NOT ICON_INSTALL_DIR)
 
 if(NOT APPS_INSTALL_DIR)
-	set(APPS_INSTALL_DIR ${CMAKE_INSTALL_FULL_DATAROOTDIR}/applications)
+	set(APPS_INSTALL_DIR share/applications)
 endif(NOT APPS_INSTALL_DIR)
 
 if(NOT INCLUDE_INSTALL_DIR)
