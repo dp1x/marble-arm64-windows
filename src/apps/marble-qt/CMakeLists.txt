@@ -48,9 +48,16 @@ if(STATIC_BUILD)
 endif(STATIC_BUILD)
 
 # No need for this when installing to a bundle
-if(NOT APPLE)
-install (TARGETS marble-qt RUNTIME DESTINATION bin )
-endif(NOT APPLE)
+if(WIN32)
+install (TARGETS marble-qt RUNTIME DESTINATION .)
+else(WIN32)
+if (APPLE)
+  # No need for this when installing to a bundle
+else (APPLE)
+    install (TARGETS marble-qt RUNTIME DESTINATION bin )
+endif (APPLE)
+endif(WIN32)
+
 if(APPS_INSTALL_DIR)
   install(PROGRAMS org.kde.marble-qt.desktop DESTINATION ${APPS_INSTALL_DIR})
 endif(APPS_INSTALL_DIR)
