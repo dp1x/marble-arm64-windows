@@ -47,7 +47,6 @@ if(STATIC_BUILD)
     target_link_libraries(marble ${QT_PLUGINS_DIR}/imageformats/qsvg.lib)
 endif(STATIC_BUILD)
 
-# No need for this when installing to a bundle
 if(WIN32)
 install (TARGETS marble-qt RUNTIME DESTINATION .)
 else(WIN32)
