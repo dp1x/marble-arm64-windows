@@ -774,13 +774,12 @@ void MarblePart::setupActions()
                            actionCollection() );
 
     // Action: Get hot new stuff
-    m_newStuffAction = KNS3::standardAction( i18nc( "Action for downloading maps (GHNS)",
-                                                    "Download Maps..."),
-                                             this,
-                                             SLOT(showNewStuffDialog()),
-                                             actionCollection(), "new_stuff" );
+    const QString knsText = i18nc("Action for downloading maps (GHNS)", "Download Maps...");
+    m_newStuffAction = new QAction(QIcon::fromTheme(QStringLiteral("get-hot-new-stuff")), knsText, this);
+    connect(m_newStuffAction, &QAction::triggered, this, &MarblePart::showNewStuffDialog);
     m_newStuffAction->setStatusTip( i18nc( "Status tip", "Download new maps"));
-    actionCollection()->setDefaultShortcut( m_newStuffAction, Qt::CTRL + Qt::Key_N );
+    m_newStuffAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
+    actionCollection()->addAction(QStringLiteral("new_stuff"), m_newStuffAction);
 
     // Action: Create a New Map
     m_mapWizardAct = new QAction( i18nc( "Action for creating new maps",
