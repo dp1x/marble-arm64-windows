@@ -39,6 +39,9 @@ target_link_libraries (
     marble-maps
     marbledeclarative
 )
-
-FILE(GLOB QML_FILES *.qml)
-add_custom_target(marble-maps_resources ALL SOURCES ${QML_FILES} package/AndroidManifest.xml)
+if(ANDROID)
+    FILE(GLOB QML_FILES *.qml)
+    add_custom_target(marble-maps_resources ALL SOURCES ${QML_FILES} package/AndroidManifest.xml)
+else()
+    install(TARGETS marble-maps RUNTIME DESTINATION bin)
+endif()
