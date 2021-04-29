@@ -216,7 +216,7 @@ QString MarbleDirs::pluginSystemPath()
 #endif   // mac bundle
 
 #ifdef Q_OS_WIN
-	return QCoreApplication::applicationDirPath();
+	return QCoreApplication::applicationDirPath() + QDir::separator() + QLatin1String("plugins");
 #endif
 
 #ifdef Q_OS_ANDROID
