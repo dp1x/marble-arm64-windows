@@ -71,7 +71,7 @@ MainWindow::MainWindow( const QString& marbleDataPath, QWidget *parent )
 MainWindow::~MainWindow()
 {
     factory()->removeClient( m_part );
-    delete m_part;
+    m_part->deleteLater();
 }
 
 ControlView* MainWindow::marbleControl() const
