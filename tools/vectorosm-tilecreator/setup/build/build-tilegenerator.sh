@@ -1,6 +1,7 @@
 #!/bin/bash
 # SPDX-License-Identifier: BSD-3-clause
 # SPDX-FileCopyrightText: 2020-2022 Volker Krause <vkrause@kde.org>
+set -x
 
 function build-static-qt-module() {
     local module=$1
@@ -24,11 +25,8 @@ build-static-qt-module qtbase --release -qpa offscreen -no-pch -no-icu -no-dbus 
 build-static-qt-module qtdeclarative -- -no-feature-qml-debug -no-feature-qml-devtools -no-feature-qml-preview -no-feature-qml-profiler
 build-static-qt-module qtsvg
 
-cd
-git clone https://invent.kde.org/education/marble
-cd marble
 mkdir build
-cd build
+pushd build
 cmake -DSTATIC_BUILD=1 \
     -DCMAKE_PREFIX_PATH=${HOME}/qt-inst \
     -DMARBLE_NO_WEBKITWIDGETS=TRUE \
@@ -39,9 +37,4 @@ cmake -DSTATIC_BUILD=1 \
     -DCMAKE_BUILD_TYPE=Release ..
 
 make -j 4
-
-# extract the relevant output
-mkdir -p /output/usr/bin
-cp tools/vectorosm-tilecreator/marble-vectorosm-tirex-backend /output/usr/bin/
-cp tools/vectorosm-tilecreator/marble-vectorosm-process-land-polygons /output/usr/bin/
-cp tools/vectorosm-tilecreator/marble-vectorosm-tilecreator /output/usr/bin/
+popd
