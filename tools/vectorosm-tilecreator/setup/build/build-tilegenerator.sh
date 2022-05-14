@@ -1,6 +1,7 @@
 #!/bin/bash
 # SPDX-License-Identifier: BSD-3-clause
 # SPDX-FileCopyrightText: 2020-2022 Volker Krause <vkrause@kde.org>
+set -x
 
 function build-static-qt-module() {
     local module=$1
