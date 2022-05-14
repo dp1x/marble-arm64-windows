@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 cd
 git clone https://github.com/openstreetmap/tirex.git
