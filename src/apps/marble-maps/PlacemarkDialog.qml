@@ -120,6 +120,18 @@ Item {
 
         IconText {
             width: parent.width
+            visible: text.length > 0
+            text: placemark === null ? "" : placemark.openingHoursStateDescription
+            textColor: {
+                if (placemark === null) { return ""; }
+                else if (placemark.openingHoursIsOpen) { return "green"; }
+                else if (placemark.openingHoursIsClosed) { return "red"; }
+                else { return ""; }
+            }
+        }
+
+        IconText {
+            width: parent.width
             visible: root.showAccessibility && text.length > 0
             text: placemark === null ? "" : placemark.wheelchairInfo
             icon: "qrc:/material/wheelchair.svg"

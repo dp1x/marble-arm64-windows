@@ -25,6 +25,10 @@ p.openinghours {
   display: %openinghoursVisibility%
 }
 
+span.openingHoursStateDescription {
+  color: %openinghoursColor%
+}
+
 table.contact {
   display: %contactVisibility%
 }
@@ -63,7 +67,7 @@ tr.smoking {
 <h2 class="osmamenity">%amenity%</h2>
 <h3 class="osmdetails">%details%</h3>
 <h3 class="osmcuisine">%cuisine%</h3>
-<p class="openinghours">Opening Hours: %openinghours%</p>
+<p class="openinghours">Opening Hours: %openinghours% <span class="openingHoursStateDescription">%openingHoursStateDescription%</span></p>
 
 <table class="contact">
 <tr class="blue">

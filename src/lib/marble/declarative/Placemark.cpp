@@ -43,6 +43,9 @@ void Placemark::setGeoDataPlacemark( const Marble::GeoDataPlacemark &placemark )
     emit websiteChanged();
     emit wikipediaChanged();
     emit openingHoursChanged();
+    emit openingHoursStateDescriptionChanged();
+    emit openingHoursIsOpenChanged();
+    emit openingHoursIsClosedChanged();
     emit wheelchairInfoChanged();
     emit wifiAvailabilityChanged();
     emit phoneChanged();
@@ -516,6 +519,21 @@ QString Placemark::openingHours() const
 
     addTagValue(m_openingHours, "opening_hours");
     return m_openingHours;
+}
+
+QString Placemark::openingHoursStateDescription() const
+{
+    return m_placemark.osmData().openingHoursStateDescription();
+}
+
+bool Placemark::openingHoursIsOpen() const
+{
+    return m_placemark.osmData().openingHoursIsOpen();
+}
+
+bool Placemark::openingHoursIsClosed() const
+{
+    return m_placemark.osmData().openingHoursIsClosed();
 }
 
 QString Placemark::coordinates() const
