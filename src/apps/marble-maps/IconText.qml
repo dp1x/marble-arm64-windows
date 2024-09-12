@@ -17,6 +17,7 @@ Item {
     property alias font: text.font
     property alias maximumLineCount: text.maximumLineCount
     property alias linkColor: text.linkColor
+    property alias textColor: text.color
 
     signal linkActivated(string link)
 

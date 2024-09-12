@@ -1,0 +1,2 @@
+#cmakedefine01 HAVE_PHONON
+#cmakedefine01 HAVE_KOPENING_HOURS

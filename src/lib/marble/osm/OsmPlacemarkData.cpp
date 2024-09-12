@@ -11,6 +11,12 @@
 
 #include <QXmlStreamAttributes>
 
+#if HAVE_KOPENING_HOURS
+#include <KOpeningHours/Display>
+#include <KOpeningHours/Interval>
+#include <KOpeningHours/OpeningHours>
+#endif
+
 namespace Marble
 {
 
@@ -338,5 +344,51 @@ const char *OsmPlacemarkData::nodeType() const
 {
     return "OsmPlacemarkDataType";
 }
+
+QString OsmPlacemarkData::openingHoursStateDescription() const
+{
+#if HAVE_KOPENING_HOURS
+    auto oh = kopeningHours();
+    return KOpeningHours::Display::currentState(oh);
+#else
+    return QString();
+#endif
+}
+
+bool OsmPlacemarkData::openingHoursIsOpen() const
+{
+#if HAVE_KOPENING_HOURS
+    auto oh = kopeningHours();
+    return oh.interval(QDateTime::currentDateTime()).state() == KOpeningHours::Interval::Open;
+#else
+    return false;
+#endif
+}
+
+bool OsmPlacemarkData::openingHoursIsClosed() const
+{
+#if HAVE_KOPENING_HOURS
+    auto oh = kopeningHours();
+    return oh.interval(QDateTime::currentDateTime()).state() == KOpeningHours::Interval::Closed;
+#else
+    return false;
+#endif
+}
+
+#if HAVE_KOPENING_HOURS
+KOpeningHours::OpeningHours OsmPlacemarkData::kopeningHours() const
+{
+    KOpeningHours::OpeningHours parser(this->tagValue("opening_hours").toUtf8());
+    if (parser.error() == KOpeningHours::OpeningHours::NoError)
+    {
+        auto country = this->tagValue("addr:country");
+        if (!country.isEmpty())
+        {
+            parser.setRegion(country);
+        }
+    }
+    return parser;
+}
+#endif
 
 }

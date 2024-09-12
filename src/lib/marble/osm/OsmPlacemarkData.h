@@ -16,6 +16,12 @@
 #include <marble_export.h>
 #include "GeoDocument.h"
 
+#include <config-libmarble.h>
+
+#if HAVE_KOPENING_HOURS
+#include <KOpeningHours/OpeningHours>
+#endif
+
 class QXmlStreamAttributes;
 
 namespace Marble
@@ -215,6 +221,12 @@ public:
      */
     static OsmPlacemarkData fromParserAttributes( const QXmlStreamAttributes &attributes );
 
+    QString openingHoursStateDescription() const;
+
+    bool openingHoursIsOpen() const;
+
+    bool openingHoursIsClosed() const;
+
 private:
     qint64 m_id;
     QHash<QString, QString> m_tags;
@@ -241,6 +253,9 @@ private:
      */
     QHash<OsmIdentifier, QString> m_relationReferences;
 
+#if HAVE_KOPENING_HOURS
+    KOpeningHours::OpeningHours kopeningHours() const;
+#endif
 };
 
 }

@@ -8,7 +8,7 @@
 
 #include "PlaybackItem.h"
 
-#include <config-phonon.h>
+#include <config-libmarble.h>
 
 #if HAVE_PHONON
 #include <phonon/MediaObject>

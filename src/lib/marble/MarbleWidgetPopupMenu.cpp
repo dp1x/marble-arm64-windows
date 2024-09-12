@@ -256,6 +256,22 @@ void MarbleWidgetPopupMenu::Private::setupDialogOsm( PopupLayer *popup, const Ge
     QString openingHours = data.tagValue(QStringLiteral("opening_hours"));
     if (!openingHours.isEmpty()) {
         doc[QStringLiteral("openinghours")] = openingHours;
+        QString openingHoursStateDescription = data.openingHoursStateDescription();
+        if (!openingHoursStateDescription.isEmpty())
+        {
+            openingHoursStateDescription = "(" + openingHoursStateDescription + ")";
+            QString color;
+            if (data.openingHoursIsOpen())
+            {
+                color = "green";
+            }
+            if (data.openingHoursIsClosed())
+            {
+                color = "red";
+            }
+            doc[QStringLiteral("openinghoursColor")] = color;
+        }
+        doc[QStringLiteral("openingHoursStateDescription")] = openingHoursStateDescription;
     } else {
         doc[QStringLiteral("openinghoursVisibility")] = none;
     }

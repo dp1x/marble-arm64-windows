@@ -11,8 +11,20 @@ marble_set_package_properties( Phonon4Qt5 PROPERTIES
 if(Phonon4Qt5_FOUND)
     set(HAVE_PHONON TRUE)
 endif()
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config-phonon.h.cmake
-               ${CMAKE_CURRENT_BINARY_DIR}/config-phonon.h)
+
+macro_optional_find_package(KOpeningHours QUIET)
+marble_set_package_properties(KOpeningHours PROPERTIES
+    DESCRIPTION "Library for parsing and evaluating OSM opening hours expressions"
+    URL "https://invent.kde.org/libraries/kopeninghours"
+    PURPOSE "Support for showing whether a place is currently open or closed"
+    TYPE OPTIONAL
+)
+if(KOpeningHours_FOUND)
+    set(HAVE_KOPENING_HOURS TRUE)
+endif()
+
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config-libmarble.h.cmake
+               ${CMAKE_CURRENT_BINARY_DIR}/config-libmarble.h)
 
 if(MARBLE_NO_WEBKITWIDGETS)
     add_definitions(-DMARBLE_NO_WEBKITWIDGETS)
@@ -424,6 +436,11 @@ if (Phonon4Qt5_FOUND)
         PRIVATE
             Phonon::phonon4qt5
     )
+endif()
+if (KOpeningHours_FOUND)
+    target_link_libraries(marblewidget
+        LINK_PRIVATE
+            KOpeningHours)
 endif()
 
 if (APPLE)
