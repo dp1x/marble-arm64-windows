@@ -47,7 +47,7 @@ endif(WIN32)
 if (NOT ANDROID)
   set_target_properties(astro PROPERTIES
       EXPORT_NAME "Astro"
-      VERSION ${ASTRO_LIB_VERSION}
+      VERSION ${RELEASE_SERVICE_VERSION}
       SOVERSION ${ASTRO_LIB_SOVERSION}
   )
 endif()

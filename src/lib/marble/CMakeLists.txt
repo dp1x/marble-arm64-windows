@@ -450,7 +450,7 @@ set_target_properties(marblewidget  PROPERTIES
 
 if (NOT ANDROID)
   set_target_properties(marblewidget  PROPERTIES
-    VERSION ${MARBLE_LIB_VERSION}
+    VERSION ${RELEASE_SERVICE_VERSION}
     SOVERSION ${MARBLE_LIB_SOVERSION}
   )
 endif()
