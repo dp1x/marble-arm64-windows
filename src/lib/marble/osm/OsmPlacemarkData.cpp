@@ -28,7 +28,7 @@ OsmPlacemarkData::OsmPlacemarkData():
 
 OsmPlacemarkData::~OsmPlacemarkData()
 {
-	delete m_href;
+	//delete m_href;
 }
 
 OsmPlacemarkDataHashRef* OsmPlacemarkData::hRef() const
