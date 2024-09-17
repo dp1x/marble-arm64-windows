@@ -58,7 +58,7 @@ int main(int argc, char **argv)
 {
     setenv("QT_LOGGING_TO_CONSOLE", "0", true); // redirects qDebug to syslog
 
-    QCoreApplication app(argc, argv);
+    QApplication app(argc, argv);
 
     // for stand-alone testing only, in normal operation this is entirely controlled via the Tirex command socket
     QCommandLineParser parser;

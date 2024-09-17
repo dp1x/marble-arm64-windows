@@ -62,7 +62,7 @@ bool writeTile(GeoDataDocument* tile, const QString &outputFile)
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication app(argc, argv);
+    QApplication app(argc, argv);
 
     QCoreApplication::setApplicationName("marble-vectorosm-tilecreator");
     QCoreApplication::setApplicationVersion("0.1");
