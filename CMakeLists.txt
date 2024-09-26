@@ -35,6 +35,7 @@ include(KDEClangFormat)
 include(KDEGitCommitHooks)
 
 include(ECMSetupVersion)
+include(ECMAddTests)
 include(ECMInstallIcons)
 include(ECMEnableSanitizers)
 include(ECMCoverageOption)
@@ -80,7 +81,6 @@ find_package(Qt6 ${QT_MIN_VERSION} REQUIRED
         Core
         Xml
         Network
-        Test
         Widgets
         Svg
         SvgWidgets
@@ -90,6 +90,10 @@ find_package(Qt6 ${QT_MIN_VERSION} REQUIRED
         PrintSupport
         Core5Compat
 )
+
+if (BUILD_TESTING)
+    find_package(Qt6 ${QT_MIN_VERSION} REQUIRED COMPONENTS Test)
+endif()
 
 find_package(KF6 ${KF_MIN_VERSION} COMPONENTS CoreAddons I18n)
 if (NOT ANDROID)
@@ -316,7 +320,9 @@ add_subdirectory(data)
 
 include(DistTarget)
 
-add_subdirectory(tests)
+if (BUILD_TESTING)
+    add_subdirectory(tests)
+endif()
 
 option(BUILD_MARBLE_TOOLS "Build various tools related to Marble" OFF)
 add_feature_info("Marble tools" BUILD_MARBLE_TOOLS "Build various Marble tools for e.g. file format conversion. Toggle with BUILD_MARBLE_TOOLS=YES/NO.")
