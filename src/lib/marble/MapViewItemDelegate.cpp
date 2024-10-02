@@ -51,7 +51,7 @@ void MapViewItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &o
     QRect const rect = styleOption.rect;
     QSize const iconSize = styleOption.decorationSize;
     QRect const iconRect(rect.topLeft(), iconSize);
-    QIcon const icon = index.data(Qt::DecorationRole).value<QIcon>();
+    auto const icon = index.data(Qt::DecorationRole).value<QIcon>();
     painter->drawPixmap(iconRect, icon.pixmap(iconSize));
 
     int const padding = 5;
@@ -88,10 +88,10 @@ QSize MapViewItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QM
         doc.setDefaultFont(option.font);
         doc.setTextWidth(m_view->width() - iconSize.width() - 10);
         doc.setHtml(text(index));
-        return QSize(iconSize.width() + doc.size().width(), iconSize.height());
+        return {iconSize.width() + doc.size().width(), iconSize.height()};
     }
 
-    return QSize();
+    return {};
 }
 
 QString MapViewItemDelegate::text(const QModelIndex &index)
