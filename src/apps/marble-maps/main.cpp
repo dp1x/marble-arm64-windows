@@ -36,7 +36,7 @@ int main(int argc, char **argv)
     QtWebEngineQuick::initialize();
 #endif
 
-        KLocalizedString::setApplicationDomain(QByteArrayLiteral("marble-maps"));
+    KLocalizedString::setApplicationDomain(QByteArrayLiteral("marble-maps"));
 
     QApplication app(argc, argv);
 
