@@ -80,52 +80,42 @@ namespace Marble
  *
  */
 
-// TODO: no private data, this can be just a namespace
-class MARBLE_EXPORT MarbleDirs
+namespace MarbleDirs
 {
-public:
-    MarbleDirs();
+// TODO: rename this to "dataFilePath" to make its function explicit
+MARBLE_EXPORT QString path(const QString &relativePath);
 
-    // TODO: rename this to "dataFilePath" to make its function explicit
-    static QString path(const QString &relativePath);
+MARBLE_EXPORT QString cacheFilePath(const QString &relativePath);
 
-    static QString cacheFilePath(const QString &relativePath);
+// TODO: rename this to "pluginFilePath" for consistency
+MARBLE_EXPORT QString pluginPath(const QString &relativePath);
 
-    // TODO: rename this to "pluginFilePath" for consistency
-    static QString pluginPath(const QString &relativePath);
+MARBLE_EXPORT QStringList entryList(const QString &relativePath, QDir::Filters filters = QDir::NoFilter);
 
-    static QStringList entryList(const QString &relativePath, QDir::Filters filters = QDir::NoFilter);
+MARBLE_EXPORT QStringList pluginEntryList(const QString &relativePath, QDir::Filters filters = QDir::NoFilter);
 
-    static QStringList pluginEntryList(const QString &relativePath, QDir::Filters filters = QDir::NoFilter);
+MARBLE_EXPORT QString systemPath();
 
-    static QString systemPath();
+MARBLE_EXPORT QString pluginSystemPath();
 
-    static QString pluginSystemPath();
+MARBLE_EXPORT QString localPath();
 
-    static QString localPath();
+MARBLE_EXPORT QString cachePath();
 
-    static QString cachePath();
+MARBLE_EXPORT QStringList oldLocalPaths();
 
-    static QStringList oldLocalPaths();
+MARBLE_EXPORT QString pluginLocalPath();
 
-    static QString pluginLocalPath();
+MARBLE_EXPORT QString marbleDataPath();
 
-    static QString marbleDataPath();
+MARBLE_EXPORT QString marblePluginPath();
 
-    static QString marblePluginPath();
+MARBLE_EXPORT void setMarbleDataPath(const QString &adaptedPath);
 
-    static void setMarbleDataPath(const QString &adaptedPath);
+MARBLE_EXPORT void setMarblePluginPath(const QString &adaptedPath);
 
-    static void setMarblePluginPath(const QString &adaptedPath);
-
-    static void debug();
-
-private:
-    Q_DISABLE_COPY(MarbleDirs)
-    class Private;
-    Private *const d;
-};
-
+MARBLE_EXPORT void debug();
+}
 }
 
 #endif

@@ -37,11 +37,6 @@ QString runTimeMarbleDataPath;
 QString runTimeMarblePluginPath;
 }
 
-MarbleDirs::MarbleDirs()
-    : d(nullptr)
-{
-}
-
 QString MarbleDirs::path(const QString &relativePath)
 {
     QString fullpath = localPath() + QLatin1Char('/') + relativePath; // local path
@@ -229,11 +224,13 @@ QString MarbleDirs::pluginSystemPath()
     }
 
     // This ultimate fallback location is for compatibility with KDE installations.
+    // TODO: this may be a bit out of date
     return QDir(QCoreApplication::applicationDirPath() + QLatin1StringView("/../lib/kde4/plugins/marble")).canonicalPath();
 }
 
 QString MarbleDirs::localPath()
 {
+    // TODO: should now be able to use QStandardPaths for all platforms
 #ifndef Q_OS_WIN
     QString dataHome = QString::fromUtf8(getenv("XDG_DATA_HOME"));
     if (dataHome.isEmpty())
