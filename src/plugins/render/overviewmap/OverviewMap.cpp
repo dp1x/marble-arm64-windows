@@ -436,9 +436,9 @@ void OverviewMap::loadPlanetMaps()
 
 void OverviewMap::loadMapSuggestions()
 {
-    QStringList paths = QDir(MarbleDirs::pluginPath(QString())).entryList(QStringList(QStringLiteral("*.svg")), QDir::Files | QDir::NoDotAndDotDot);
+    QStringList paths = QDir(MarbleDirs::pluginFilePath(QString())).entryList(QStringList(QStringLiteral("*.svg")), QDir::Files | QDir::NoDotAndDotDot);
     for (int i = 0; i < paths.size(); ++i) {
-        paths[i] = MarbleDirs::pluginPath(QString()) + QLatin1Char('/') + paths[i];
+        paths[i] = MarbleDirs::pluginFilePath(QString()) + QLatin1Char('/') + paths[i];
     }
     paths << MarbleDirs::dataFilePath(QStringLiteral("svg/worldmap.svg")) << MarbleDirs::dataFilePath(QStringLiteral("svg/lunarmap.svg"));
     ui_configWidget->m_tableWidget->setRowCount(paths.size());

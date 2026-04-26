@@ -60,7 +60,7 @@ QString MarbleDirs::cacheFilePath(const QString &relativePath)
     return QDir(fullpath).canonicalPath();
 }
 
-QString MarbleDirs::pluginPath(const QString &relativePath)
+QString MarbleDirs::pluginFilePath(const QString &relativePath)
 {
     const QString localpath = pluginLocalPath() + QDir::separator() + relativePath; // local path
     const QString systempath = pluginSystemPath() + QDir::separator() + relativePath; // system path

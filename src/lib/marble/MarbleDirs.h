@@ -86,8 +86,7 @@ MARBLE_EXPORT QString dataFilePath(const QString &relativePath);
 
 MARBLE_EXPORT QString cacheFilePath(const QString &relativePath);
 
-// TODO: rename this to "pluginFilePath" for consistency
-MARBLE_EXPORT QString pluginPath(const QString &relativePath);
+MARBLE_EXPORT QString pluginFilePath(const QString &relativePath);
 
 MARBLE_EXPORT QStringList entryList(const QString &relativePath, QDir::Filters filters = QDir::NoFilter);
 
