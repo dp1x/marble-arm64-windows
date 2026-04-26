@@ -82,8 +82,7 @@ namespace Marble
 
 namespace MarbleDirs
 {
-// TODO: rename this to "dataFilePath" to make its function explicit
-MARBLE_EXPORT QString path(const QString &relativePath);
+MARBLE_EXPORT QString dataFilePath(const QString &relativePath);
 
 MARBLE_EXPORT QString cacheFilePath(const QString &relativePath);
 

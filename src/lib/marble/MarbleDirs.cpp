@@ -37,7 +37,7 @@ QString runTimeMarbleDataPath;
 QString runTimeMarblePluginPath;
 }
 
-QString MarbleDirs::path(const QString &relativePath)
+QString MarbleDirs::dataFilePath(const QString &relativePath)
 {
     QString fullpath = localPath() + QLatin1Char('/') + relativePath; // local path
     if (!QFile::exists(fullpath)) {

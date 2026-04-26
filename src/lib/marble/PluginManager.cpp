@@ -233,7 +233,7 @@ void PluginManagerPrivate::loadPlugins()
             continue;
         }
 
-        // mDebug() << fileName << " - " << MarbleDirs::pluginPath( fileName );
+        // mDebug() << fileName << " - " << MarbleDirs::pluginFilePath( fileName );
         QString const path = MarbleDirs::pluginPath(fileName);
 #ifdef Q_OS_ANDROID
         QFileInfo targetFile(path);
