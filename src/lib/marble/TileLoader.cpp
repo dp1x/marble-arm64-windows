@@ -136,7 +136,7 @@ int TileLoader::maximumTileLevel(GeoSceneTileDataset const &tileData)
 
     int maximumTileLevel = -1;
     const QFileInfo themeStr(tileData.themeStr());
-    const QString tilepath = themeStr.isAbsolute() ? themeStr.absoluteFilePath() : MarbleDirs::path(tileData.themeStr());
+    const QString tilepath = themeStr.isAbsolute() ? themeStr.absoluteFilePath() : MarbleDirs::dataFilePath(tileData.themeStr());
     //    mDebug() << "StackedTileLoader::maxPartialTileLevel tilepath" << tilepath;
     QStringList leveldirs = QDir(tilepath).entryList(QDir::AllDirs | QDir::NoSymLinks | QDir::NoDotAndDotDot);
 
@@ -227,7 +227,7 @@ void TileLoader::updateTile(const QString &fileName, const QString &idStr)
 
     TileId const id = TileId(sourceDir, zoomLevel, tileX, tileY);
     if (origin == QString::fromLatin1(GeoSceneTypes::GeoSceneVectorTileType)) {
-        GeoDataDocument *document = openVectorFile(MarbleDirs::path(fileName));
+        GeoDataDocument *document = openVectorFile(MarbleDirs::dataFilePath(fileName));
         if (document) {
             Q_EMIT tileCompleted(id, document);
         }
@@ -238,7 +238,7 @@ QString TileLoader::tileFileName(GeoSceneTileDataset const *tileData, TileId con
 {
     QString const fileName = tileData->relativeTileFileName(tileId);
     QFileInfo const dirInfo(fileName);
-    return dirInfo.isAbsolute() ? fileName : MarbleDirs::path(fileName);
+    return dirInfo.isAbsolute() ? fileName : MarbleDirs::cacheFilePath(fileName);
 }
 
 void TileLoader::triggerDownload(GeoSceneTileDataset const *tileData, TileId const &id, DownloadUsage const usage)
