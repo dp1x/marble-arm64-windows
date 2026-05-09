@@ -1,0 +1,37 @@
+name: Build Native ARM64
+on:
+  schedule:
+    - cron: '0 0 1 * *' # Monthly automated build
+  workflow_dispatch:     # Allows you to trigger it manually
+
+jobs:
+  build:
+    runs-on: windows-11-arm # Native ARM64 cloud hardware
+    permissions:
+      id-token: write      # Required for Attestations
+      attestations: write  # The "Security Stamp"
+      contents: write      # Required to create a Release
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies (vcpkg)
+        run: |
+          vcpkg install qtbase:arm64-windows zlib:arm64-windows
+          # vcpkg automatically handles the cross-compilation for ARM64
+
+      - name: Configure and Build
+        run: |
+          cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DMARBLE_DATA_PATH="data"
+          cmake --build build --config Release
+
+      - name: Attest Build (Verified Provenance)
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: 'build/bin/marble.exe'
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Marble-ARM64-Native
+          path: build/bin/
