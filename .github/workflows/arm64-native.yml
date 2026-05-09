@@ -1,37 +1,51 @@
 name: Build Native ARM64
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   schedule:
-    - cron: '0 0 1 * *' # Monthly automated build
-  workflow_dispatch:     # Allows you to trigger it manually
+    - cron: '0 0 1 * *' 
+  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: windows-11-arm # Native ARM64 cloud hardware
+    runs-on: windows-11-arm
     permissions:
-      id-token: write      # Required for Attestations
-      attestations: write  # The "Security Stamp"
-      contents: write      # Required to create a Release
+      id-token: write
+      attestations: write
+      contents: write
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install Dependencies (vcpkg)
         run: |
-          vcpkg install qtbase:arm64-windows zlib:arm64-windows
-          # vcpkg automatically handles the cross-compilation for ARM64
+          # We need Qt5 specifically for Marble, plus Protobuf
+          vcpkg install zlib:arm64-windows
+          vcpkg install protobuf:arm64-windows
+          vcpkg install qt5-base:arm64-windows
+          vcpkg install qt5-svg:arm64-windows
+          vcpkg install qt5-declarative:arm64-windows
 
-      - name: Configure and Build
+      - name: Configure CMake
+        # The toolchain file is the secret sauce that tells CMake where vcpkg put the files
         run: |
-          cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DMARBLE_DATA_PATH="data"
-          cmake --build build --config Release
+          cmake -B build -S . `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DMARBLE_DATA_PATH="data" `
+            -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" `
+            -DVCPKG_TARGET_TRIPLET=arm64-windows
 
-      - name: Attest Build (Verified Provenance)
+      - name: Build Project
+        run: cmake --build build --config Release
+
+      - name: Attest Build
         uses: actions/attest-build-provenance@v1
         with:
           subject-path: 'build/bin/marble.exe'
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: Marble-ARM64-Native
           path: build/bin/
