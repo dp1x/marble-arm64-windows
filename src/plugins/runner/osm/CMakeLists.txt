@@ -15,7 +15,7 @@ if (Protobuf_FOUND AND Protobuf_PROTOC_EXECUTABLE)
         ${CMAKE_SOURCE_DIR}/tools/osm-addresses/pbf/fileformat.proto
         ${CMAKE_SOURCE_DIR}/tools/osm-addresses/pbf/osmformat.proto
     )
-    set(EXTRA_LIBS ${Protobuf_LIBRARIES} ${ZLIB_LIBRARIES})
+    set(EXTRA_LIBS protobuf::libprotobuf ${ZLIB_LIBRARIES})
     add_definitions(-DHAVE_PROTOBUF)
 
 	if(MSVC)

@@ -55,7 +55,9 @@ add_subdirectory( 3rdparty/o5mreader )
 add_subdirectory( 3rdparty/sgp4 )
 add_subdirectory( lib/marble )
 add_subdirectory( lib/astro )
-add_subdirectory( lib/marble/declarative )
+if(Qt5Quick_FOUND)
+    add_subdirectory( lib/marble/declarative )
+endif()
 
 add_subdirectory( plugins )
 
