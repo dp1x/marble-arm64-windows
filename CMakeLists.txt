@@ -129,9 +129,10 @@ find_package(Qt5 ${REQUIRED_QT_VERSION} REQUIRED
         Svg
         Sql
         Concurrent
-        Quick
         PrintSupport
 )
+
+find_package(Qt5Quick ${REQUIRED_QT_VERSION} QUIET)
 
 if(ANDROID)
     find_package(Qt5Positioning ${REQUIRED_QT_VERSION} REQUIRED)
