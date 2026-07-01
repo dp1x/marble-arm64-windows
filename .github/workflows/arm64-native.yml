@@ -1,22 +1,36 @@
 name: Build Native ARM64
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
+  push:
+    tags:
+      - 'v*'
   schedule:
     - cron: '0 0 1 * *'
   workflow_dispatch:
+
+permissions:
+  id-token: write
+  attestations: write
+  contents: write
+
+env:
+  VCPKG_VERSION: 2026-05-27
+  MARBLE_VERSION: 22.07.70
+
 jobs:
   build:
     runs-on: windows-11-vs2026-arm
-    permissions:
-      id-token: write
-      attestations: write
-      contents: write
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
-      - name: Install Dependencies (vcpkg)
+      - name: Set up vcpkg
+        uses: johnwason/vcpkg-action@v4
+        with:
+          revision: ${{ env.VCPKG_VERSION }}
+          triplet: arm64-windows
+
+      - name: Install Dependencies
         run: |
           vcpkg install zlib:arm64-windows
           vcpkg install protobuf:arm64-windows
@@ -42,3 +56,73 @@ jobs:
 
       - name: Build Project
         run: cmake --build build --config Release --parallel 4 --clean-first
+
+      - name: Collect Artifacts
+        run: |
+          $distDir = "dist"
+          if (Test-Path $distDir) { Remove-Item $distDir -Recurse -Force }
+          New-Item -ItemType Directory -Path $distDir | Out-Null
+
+          $srcDirs = @(
+            "build\src\apps\marble-qt\Release",
+            "build\src\plugins",
+            "build\plugins"
+          )
+
+          foreach ($dir in $srcDirs) {
+            if (Test-Path $dir) {
+              $files = Get-ChildItem -Path $dir -Recurse -Include *.dll,*.exe,*.pdb -ErrorAction SilentlyContinue
+              foreach ($f in $files) {
+                $target = Join-Path $distDir $f.Name
+                if (-not (Test-Path $target)) {
+                  Copy-Item $f.FullName $target
+                }
+              }
+            }
+          }
+
+      - name: Create Release Archive
+        run: |
+          $zipName = "marble-arm64-win-${{ env.MARBLE_VERSION }}.zip"
+          if (Test-Path $zipName) { Remove-Item $zipName -Force }
+          Compress-Archive -Path "dist\*" -DestinationPath $zipName
+          Write-Host "Created $zipName ($((Get-Item $zipName).Length / 1MB) MB)"
+
+      - name: Generate SHA256SUMS
+        run: |
+          $zipName = "marble-arm64-win-${{ env.MARBLE_VERSION }}.zip"
+          $hash = (Get-FileHash $zipName -Algorithm SHA256).Hash.ToLower()
+          "$hash  $zipName" | Out-File -FilePath SHA256SUMS -Encoding ascii
+          Get-Content SHA256SUMS
+
+      - name: Attest Build Provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: 'marble-arm64-win-${{ env.MARBLE_VERSION }}.zip'
+
+      - name: Upload Release Artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Marble ${{ env.MARBLE_VERSION }} (ARM64 Windows)
+          body: |
+            Native Windows ARM64 build of KDE Marble ${{ env.MARBLE_VERSION }}.
+
+            ## Installation
+            1. Extract `marble-arm64-win-${{ env.MARBLE_VERSION }}.zip`
+            2. Run `marble-qt.exe`
+
+            ## Verification
+            Verify the download with the included SHA256SUMS:
+            ```bash
+            certutil -hashfile marble-arm64-win-${{ env.MARBLE_VERSION }}.zip SHA256
+            ```
+
+            This release was built automatically by GitHub Actions with Sigstore attestation.
+          files: |
+            marble-arm64-win-${{ env.MARBLE_VERSION }}.zip
+            SHA256SUMS
+          draft: false
+          prerelease: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
