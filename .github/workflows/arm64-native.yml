@@ -50,7 +50,8 @@ jobs:
             -DBUILD_WITH_DBUS=OFF
 
       - name: Build Project
-        run: cmake --build build --config Release --parallel 4 --clean-first
+        shell: powershell
+        run: cmake --build build --config Release --parallel 2
 
       - name: Collect Artifacts
         run: |
