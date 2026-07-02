@@ -1,6 +1,4 @@
 name: Build Native ARM64
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 on:
   push:
@@ -15,12 +13,12 @@ permissions:
   attestations: write
   contents: write
 
-env:
-  MARBLE_VERSION: 22.07.70
-
 jobs:
   build:
     runs-on: windows-11-vs2026-arm
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      MARBLE_VERSION: 22.07.70
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
