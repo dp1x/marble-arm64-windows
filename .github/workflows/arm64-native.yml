@@ -16,6 +16,7 @@ permissions:
 jobs:
   build:
     runs-on: windows-11-vs2026-arm
+    timeout-minutes: 240
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       MARBLE_VERSION: 22.07.70
