@@ -1,4 +1,6 @@
 name: Build Native ARM64
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 on:
   push:
@@ -14,7 +16,6 @@ permissions:
   contents: write
 
 env:
-  VCPKG_VERSION: 2026-05-27
   MARBLE_VERSION: 22.07.70
 
 jobs:
@@ -24,14 +25,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up vcpkg
-        uses: johnwason/vcpkg-action@v4
-        with:
-          revision: ${{ env.VCPKG_VERSION }}
-          triplet: arm64-windows
-
-      - name: Install Dependencies
+      - name: Install Dependencies (vcpkg)
+        shell: powershell
         run: |
+          $env:PATH = "C:\vcpkg;" + $env:PATH
           vcpkg install zlib:arm64-windows
           vcpkg install protobuf:arm64-windows
           vcpkg install qt5-base:arm64-windows
