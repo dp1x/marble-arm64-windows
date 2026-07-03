@@ -18,7 +18,6 @@ jobs:
     runs-on: windows-11-vs2026-arm
     timeout-minutes: 240
     env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       MARBLE_VERSION: 22.07.70
     steps:
       - name: Checkout Code
@@ -47,7 +46,7 @@ jobs:
             -DBUILD_MARBLE_TESTS=OFF `
             -DBUILD_MARBLE_EXAMPLES=OFF `
             -DBUILD_MARBLE_TOOLS=OFF `
-            -DBUILD_MARBLE_APPS=OFF `
+            -DBUILD_MARBLE_APPS=ON `
             -DBUILD_WITH_DBUS=OFF
 
       - name: Build Project
@@ -55,44 +54,95 @@ jobs:
         run: cmake --build build --config Release --parallel 2
 
       - name: Collect Artifacts
+        shell: powershell
         run: |
           $distDir = "dist"
           if (Test-Path $distDir) { Remove-Item $distDir -Recurse -Force }
-          New-Item -ItemType Directory -Path $distDir | Out-Null
+          New-Item -ItemType Directory -Path "$distDir\plugins\platforms" | Out-Null
+          New-Item -ItemType Directory -Path "$distDir\plugins\bearer" | Out-Null
+          New-Item -ItemType Directory -Path "$distDir\plugins\imageformats" | Out-Null
+          New-Item -ItemType Directory -Path "$distDir\plugins\sqldrivers" | Out-Null
+          New-Item -ItemType Directory -Path "$distDir\plugins\styles" | Out-Null
 
-          $srcDirs = @(
+          $appDirs = @(
             "build\src\apps\marble-qt\Release",
-            "build\src\plugins",
-            "build\plugins"
+            "build\src\lib\marblewidget\Release"
           )
-
-          foreach ($dir in $srcDirs) {
+          foreach ($dir in $appDirs) {
             if (Test-Path $dir) {
-              $files = Get-ChildItem -Path $dir -Recurse -Include *.dll,*.exe,*.pdb -ErrorAction SilentlyContinue
-              foreach ($f in $files) {
-                $target = Join-Path $distDir $f.Name
-                if (-not (Test-Path $target)) {
-                  Copy-Item $f.FullName $target
-                }
-              }
+              Get-ChildItem "$dir\*.dll","$dir\*.exe" -ErrorAction SilentlyContinue |
+                Copy-Item -Destination $distDir -Force
             }
           }
 
+          Get-ChildItem "build" -Recurse -Filter "*Plugin.dll" -ErrorAction SilentlyContinue |
+            Where-Object { $_.FullName -notmatch "platforms|bearer|imageformats|sqldrivers|styles" } |
+            Copy-Item -Destination "$distDir\plugins" -Force
+
+          Get-ChildItem "build\plugins" -Recurse -Filter "*.dll" -ErrorAction SilentlyContinue |
+            ForEach-Object {
+              $base = Resolve-Path "build\plugins"
+              $rel = $_.FullName.Substring($base.Path.Length + 1)
+              $dest = Join-Path $distDir $rel
+              $destDir = Split-Path $dest -Parent
+              if (-not (Test-Path $destDir)) { New-Item -ItemType Directory -Path $destDir | Out-Null }
+              Copy-Item $_.FullName $dest -Force
+            }
+
+          $vcpkgDir = "C:\vcpkg\installed\arm64-windows\bin"
+          $exclude = @("libprotobuf-lite.dll", "libprotoc.dll")
+          if (Test-Path $vcpkgDir) {
+            Get-ChildItem $vcpkgDir -Filter "*.dll" -ErrorAction SilentlyContinue |
+              Where-Object { $_.Name -notin $exclude } |
+              Copy-Item -Destination $distDir -Force
+          }
+
+          if (Test-Path "build\data") {
+            Copy-Item "build\data" "$distDir\data" -Recurse -Force
+          }
+
+          if (-not (Test-Path "dist\plugins\platforms\qwindows.dll")) {
+            Write-Error "CRITICAL: qwindows.dll missing from plugins/platforms/"
+            exit 1
+          }
+
       - name: Create Release Archive
+        shell: powershell
         run: |
-          $zipName = "marble-arm64-win-${{ env.MARBLE_VERSION }}.zip"
+          $version = $env:MARBLE_VERSION.Trim()
+          if (-not $version) { $version = "22.07.70" }
+          $zipName = "marble-arm64-win-$version.zip"
           if (Test-Path $zipName) { Remove-Item $zipName -Force }
-          Compress-Archive -Path "dist\*" -DestinationPath $zipName
-          Write-Host "Created $zipName ($((Get-Item $zipName).Length / 1MB) MB)"
+          Compress-Archive -Path "dist\*" -DestinationPath $zipName -CompressionLevel Optimal
+          $sizeMB = [math]::Round((Get-Item $zipName).Length / 1MB, 1)
+          Write-Host "Created $zipName ($sizeMB MB)"
 
       - name: Generate SHA256SUMS
+        shell: powershell
         run: |
-          $zipName = "marble-arm64-win-${{ env.MARBLE_VERSION }}.zip"
+          $version = $env:MARBLE_VERSION.Trim()
+          if (-not $version) { $version = "22.07.70" }
+          $zipName = "marble-arm64-win-$version.zip"
           $hash = (Get-FileHash $zipName -Algorithm SHA256).Hash.ToLower()
           "$hash  $zipName" | Out-File -FilePath SHA256SUMS -Encoding ascii
+          Write-Host "SHA256: $hash"
           Get-Content SHA256SUMS
 
-      - name: Attest Build Provenance
+      - name: Verify Checksums
+        shell: powershell
+        run: |
+          $version = $env:MARBLE_VERSION.Trim()
+          if (-not $version) { $version = "22.07.70" }
+          $zipName = "marble-arm64-win-$version.zip"
+          $stored = (Get-Content SHA256SUMS).Split(' ')[0]
+          $computed = (Get-FileHash $zipName -Algorithm SHA256).Hash.ToLower()
+          if ($stored -ne $computed) {
+            Write-Error "SHA256 mismatch! stored=$stored computed=$computed"
+            exit 1
+          }
+          Write-Host "Checksum verified OK"
+
+      - name: Attest Build Provenance (SLSA v1)
         uses: actions/attest-build-provenance@v2
         with:
           subject-path: 'marble-arm64-win-${{ env.MARBLE_VERSION }}.zip'
@@ -111,15 +161,23 @@ jobs:
 
             ## Verification
             Verify the download with the included SHA256SUMS:
-            ```bash
+            ```powershell
             certutil -hashfile marble-arm64-win-${{ env.MARBLE_VERSION }}.zip SHA256
             ```
+
+            ## Provenance
+            Build provenance (SLSA v1): https://github.com/dp1x/marble-arm64-windows/attestations/${{ github.run_id }}
+            Source commit: `${{ github.sha }}`
+            Workflow run: https://github.com/dp1x/marble-arm64-windows/actions/runs/${{ github.run_id }}
+
+            ## Upstream
+            This is built from KDE Marble v${{ env.MARBLE_VERSION }}: https://invent.kde.org/education/marble/-/releases/v${{ env.MARBLE_VERSION }}
 
             This release was built automatically by GitHub Actions with Sigstore attestation.
           files: |
             marble-arm64-win-${{ env.MARBLE_VERSION }}.zip
             SHA256SUMS
           draft: false
-          prerelease: true
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
