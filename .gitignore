@@ -1,13 +1,57 @@
 .directory
 CMakeLists.txt.user
 src/apps/marble_maps/Marble.keystore
-# kde-style translation system folders
-po
-enpo
+
+# Build directories
+/build/
+/cmake-build*/
+Release/
+dist/
+
+# Artifacts - NEVER commit binaries to source
+*.zip
+*.7z
+*.tar.gz
+*.tar.xz
+*.exe
+*.dll
+*.pdb
+marble-arm64*.zip
+SHA256SUMS
+
+# IDE / editor
+.clangd
+.idea/
+*.user
+compile_commands.json
+
+# Plan/checkpoint files - these are session notes, never commit
+CHECKPOINT.md
+BLUEPRINT.md
+
+# KDE / ECM artifacts
 .cmake/
 /.clang-format
-/compile_commands.json
-.clangd
-.cache
-.idea
-/cmake-build*
+.cache/
+po/
+enpo/
+
+# CMake generated
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CPackConfig.cmake
+CPackSourceConfig.cmake
+DartConfiguration.tcl
+Makefile
+cmake_uninstall.cmake
+src/lib/marble/marble_version.h
+Testing/
+*_testrunner*
+
+# Debug logs
+debug.log
+*.log
+
+# Session plans and notes
+docs/superpowers/plans/
