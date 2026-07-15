@@ -53,7 +53,6 @@ if ($existingKeys) {
     
     # Create batch file for key generation
     $batchContent = @"
-%no-protection
 Key-Type: RSA
 Key-Length: 4096
 Subkey-Type: RSA
@@ -61,6 +60,7 @@ Subkey-Length: 4096
 Name-Real: $Name
 Name-Email: $Email
 Expire-Date: 0
+%no-protection
 %commit
 "@
     
@@ -112,12 +112,20 @@ Write-Host ""
 Write-Host "[5/5] Configuring git for GPG signing..." -ForegroundColor Yellow
 git config --global user.signingkey $keyId
 git config --global commit.gpgsign true
-git config --global gpg.program gpg
 
 Write-Host "Git configured:" -ForegroundColor Green
 Write-Host "  user.signingkey = $keyId" -ForegroundColor White
 Write-Host "  commit.gpgsign = true" -ForegroundColor White
-Write-Host "  gpg.program = gpg" -ForegroundColor White
+
+# Set gpg.program to use Gpg4win if available, otherwise use default gpg
+$gpgExe = Get-Command gpg.exe -ErrorAction SilentlyContinue | Select-Object -First 1
+if ($gpgExe) {
+    $gpgProgram = $gpgExe.Source
+} else {
+    $gpgProgram = "gpg"
+}
+git config --global gpg.program $gpgProgram
+Write-Host "  gpg.program = $gpgProgram" -ForegroundColor White
 
 Write-Host ""
 Write-Host "=== Setup Complete ===" -ForegroundColor Cyan
