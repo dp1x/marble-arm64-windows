@@ -15,13 +15,30 @@ permissions:
 
 jobs:
   build:
-    runs-on: windows-11-vs2026-arm
+    runs-on: windows-11-arm
     timeout-minutes: 240
-    env:
-      MARBLE_VERSION: 22.07.70
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine Version
+        id: get_version
+        shell: powershell
+        run: |
+          $tag = "${{ github.ref_name }}"
+          if ($tag -match '^v?(\d+\.\d+\.\d+)') {
+            $version = $Matches[1]
+          } else {
+            # Fallback for workflow_dispatch / schedule with no tag
+            $fallback = (git describe --tags --abbrev=0 2>$null)
+            if ($fallback -match '^v?(\d+\.\d+\.\d+)') { $version = $Matches[1] }
+            else { $version = "22.07.70" }
+          }
+          Write-Host "Resolved MARBLE_VERSION=$version (from ref '${{ github.ref_name }}')"
+          "MARBLE_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "MARBLE_VERSION=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
       - name: Install Dependencies (vcpkg)
         shell: powershell
@@ -33,11 +50,13 @@ jobs:
           vcpkg install qt5-svg:arm64-windows
 
       - name: Configure CMake
+        shell: powershell
         run: |
           cmake -B build -S . `
-            -G "Visual Studio 18 2026" `
+            -G "Visual Studio 17 2022" `
             -A ARM64 `
             -DCMAKE_BUILD_TYPE=Release `
+            -DRELEASE_SERVICE_VERSION=$env:MARBLE_VERSION `
             -DMARBLE_DATA_PATH="data" `
             -DCMAKE_TOOLCHAIN_FILE="C:/vcpkg/scripts/buildsystems/vcpkg.cmake" `
             -DVCPKG_TARGET_TRIPLET=arm64-windows `
