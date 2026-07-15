@@ -36,9 +36,10 @@ jobs:
             if ($fallback -match '^v?(\d+\.\d+\.\d+)') { $version = $Matches[1] }
             else { $version = "22.07.70" }
           }
+          $version = $version.Trim()
           Write-Host "Resolved MARBLE_VERSION=$version (from ref '${{ github.ref_name }}')"
-          "MARBLE_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Append
-          "MARBLE_VERSION=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          Add-Content -Path $env:GITHUB_ENV -Value "MARBLE_VERSION=$version" -Encoding utf8
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "MARBLE_VERSION=$version" -Encoding utf8
 
       - name: Install Dependencies (vcpkg)
         shell: powershell
@@ -52,11 +53,12 @@ jobs:
       - name: Configure CMake
         shell: powershell
         run: |
+          $version = $env:MARBLE_VERSION.Trim()
           cmake -B build -S . `
             -G "Visual Studio 17 2022" `
             -A ARM64 `
             -DCMAKE_BUILD_TYPE=Release `
-            -DRELEASE_SERVICE_VERSION=$env:MARBLE_VERSION `
+            -DRELEASE_SERVICE_VERSION=$version `
             -DMARBLE_DATA_PATH="data" `
             -DCMAKE_TOOLCHAIN_FILE="C:/vcpkg/scripts/buildsystems/vcpkg.cmake" `
             -DVCPKG_TARGET_TRIPLET=arm64-windows `
