@@ -49,8 +49,9 @@ jobs:
           vcpkg install protobuf:arm64-windows
           vcpkg install qt5-base:arm64-windows
           vcpkg install qt5-svg:arm64-windows
-          vcpkg install qt5-quick:arm64-windows
+          vcpkg install qt5-declarative:arm64-windows
           vcpkg install qt5-tools:arm64-windows
+          vcpkg install qt5-webchannel:arm64-windows
           vcpkg install qt5-webengine:arm64-windows
 
       - name: Configure CMake
