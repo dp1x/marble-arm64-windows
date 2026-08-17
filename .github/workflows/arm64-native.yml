@@ -55,7 +55,22 @@ jobs:
         shell: powershell
         run: |
           $env:PATH = "C:\vcpkg;" + $env:PATH
-          vcpkg install --recurse zlib:arm64-windows protobuf:arm64-windows qt5-base[core,openssl]:arm64-windows qt5-svg:arm64-windows qt5-declarative:arm64-windows qt5-tools:arm64-windows qt5-webchannel:arm64-windows qt5-webengine:arm64-windows
+          $maxRetries = 3
+          $retry = 0
+          do {
+            $retry++
+            Write-Host "vcpkg install attempt $retry of $maxRetries"
+            vcpkg install --recurse zlib:arm64-windows protobuf:arm64-windows qt5-base[core,openssl]:arm64-windows qt5-svg:arm64-windows qt5-declarative:arm64-windows qt5-tools:arm64-windows qt5-webchannel:arm64-windows qt5-webengine:arm64-windows
+            $lastExitCode = $LASTEXITCODE
+            if ($lastExitCode -ne 0 -and $retry -lt $maxRetries) {
+              Write-Host "vcpkg install failed with exit code $lastExitCode, retrying in 60 seconds..."
+              Start-Sleep -Seconds 60
+            }
+          } while ($lastExitCode -ne 0 -and $retry -lt $maxRetries)
+          if ($lastExitCode -ne 0) {
+            Write-Error "vcpkg install failed after $maxRetries attempts"
+            exit 1
+          }
 
       - name: Configure CMake
         shell: powershell
