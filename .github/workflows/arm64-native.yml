@@ -45,14 +45,15 @@ jobs:
         shell: powershell
         run: |
           $env:PATH = "C:\vcpkg;" + $env:PATH
-          vcpkg install zlib:arm64-windows
-          vcpkg install protobuf:arm64-windows
-          vcpkg install qt5-base:arm64-windows
-          vcpkg install qt5-svg:arm64-windows
-          vcpkg install qt5-declarative:arm64-windows
-          vcpkg install qt5-tools:arm64-windows
-          vcpkg install qt5-webchannel:arm64-windows
-          vcpkg install qt5-webengine:arm64-windows
+          vcpkg install --recurse \
+            zlib:arm64-windows \
+            protobuf:arm64-windows \
+            qt5-base[core,openssl]:arm64-windows \
+            qt5-svg:arm64-windows \
+            qt5-declarative:arm64-windows \
+            qt5-tools:arm64-windows \
+            qt5-webchannel:arm64-windows \
+            qt5-webengine:arm64-windows
 
       - name: Configure CMake
         shell: powershell
