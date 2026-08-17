@@ -41,6 +41,16 @@ jobs:
           Add-Content -Path $env:GITHUB_ENV -Value "MARBLE_VERSION=$version" -Encoding utf8
           Add-Content -Path $env:GITHUB_OUTPUT -Value "MARBLE_VERSION=$version" -Encoding utf8
 
+      - name: Cache vcpkg packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            C:\vcpkg\buildtrees
+            C:\vcpkg\packages
+            C:\vcpkg\installed
+            C:\vcpkg\downloads
+          key: ${{ runner.os }}-arm64-marble-vcpkg-${{ hashFiles('.github/workflows/arm64-native.yml') }}
+
       - name: Install Dependencies (vcpkg)
         shell: powershell
         run: |
