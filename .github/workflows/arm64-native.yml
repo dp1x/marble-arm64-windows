@@ -119,7 +119,7 @@ jobs:
           if (Test-Path $vcpkgPluginsDir) {
             Get-ChildItem $vcpkgPluginsDir -Recurse -Filter "*.dll" -ErrorAction SilentlyContinue |
               ForEach-Object {
-                $rel = $_.FullName.Substring($vcpkgPluginsDir.Length + 1)
+                $rel = $_.FullName.Substring($vcpkgDir.Length + 1)
                 $dest = Join-Path $distDir $rel
                 $destDir = Split-Path $dest -Parent
                 if (-not (Test-Path $destDir)) { New-Item -ItemType Directory -Path $destDir | Out-Null }
