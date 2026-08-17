@@ -95,6 +95,16 @@ jobs:
         shell: powershell
         run: cmake --build build --config Release --parallel 2
 
+      - name: Install (CMake --install)
+        shell: powershell
+        run: |
+          cmake --install build --config Release --prefix dist_install
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "CMake install failed with exit code $LASTEXITCODE"
+            exit 1
+          }
+          Write-Host "CMake install completed successfully"
+
       - name: Collect Artifacts
         shell: powershell
         run: |
@@ -152,9 +162,23 @@ jobs:
               }
           }
 
-          if (Test-Path "build\data") {
-            Copy-Item "build\data" "$distDir\data" -Recurse -Force
+          if (Test-Path "dist_install\data") {
+            if (Test-Path "$distDir\data") { Remove-Item "$distDir\data" -Recurse -Force }
+            Copy-Item "dist_install\data" "$distDir\data" -Recurse -Force
+          } else {
+            Write-Error "CRITICAL: dist_install\data not found — Marble data files missing from cmake --install output!"
+            exit 1
           }
+
+          # Verify the data directory contains real Marble data, not CMake artifacts
+          $requiredDataDirs = @("maps", "placemarks", "bitmaps", "svg")
+          foreach ($requiredDir in $requiredDataDirs) {
+            if (-not (Test-Path "$distDir\data\$requiredDir")) {
+              Write-Error "CRITICAL: data\$requiredDir missing from dist — Marble data files not installed correctly!"
+              exit 1
+            }
+          }
+          Write-Host "Data directory verified: maps, placemarks, bitmaps, svg all present"
 
           if (-not (Test-Path "dist\plugins\platforms\qwindows.dll")) {
             Write-Error "CRITICAL: qwindows.dll missing from plugins/platforms/"
