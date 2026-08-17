@@ -106,12 +106,25 @@ jobs:
               Copy-Item $_.FullName $dest -Force
             }
 
-          $vcpkgDir = "C:\vcpkg\installed\arm64-windows\bin"
+          $vcpkgDir = "C:\vcpkg\installed\arm64-windows"
+          $vcpkgBinDir = Join-Path $vcpkgDir "bin"
+          $vcpkgPluginsDir = Join-Path $vcpkgDir "plugins"
           $exclude = @("libprotobuf-lite.dll", "libprotoc.dll")
-          if (Test-Path $vcpkgDir) {
-            Get-ChildItem $vcpkgDir -Filter "*.dll" -ErrorAction SilentlyContinue |
+          if (Test-Path $vcpkgBinDir) {
+            Get-ChildItem $vcpkgBinDir -Filter "*.dll" -ErrorAction SilentlyContinue |
               Where-Object { $_.Name -notin $exclude } |
               Copy-Item -Destination $distDir -Force
+          }
+
+          if (Test-Path $vcpkgPluginsDir) {
+            Get-ChildItem $vcpkgPluginsDir -Recurse -Filter "*.dll" -ErrorAction SilentlyContinue |
+              ForEach-Object {
+                $rel = $_.FullName.Substring($vcpkgPluginsDir.Length + 1)
+                $dest = Join-Path $distDir $rel
+                $destDir = Split-Path $dest -Parent
+                if (-not (Test-Path $destDir)) { New-Item -ItemType Directory -Path $destDir | Out-Null }
+                Copy-Item $_.FullName $dest -Force
+              }
           }
 
           if (Test-Path "build\data") {
