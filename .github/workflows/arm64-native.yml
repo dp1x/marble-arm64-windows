@@ -166,15 +166,14 @@ jobs:
             if (Test-Path "$distDir\data") { Remove-Item "$distDir\data" -Recurse -Force }
             Copy-Item "dist_install\data" "$distDir\data" -Recurse -Force
           } else {
-            Write-Error "CRITICAL: dist_install\data not found — Marble data files missing from cmake --install output!"
+            Write-Error "CRITICAL: dist_install\data not found - Marble data files missing from cmake --install output!"
             exit 1
           }
 
-          # Verify the data directory contains real Marble data, not CMake artifacts
           $requiredDataDirs = @("maps", "placemarks", "bitmaps", "svg")
           foreach ($requiredDir in $requiredDataDirs) {
             if (-not (Test-Path "$distDir\data\$requiredDir")) {
-              Write-Error "CRITICAL: data\$requiredDir missing from dist — Marble data files not installed correctly!"
+              Write-Error "CRITICAL: data\$requiredDir missing from dist - Marble data files not installed correctly!"
               exit 1
             }
           }
