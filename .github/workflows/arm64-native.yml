@@ -118,13 +118,19 @@ jobs:
 
           $appDirs = @(
             "build\src\apps\marble-qt\Release",
-            "build\src\lib\marblewidget\Release"
+            "build\src\lib\marble\Release"
           )
           foreach ($dir in $appDirs) {
             if (Test-Path $dir) {
               Get-ChildItem "$dir\*.dll","$dir\*.exe" -ErrorAction SilentlyContinue |
                 Copy-Item -Destination $distDir -Force
             }
+          }
+
+          # Also copy Marble-built DLLs from cmake --install output (marblewidget-qt5.dll, astro.dll, etc.)
+          if (Test-Path "dist_install") {
+            Get-ChildItem "dist_install" -Filter "*.dll" -ErrorAction SilentlyContinue |
+              Copy-Item -Destination $distDir -Force
           }
 
           Get-ChildItem "build" -Recurse -Filter "*Plugin.dll" -ErrorAction SilentlyContinue |
@@ -183,6 +189,15 @@ jobs:
             Write-Error "CRITICAL: qwindows.dll missing from plugins/platforms/"
             exit 1
           }
+
+          $requiredDlls = @("marble-qt.exe", "marblewidget-qt5.dll", "astro.dll", "Qt5Core.dll", "Qt5Gui.dll", "Qt5Widgets.dll")
+          foreach ($requiredDll in $requiredDlls) {
+            if (-not (Test-Path "$distDir\$requiredDll")) {
+              Write-Error "CRITICAL: $requiredDll missing from dist root!"
+              exit 1
+            }
+          }
+          Write-Host "Required executables and DLLs verified: marble-qt.exe, marblewidget-qt5.dll, astro.dll, Qt5Core/Gui/Widgets.dll"
 
       - name: Create Release Archive
         shell: powershell
